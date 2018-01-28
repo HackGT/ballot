@@ -10,22 +10,22 @@ const debug = Debug('app:response');
 const logger = new winston.Logger({
     transports: [
         new winston.transports.Console({
-            level: ,
+            level: 'debug',
             timestamp: true,
             handleExceptions: true,
             json: true,
-            colorize: true
-        })
+            colorize: true,
+        }),
     ],
-    exitOnError: false
+    exitOnError: false,
 });
 
-const stream = (streamFunction) => ({
-    'stream': streamFunction
+const stream = (streamFunction: any) => ({
+    stream: streamFunction,
 });
 
-const write = (writeFunction) => ({
-    write: (message: string) => writeFunction(message)
+const write = (writeFunction: (message: any) => any) => ({
+    write: (message: any) => writeFunction(message),
 });
 
 /**
@@ -58,6 +58,6 @@ export const Logger = (scope: string) => {
         silly: (message: string, ...args: any[]) => logger.silly(format(scope, message), parse(args)),
         info: (message: string, ...args: any[]) => logger.info(format(scope, message), parse(args)),
         warn: (message: string, ...args: any[]) => logger.warn(format(scope, message), parse(args)),
-        error: (message: string, ...args: any[]) => logger.error(format(scope, message), parse(args))
+        error: (message: string, ...args: any[]) => logger.error(format(scope, message), parse(args)),
     };
 };

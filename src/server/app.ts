@@ -2,29 +2,44 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import * as cors from 'cors';
 import * as express from 'express';
-import * as http from 'http';
-import { normalizePort } from './util/server';
+import { normalizePort, verifyEnvironment } from './util/server';
 import { Environment } from './config/Environment';
+import healthcheck from './routes/healthcheck';
+import auth from './routes/auth';
+import { Logger } from './util/Logger';
 
 const app = express();
 
-// Integrate Helmet
-app.use(helmet());
-app.use(helmet.noCache());
-app.use(helmet.hsts({
-    maxAge: 31536000,
-    includeSubdomains: true
-}));
+// Throw any errors if missing configurations
+try {
+    verifyEnvironment();
 
-// Integrate Cors
-app.use(cors());
+    // Integrate Helmet
+    app.use(helmet());
+    app.use(helmet.noCache());
+    app.use(helmet.hsts({
+        maxAge: 31536000,
+        includeSubdomains: true,
+    }));
 
-// Integrate Logging
-app.use(morgan('dev'));
+    // Integrate Cors
+    app.use(cors());
 
-// Start Server
-const port = Environment.getPort();
-const server = app.listen(normalizePort('3000'));
-server.on('listening', ()=>{
-    console.log(`Listening on ${this.bind(server.address())}`);
-})
+    // Integrate Logging
+    app.use(morgan('dev'));
+
+    // Activate Routes
+    app.use('/healthcheck', healthcheck);
+    app.use('/auth', auth);
+
+    // Start Server
+    const port = Environment.getPort();
+    app.listen(normalizePort('3000'), () => {
+        console.log(`Listening on port ${port}`);
+    });
+} catch (error) {
+    Logger('server:startup').error('Server startup canceled due to missing dependencies');
+}
+
+
+
