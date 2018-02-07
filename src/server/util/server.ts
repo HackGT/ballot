@@ -1,5 +1,5 @@
-import { Environment } from "../config/Environment";
-import { Logger } from "./Logger";
+import { Environment } from '../config/Environment';
+import { Logger } from './Logger';
 
 const warn = Logger('server:startup').warn;
 
@@ -14,8 +14,8 @@ export function normalizePort(port: string): number | string | boolean {
     return false;
 }
 
-export function verifyEnvironment() {
-    if (Environment.getUrl() === '') { 
+export function verifyEnvironment(): void {
+    if (Environment.getUrl() === '') {
         warn('URL is not defined in environment variables!');
         throw new Error('missing process.env.URL');
     }

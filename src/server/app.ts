@@ -6,7 +6,11 @@ import { normalizePort, verifyEnvironment } from './util/server';
 import { Environment } from './config/Environment';
 import healthcheck from './routes/healthcheck';
 import auth from './routes/auth';
+import index from './routes/index';
 import { Logger } from './util/Logger';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
@@ -29,6 +33,7 @@ try {
     app.use(morgan('dev'));
 
     // Activate Routes
+    app.use('/', index);
     app.use('/healthcheck', healthcheck);
     app.use('/auth', auth);
 

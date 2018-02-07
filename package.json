@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "gulp",
     "postinstall": "node ./scripts/postinstall.js"
   },
   "keywords": [],
@@ -11,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/debug": "0.0.30",
+    "@types/dotenv": "^4.0.2",
     "@types/express": "^4.11.0",
     "@types/helmet": "0.0.37",
     "@types/node": "^9.4.0",

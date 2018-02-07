@@ -13,7 +13,6 @@ const logger = new winston.Logger({
             level: 'debug',
             timestamp: true,
             handleExceptions: true,
-            json: true,
             colorize: true,
         }),
     ],
