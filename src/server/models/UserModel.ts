@@ -1,7 +1,11 @@
 export interface IUserModel {
+    userId?: string;
     name: string;
     email: string;
     userClass: UserClass;
+    service: string;
+    salt?: string;
+    hash?: string;
 }
 
 export enum UserClass {

@@ -17,8 +17,27 @@ export class UserService {
             });
     }
 
-    public static findByEmail(email: string): Promise<IUserModel | undefined> {
-        return query(`SELECT * FROM users WHERE email='${email}'`)
+    public static findById(id: string): Promise<IUserModel | undefined> {
+        return query(`SELECT * FROM users WHERE userid='${id}'`)
+            .then((res) => {
+                logger.info('Searching for user: ', id);
+                if (res.rows.length === 0) {
+                    return undefined;
+                }
+                return res.rows[0] as IUserModel;
+            }).catch((err) => {
+                logger.error('FindById Failed with: ', err);
+                return undefined;
+            });
+    }
+
+    public static findByEmail(email: string, service?: string): Promise<IUserModel | undefined> {
+        let querystr = `SELECT * FROM users WHERE email='${email}'`;
+        if(service) {
+            querystr += `, service='${service}'`;
+        }
+
+        return query(querystr)
             .then((res) => {
                 logger.info('Searching for user: ', email);
                 if (res.rows.length === 0) {
@@ -82,5 +101,16 @@ export class UserService {
             }).catch((err) => {
                 logger.error('Delete failed with: ', err);
             });
+    }
+
+    public static isEmpty(): Promise<boolean> {
+        return query('SELECT count(*) FROM (SELECT 1 FROM users LIMIT 1)')
+        .then((res) => {
+            console.log(res);
+            return true;
+        }).catch((err)=> {
+            logger.error('isEmpty query failed with: ', err);
+            return false;
+        });
     }
 }

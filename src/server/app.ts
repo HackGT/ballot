@@ -9,6 +9,9 @@ import auth from './routes/auth';
 import index from './routes/index';
 import { Logger } from './util/Logger';
 import * as dotenv from 'dotenv';
+import * as session from 'express-session';
+import * as passport from 'passport';
+import { strategies, serialize, deserialize } from './config/auth';
 
 dotenv.config();
 
@@ -31,6 +34,23 @@ try {
 
     // Integrate Logging
     app.use(morgan('dev'));
+
+    // Integrate Authentication
+    app.use(session({
+        secret: Environment.getSession(),
+        resave: true,
+        saveUninitialized: true
+    }));
+    
+    for(const strategy of strategies) {
+        passport.use(strategy);
+    }
+    passport.serializeUser(serialize);
+    passport.deserializeUser(deserialize);
+
+    app.use(passport.initialize());
+    app.use(passport.session());
+
 
     // Activate Routes
     app.use('/', index);
