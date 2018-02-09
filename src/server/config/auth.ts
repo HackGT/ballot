@@ -34,7 +34,6 @@ addStrategy('facebook',
     FacebookStrategy);
 
 // Local
-console.log(process.env.AUTH_ALLOW_LOCAL)
 if (Environment.allowLocalAuth()) {
     logger.info('Local envars found, enabling Local Authentication');
     strategies.push(new LocalStrategy(

@@ -4,6 +4,6 @@ type User {
     email: String,
     name: String,
     userClass: String,
-}`
+}`;
 
 export default schema;

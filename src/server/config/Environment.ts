@@ -34,9 +34,9 @@ export class Environment {
     }
 
     public static getGithubAuth(): IGithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID !== undefined && 
+        if (process.env.AUTH_GITHUB_ID !== undefined &&
             process.env.AUTH_GITHUB_SECRET !== undefined &&
-            process.env.AUTH_CALLBACK_URL !== undefined) {
+            process.env.AUTH_GITHUB_CALLBACK_URL !== undefined) {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
@@ -50,7 +50,7 @@ export class Environment {
     public static getFacebookAuth(): IFacebookConfig | undefined {
         if (process.env.AUTH_FACEBOOK_ID !== undefined &&
             process.env.AUTH_FACEBOOK_SECRET !== undefined &&
-            process.env.AUTH_CALLBACK_URL !== undefined) {
+            process.env.AUTH_FACEBOOK_CALLBACK_URL !== undefined) {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
@@ -64,7 +64,7 @@ export class Environment {
     public static getGoogleAuth(): IGoogleConfig | undefined {
         if (process.env.AUTH_GOOGLE_ID !== undefined &&
             process.env.AUTH_GOOGLE_SECRET !== undefined &&
-            process.env.AUTH_CALLBACK_URL !== undefined) {
+            process.env.AUTH_GOOGLE_CALLBACK_URL !== undefined) {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,

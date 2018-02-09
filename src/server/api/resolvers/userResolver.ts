@@ -1,10 +1,10 @@
-import { UserService } from "../../controllers/UserService";
-import { IUserModel } from "../../models/UserModel";
+import { UserService } from '../../controllers/UserService';
+import { IUserModel } from '../../models/UserModel';
 
 const resolvers = {
     Query: {
         user: (obj: any, args: any, context: any) => {
-            let users: Promise<IUserModel|undefined>[];
+            let users: Array<Promise<IUserModel | undefined>>;
             if (args.email) {
                 users = [UserService.findByEmail(args.email)];
             } else if (args.id) {
@@ -13,12 +13,12 @@ const resolvers = {
                 users = UserService.find() as any;
             }
             return users;
-        }
+        },
     },
 
     Mutation: {
-        
-    }
-}
+
+    },
+};
 
 export default resolvers;
