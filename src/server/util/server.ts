@@ -20,8 +20,8 @@ export function verifyEnvironment(): void {
         warn('URL is not defined in environment variables!');
         throw new Error('missing process.env.URL');
     }
-    
-    if(strategies.length === 0) {
+
+    if (strategies.length === 0) {
         warn('There are no activated authentication strategies!');
         throw new Error('missing authentication strategy');
     }

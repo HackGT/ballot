@@ -6,11 +6,11 @@ const logger = Logger('UserService');
 
 export class UserService {
 
-    public static find(): Promise<[IUserModel] | undefined> {
+    public static find(): Promise<IUserModel[] | undefined> {
         return query(`SELECT * FROM users`)
             .then((res) => {
                 logger.info('Listing all users');
-                return res.rows as [IUserModel];
+                return res.rows as IUserModel[];
             }).catch((err) => {
                 logger.error('Find Failed with: ', err);
                 return undefined;
@@ -33,7 +33,7 @@ export class UserService {
 
     public static findByEmail(email: string, service?: string): Promise<IUserModel | undefined> {
         let querystr = `SELECT * FROM users WHERE email='${email}'`;
-        if(service) {
+        if (service) {
             querystr += `, service='${service}'`;
         }
 
@@ -105,12 +105,12 @@ export class UserService {
 
     public static isEmpty(): Promise<boolean> {
         return query('SELECT count(*) FROM (SELECT 1 FROM users LIMIT 1)')
-        .then((res) => {
-            console.log(res);
-            return true;
-        }).catch((err)=> {
-            logger.error('isEmpty query failed with: ', err);
-            return false;
-        });
+            .then((res) => {
+                console.log(res);
+                return true;
+            }).catch((err) => {
+                logger.error('isEmpty query failed with: ', err);
+                return false;
+            });
     }
 }
