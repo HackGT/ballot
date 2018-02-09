@@ -1,5 +1,6 @@
 CREATE TABLE public.users (
-   email text primary key, 
+   userId serial primary key,
+   email text not null UNIQUE, 
    name text not null, 
    hash text not null, 
    salt text not null,
