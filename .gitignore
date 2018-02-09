@@ -8,4 +8,6 @@ build/
 logs
 npm-debug.log
 
+package-lock.json
+
 .env

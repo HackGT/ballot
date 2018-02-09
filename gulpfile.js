@@ -41,8 +41,8 @@ gulp.task('build:client', () => {
 gulp.task('serve', ['lint', 'build:server'], () => {
     nodemon({
                 script: path.join(__dirname, 'build/app.js'),
-    watch: ['out/'],
-    ignore: ['out/public'],
+    watch: ['build/'],
+    ignore: ['build/public'],
     env: {'NODE_ENV': 'dev'}
 }).on('start', function() {
     gutil.log(gutil.colors.blue('Server started!'));

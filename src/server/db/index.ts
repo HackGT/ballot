@@ -11,10 +11,7 @@ import { Pool } from 'pg';
 //     port: config.pgsql_port, // Can override by env var: PGPORT
 // });
 
-const pool = new Pool();
+export const pool = new Pool();
 
 // Initializes a connection pool
-export default {
-    query: (text: string, params: any[]) => pool.query(text, params),
-    pool,
-};
+export const query = (text: string, params?: any[]) => pool.query(text, params);
