@@ -34,7 +34,7 @@ export class Environment {
     }
 
     public static getGithubAuth(): IGithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID !== undefined &&
+        if (process.env.AUTH_GITHUB_ID !== undefined && 
             process.env.AUTH_GITHUB_SECRET !== undefined &&
             process.env.AUTH_CALLBACK_URL !== undefined) {
             return {
