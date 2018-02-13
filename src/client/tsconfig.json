@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "outDir": "../../build/public",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "es5",
+        "jsx": "react",
+        "typeRoots": [
+            "../../node_modules/@types"
+        ],
+        "lib": [
+            "es2015",
+            "webworker",
+            "dom"
+        ]
+    },
+    "include": [
+        "./**/*"
+    ]
+}

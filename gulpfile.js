@@ -7,11 +7,11 @@ const nodemon = require('nodemon');
 const path = require('path');
 
 const tsProject = ts.createProject('./src/server/tsconfig.json');
-// const webpackConfig = require('./src/client/webpack.config.js');
+const webpackConfig = require('./src/client/webpack.config.js');
 
 gulp.task('watch', (done) => {
     // unnecessary because of hot module reloading
-    //gulp.watch('src/client/**/*', ['lint', 'build:client']);
+    // gulp.watch('src/client/**/*', ['lint', 'build:client']);
     gulp.watch('src/server/**/*', ['lint', 'build:server']);
 });
 
@@ -30,12 +30,12 @@ gulp.task('build:server', () => {
 });
 
 gulp.task('build:client', () => {
-    // webpack(webpackConfig, function (err, stats) {
-    //     if (err) throw new gutil.PluginError("webpack", err);
-    //     gutil.log("[webpack]", stats.toString({
-    //         colors: true
-    //     }))
-    // });
+    webpack(webpackConfig, function (err, stats) {
+        if (err) throw new gutil.PluginError("webpack", err);
+        gutil.log("[webpack]", stats.toString({
+            colors: true
+        }))
+    });
 });
 
 gulp.task('serve', ['lint', 'build:server'], () => {
