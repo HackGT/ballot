@@ -70,12 +70,12 @@ try {
 
     // Start Server
     const port = Environment.getPort();
-    app.listen(normalizePort('3000'), () => {
-        console.log(`Listening on port ${port}`);
+    app.listen(normalizePort(port), () => {
+        Logger('app').info(`Listening on port ${port}`);
     });
 } catch (error) {
-    Logger('server:startup').error('Server startup canceled due to missing dependencies');
-    Logger('server:startup').error(error);
+    Logger('app').error('Server startup canceled due to missing dependencies');
+    Logger('app').error(error);
 }
 
 

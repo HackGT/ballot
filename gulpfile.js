@@ -19,8 +19,12 @@ gulp.task('build', ['lint', 'build:server', 'build:client']);
 
 gulp.task('lint', () => {
     return gulp.src('src/**/*.ts')
-        .pipe(tslint({formatter: "prose"}))
-        .pipe(tslint.report({emitError: false}));
+        .pipe(tslint({
+            formatter: "prose"
+        }))
+        .pipe(tslint.report({
+            emitError: false
+        }));
 });
 
 gulp.task('build:server', () => {
@@ -40,13 +44,15 @@ gulp.task('build:client', () => {
 
 gulp.task('serve', ['lint', 'build:server'], () => {
     nodemon({
-                script: path.join(__dirname, 'build/app.js'),
-    watch: ['build/'],
-    ignore: ['build/public'],
-    env: {'NODE_ENV': 'dev'}
-}).on('start', function() {
-    gutil.log(gutil.colors.blue('Server started!'));
-});
+        script: path.join(__dirname, 'build/app.js'),
+        watch: ['build/'],
+        ignore: ['build/public'],
+        env: {
+            'NODE_ENV': 'dev'
+        }
+    }).on('start', function () {
+        gutil.log(gutil.colors.blue('Server started!'));
+    });
 });
 
 gulp.task('default', ['serve', 'watch']);

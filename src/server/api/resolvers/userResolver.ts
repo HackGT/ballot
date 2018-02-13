@@ -21,6 +21,10 @@ const resolvers = {
             return user;
         },
     },
+
+    Mutation: {
+
+    },
 };
 
 export default resolvers;
