@@ -3,21 +3,23 @@ import { IUserModel } from '../../models/UserModel';
 
 const resolvers = {
     Query: {
-        user: (obj: any, args: any, context: any) => {
-            let users: Array<Promise<IUserModel | undefined>>;
-            if (args.email) {
-                users = [UserService.findByEmail(args.email)];
-            } else if (args.id) {
-                users = [UserService.findByEmail(args.id)];
-            } else {
-                users = UserService.find() as any;
+        users: () => {
+            const users = UserService.find();
+            if (users !== undefined) {
+                return users;
             }
-            return users;
+            return [];
         },
-    },
 
-    Mutation: {
-
+        user: async (obj: any, args: any, context: any) => {
+            let user: IUserModel | undefined = undefined;
+            if (args.email) {
+                user = await UserService.findByEmail(args.email);
+            } else if (args.id) {
+                user = await UserService.findById(args.id);
+            }
+            return user;
+        },
     },
 };
 

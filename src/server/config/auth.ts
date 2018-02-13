@@ -1,8 +1,8 @@
 import { Environment } from './Environment';
 import { Logger } from '../util/Logger';
-import { Strategy as GitHubStrategy, Profile as GithubProfile } from 'passport-github2';
+import { Strategy as GitHubStrategy } from 'passport-github2';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
-import { Strategy as FacebookStrategy, Profile as FacebookProfile } from 'passport-facebook';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy, Profile } from 'passport';
 import { UserService } from '../controllers/UserService';
@@ -19,19 +19,28 @@ export const strategies: Strategy[] = [];
 const githubConfig = Environment.getGithubAuth();
 addStrategy('github',
     githubConfig,
-    GitHubStrategy);
+    GitHubStrategy,
+    (profile): string => {
+        return profile.id;
+    });
 
 // Google
 const googleConfig = Environment.getGoogleAuth();
 addStrategy('google',
     googleConfig,
-    GoogleStrategy);
+    GoogleStrategy,
+    (profile): string => {
+        return profile.id;
+    });
 
 // Facebook
 const facebookConfig = Environment.getFacebookAuth();
 addStrategy('facebook',
     facebookConfig,
-    FacebookStrategy);
+    FacebookStrategy,
+    (profile): string => {
+        return profile.id;
+    });
 
 // Local
 if (Environment.allowLocalAuth()) {
@@ -67,7 +76,6 @@ if (Environment.allowLocalAuth()) {
                         userClass: UserClass.Owner,
                         salt: salt.toString('hex'),
                         hash: hash.toString('hex'),
-                        service: 'local',
                     });
                 } else {
                     if (user === undefined) {
@@ -77,7 +85,6 @@ if (Environment.allowLocalAuth()) {
                             userClass: UserClass.Pending,
                             salt: salt.toString('hex'),
                             hash: hash.toString('hex'),
-                            service: 'local',
                         });
                     } else {
                         // TODO: display this issue using express.flash middleware
@@ -86,7 +93,7 @@ if (Environment.allowLocalAuth()) {
                     }
                 }
             } else {
-                if (!user || !user.salt || !user.hash || user.service !== 'local') {
+                if (!user || !user.salt || !user.hash) {
                     // TODO: display this issue using express.flash middleware
                     logger.error(`Attempted local account sign in - Wrong service`);
                     return done(undefined, false);
@@ -105,55 +112,59 @@ if (Environment.allowLocalAuth()) {
     logger.warn('No Local Authentication envars found.');
 }
 
-function addStrategy(name: string, config: any, strategy: any): void {
-    if (config) {
-        logger.info(`${name} envars found, enabling ${name} Authentication`);
-        strategies.push(
-            new strategy(config,
-                async (accessToken: string, refreshToken: string, profile: GithubProfile, done: (error: any, user?: any) => void) => {
-                    if (profile.emails === undefined) {
-                        // TODO: display this issue using express.flash middleware
-                        logger.error(`${name} Login attempt without public email in ${name} profile`);
-                        return done(undefined, false);
-                    } else if (profile.displayName === undefined || profile.displayName.trim() === '') {
-                        // TODO: display this issue using express.flash middleware
-                        logger.error(`${name} Login attempt without a display name in ${name} profile`);
-                        return done(undefined, false);
-                    }
-                    const isEmpty = await UserService.isEmpty();
-                    let user;
-                    // First user will be the application 'Owner'
-                    if (isEmpty) {
-                        user = await UserService.create({
-                            name: profile.displayName,
-                            email: profile.emails[0].value,
-                            userClass: UserClass.Owner,
-                            service: name,
-                        });
-                    } else {
-                        user = await UserService.findByEmail(profile.emails[0].value);
-                        // Any other new user will need to be approved
-                        if (user === undefined) {
-                            user = await UserService.create({
-                                name: profile.displayName,
-                                email: profile.emails[0].value,
-                                userClass: 0,
-                                service: name,
-                            });
-                        } else if (user.service !== name) {
-                            // TODO: display this issue using express.flash middleware
-                            logger.error(`${name} Login attempted for an account already created through ${user.service}`);
-                            return done(undefined, false);
-                        }
-                    }
-
-                    done(undefined, user);
-                }
-            )
-        );
-    } else {
-        logger.warn(`No ${name} Authentication envars found. Skipping.`);
+function addStrategy(serviceName: 'github' | 'google' | 'facebook',
+                     config: any,
+                     strategy: any,
+                     getIdFromProfile: (profile: any) => string): void {
+    if (!config) {
+        logger.warn(`No ${serviceName} Authentication envars found. Skipping.`);
+        return;
     }
+    logger.info(`${serviceName} envars found, enabling ${serviceName} Authentication`);
+
+    const newStrategy = new strategy(config,
+        async (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any) => void) => {
+            // Sanity checks
+            if (profile.emails === undefined) {
+                // TODO: display this issue using express.flash middleware
+                logger.error(`${serviceName} Login attempt without public email in ${serviceName} profile`);
+                return done(undefined, false);
+            } else if (profile.displayName === undefined || profile.displayName.trim() === '') {
+                // TODO: display this issue using express.flash middleware
+                logger.error(`${serviceName} Login attempt without a display name in ${serviceName} profile`);
+                return done(undefined, false);
+            }
+            let user;
+            // If there does not exist any other user in the database, the first one should be "Owner"
+            if (await UserService.isEmpty()) {
+                user = await UserService.create({
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    userClass: UserClass.Owner,
+                    [serviceName]: getIdFromProfile(profile),
+                });
+            } else {
+                user = await UserService.findByEmail(profile.emails[0].value);
+                // Any other new user will need to be approved
+                if (user === undefined) {
+                    user = await UserService.create({
+                        name: profile.displayName,
+                        email: profile.emails[0].value,
+                        userClass: 0,
+                        [serviceName]: getIdFromProfile(profile),
+                    });
+                    // If the found profile doesn't exist in the found user
+                } else if (user[serviceName] !== getIdFromProfile(profile)) {
+                    // TODO: display this issue using express.flash middleware
+                    logger.error(`Login attempt through ${serviceName} but account isn't integrated.`);
+                    return done(undefined, false);
+                }
+            }
+
+            done(undefined, user);
+        }
+    );
+    strategies.push(newStrategy);
 }
 
 export function serialize(user: IUserModel, done: (err: any, id?: string) => void): void {

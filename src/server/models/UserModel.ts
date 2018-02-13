@@ -3,7 +3,9 @@ export interface IUserModel {
     name: string;
     email: string;
     userClass: UserClass;
-    service: string;
+    github?: string;
+    google?: string;
+    facebook?: string;
     salt?: string;
     hash?: string;
 }
