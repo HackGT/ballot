@@ -69,7 +69,7 @@ export class UserService {
 
         // build 'SET' query
         let updateStr = '';
-        for (const key of ['email', 'name', 'userClass']) {
+        for (const key of ['email', 'name', 'userClass', 'hash', 'salt']) {
             if (user[key]) {
                 updateStr += `${key}='${user[key]}', `;
             }
