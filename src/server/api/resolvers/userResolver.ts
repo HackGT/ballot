@@ -49,7 +49,7 @@ const resolvers = {
         },
         changeUserClass: async (obj: any, args: any, context: any) => {
             let user: IUserModel | undefined = undefined;
-            if (args.email && args.newClass) {
+            if (args.email) {
                 user = await UserService.update(args.email, {userClass : args.newClass});
             }
             return user;
