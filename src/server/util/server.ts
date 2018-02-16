@@ -21,6 +21,11 @@ export function verifyEnvironment(): void {
         throw new Error('missing process.env.URL');
     }
 
+    if (Environment.getSession() === '') {
+        warn('Session Secret is not defined in environment variables!');
+        throw new Error('missing process.env.SESSION_SECRET');
+    }
+
     if (strategies.length === 0) {
         warn('There are no activated authentication strategies!');
         throw new Error('missing authentication strategy');

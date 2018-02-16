@@ -2,7 +2,7 @@ import { IUserModel } from '../models/UserModel';
 import { query } from '../db';
 import { Logger } from '../util/Logger';
 
-const logger = Logger('UserService');
+const logger = Logger('controllers/UserService');
 
 export class UserService {
 
@@ -69,8 +69,8 @@ export class UserService {
 
         // build 'SET' query
         let updateStr = '';
-        for (const key of ['email', 'name', 'userClass']) {
-            if (user[key]) {
+        for (const key of ['email', 'name', 'userClass', 'hash', 'salt']) {
+            if (key in user) {
                 updateStr += `${key}='${user[key]}', `;
             }
         }

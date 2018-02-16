@@ -17,7 +17,7 @@ interface IGoogleConfig {
 }
 
 export class Environment {
-    public static getPort(): string | number {
+    public static getPort(): string {
         return process.env.PORT || '3000';
     }
 

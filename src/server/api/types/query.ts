@@ -1,6 +1,7 @@
 const schema = `
 type Query {
-    user(email: String, id: String): [User!]!
+    user(email: String, id: String): User
+    users: [User!]!
 }
 
 schema {
