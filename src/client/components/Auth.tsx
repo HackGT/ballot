@@ -8,7 +8,7 @@ const Authorization = (allowedRoles: string[]) => (WrappedComponent: React.Compo
 
             this.state = {
                 user: {
-                    role: 'About',
+                    role: '',
                 }
             };
         }
@@ -20,7 +20,7 @@ const Authorization = (allowedRoles: string[]) => (WrappedComponent: React.Compo
                 credentials: "same-origin",
             });
             let data = await result.json();
-            if (data.a) {
+            if (data.a >= 0 && data.a <= 4) {
                 self.setState({user: {role: userModel[data.a]}});
             }
         }

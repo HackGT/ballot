@@ -4,7 +4,7 @@ import * as React from "react";
 class Judge extends React.Component {
     render() {
         return (
-            <div id="register-form">
+            <div>
                 <h1>Welcome!</h1>
                 <p>You have been approved as a Judge!</p>
             </div>
