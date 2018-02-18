@@ -1,20 +1,13 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Authorization from "./components/Auth";
-import NoSession from "./components/NoSession";
-import Hello from "./containers/Hello";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import AppContainer from "./components/AppContainer";
-import Ranking from "./components/admin/Ranking";
-import Events from "./components/admin/Events";
-import Projects from "./components/admin/Projects";
-import Users from "./components/admin/Users";
-import ProjectList from "./components/judge/ProjectList";
-import JudgingList from "./components/judge/JudgingList";
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from "redux";
+import Authorization from "./components/Auth";
+import AppContainer from "./components/AppContainer";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import NoSession from "./components/NoSession";
 import { number } from './reducers/index';
 import { StoreState } from './types/index';
 

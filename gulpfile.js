@@ -42,7 +42,7 @@ gulp.task('build:client', () => {
     });
 });
 
-gulp.task('serve', ['lint', 'build:server'], () => {
+gulp.task('serve', ['lint', 'build:client', 'build:server'], () => {
     nodemon({
         script: path.join(__dirname, 'build/app.js'),
         watch: ['build/'],

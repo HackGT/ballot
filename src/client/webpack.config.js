@@ -2,6 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 // const config = require('../../config.json');
 
 const loadLandingPage = new HTMLWebpackPlugin({
@@ -32,7 +33,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".json"]
+        extensions: [".ts", ".tsx", ".js", ".json"],
     },
 
     module: {
@@ -47,8 +48,9 @@ module.exports = {
         loadLandingPage,
         extractSass,
         new webpack.HotModuleReplacementPlugin(),
-        // new webpack.DefinePlugin({
-        //     URL: JSON.stringify(config.server.url)
-        // })
+        new Dotenv({
+            path: './.env',
+            safe: false,
+        }),
     ],
 };
