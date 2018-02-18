@@ -55,6 +55,7 @@ export class Environment {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
                 callbackURL: process.env.AUTH_FACEBOOK_CALLBACK_URL,
+                profileFields: ['id', 'name', 'email', 'displayName'],
             } as IFacebookConfig;
         }
 
