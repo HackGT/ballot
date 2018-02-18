@@ -54,7 +54,7 @@ export class UserService {
         // TODO: user validation
 
         return query(`INSERT INTO users(email, name, userClass, hash, salt)
-                        VALUES('${user.email}', '${user.name}', ${user.userClass}, '', '')`)
+                        VALUES('${user.email}', '${user.name}', ${user.userClass}, '${user.hash}', '${user.salt}')`)
             .then((res) => {
                 logger.info('Creating user: ', user.email);
                 return user;

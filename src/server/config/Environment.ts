@@ -40,7 +40,7 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_GITHUB_CALLBACK_URL,
             } as IGithubConfig;
         }
 
@@ -54,7 +54,7 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_FACEBOOK_CALLBACK_URL,
             } as IFacebookConfig;
         }
 
@@ -68,7 +68,7 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_GOOGLE_CALLBACK_URL,
             } as IGoogleConfig;
         }
 

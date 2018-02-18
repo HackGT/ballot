@@ -11,7 +11,7 @@ const webpackConfig = require('./src/client/webpack.config.js');
 
 gulp.task('watch', (done) => {
     // unnecessary because of hot module reloading
-    // gulp.watch('src/client/**/*', ['lint', 'build:client']);
+    gulp.watch('src/client/**/*', ['lint', 'build:client']);
     gulp.watch('src/server/**/*', ['lint', 'build:server']);
 });
 

@@ -92,6 +92,7 @@ if (Environment.allowLocalAuth()) {
                         return done(undefined, false);
                     }
                 }
+                return done(undefined, false);
             } else {
                 if (!user || !user.salt || !user.hash) {
                     // TODO: display this issue using express.flash middleware
@@ -104,7 +105,7 @@ if (Environment.allowLocalAuth()) {
                 } else {
                     // TODO: display this issue using express.flash middleware
                     logger.error(`Attempted local acccount sign in - Wrong password`);
-                    done(undefined, user);
+                    done(undefined, false);
                 }
             }
         }));
@@ -168,11 +169,11 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
 }
 
 export function serialize(user: IUserModel, done: (err: any, id?: string) => void): void {
-    done(undefined, user.userId);
+    done(undefined, user.email);
 }
 
 export function deserialize(id: string, done: (err: any, user?: IUserModel) => void): void {
-    UserService.findById(id).then((user) => {
+    UserService.findByEmail(id).then((user) => {
         done(undefined, user);
     }).catch((err) => {
         done(err);
