@@ -1,50 +1,77 @@
 CREATE TABLE users (
-   user_id serial primary key,
-   email text not null UNIQUE, 
-   name text not null, 
-   user_class smallint not null default 0,
-   hash text, 
-   salt text,
-   github text,
-   google text,
-   facebook text,
-   created timestamptz default now()
-)
+    user_id serial PRIMARY KEY,
+    email character varying(254) NOT NULL,
+    name character varying(64) NOT NULL UNIQUE,
+    user_class smallint NOT NULL DEFAULT 0,
+    salt character varying(32),
+    hash character varying(128),
+    github text,
+    google text,
+    facebook text,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
 
-CREATE TABLE ballots (
-    ballot_id serial primary key,
-    priority int not null,
-    status smallint not null,
-    project_id integer references projects not null ,
-    criteria_id integer references criteria not null ,
-    user_id integer references users not null ,
-    score int
-)
+CREATE TABLE projects (
+    project_id serial PRIMARY KEY,
+    devpost_id text NOT NULL UNIQUE,
+    name character varying(64) NOT NULL,
+    table_number smallint,
+    expo_number smallint,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
 
-create TABLE projects (
-    project_id serial primary key,
-    devpost_id text not null UNIQUE,
-    name text not null,
-    table_number integer, 
-    expo_number integer
-)
+CREATE TABLE categories (
+    category_id serial PRIMARY KEY,
+    name character varying(64) NOT NULL,
+    isPrimary boolean NOT NULL,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
 
-create TABLE categories (
-    category_id serial primary key,
-    name text not null,
-    isPrimary smallint not null
-)
-
-create TABLE criteria (
-    criteria_id serial primary key,
-    name text not null,
-    rubric text,
+CREATE TABLE criteria (
+    criteria_id serial PRIMARY KEY,
+    name character varying(64) NOT NULL,
+    rubric character varying(512),
     min_score smallint,
     max_score smallint,
-    category_id integer references categories not null
-)
+    category_id integer NOT NULL REFERENCES categories,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
 
-create TABLE projectCategories(
-    project_id integer references projects,
-    category_id integer references categories
-)
+CREATE TABLE ballots (
+    ballot_id serial PRIMARY KEY,
+    project_id integer NOT NULL REFERENCES projects,
+    criteria_id integer NOT NULL REFERENCES criteria,
+    user_id integer NOT NULL REFERENCES users,
+    judge_priority integer NOT NULL,
+    status smallint NOT NULL,
+    score smallint,
+    score_submitted_at timestamptz,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+
+CREATE FUNCTION set_score_submit_time()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.score_submitted_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_ballot_score_submit_time
+    BEFORE UPDATE 
+    ON public.ballots
+    FOR EACH ROW
+    WHEN (OLD.score IS DISTINCT FROM NEW.score)
+    EXECUTE PROCEDURE public.set_score_submit_time();
+
+CREATE TABLE project_categories (
+    project_id integer NOT NULL REFERENCES projects,
+    category_id integer NOT NULL REFERENCES categories,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);

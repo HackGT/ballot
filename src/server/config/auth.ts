@@ -73,7 +73,7 @@ if (Environment.allowLocalAuth()) {
                     user = await UserService.create({
                         name,
                         email,
-                        userClass: UserClass.Owner,
+                        user_class: UserClass.Owner,
                         salt: salt.toString('hex'),
                         hash: hash.toString('hex'),
                     });
@@ -82,7 +82,7 @@ if (Environment.allowLocalAuth()) {
                         user = await UserService.create({
                             name,
                             email,
-                            userClass: UserClass.Pending,
+                            user_class: UserClass.Pending,
                             salt: salt.toString('hex'),
                             hash: hash.toString('hex'),
                         });
@@ -140,7 +140,7 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
                 user = await UserService.create({
                     name: profile.displayName,
                     email: profile.emails[0].value,
-                    userClass: UserClass.Owner,
+                    user_class: UserClass.Owner,
                     [serviceName]: getIdFromProfile(profile),
                 });
             } else {
@@ -150,7 +150,7 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
                     user = await UserService.create({
                         name: profile.displayName,
                         email: profile.emails[0].value,
-                        userClass: 0,
+                        user_class: 0,
                         [serviceName]: getIdFromProfile(profile),
                     });
                     // If the found profile doesn't exist in the found user
@@ -167,11 +167,11 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
     strategies.push(newStrategy);
 }
 
-export function serialize(user: IUserModel, done: (err: any, id?: string) => void): void {
-    done(undefined, user.userId);
+export function serialize(user: IUserModel, done: (err: any, id?: number) => void): void {
+    done(undefined, user.user_id);
 }
 
-export function deserialize(id: string, done: (err: any, user?: IUserModel) => void): void {
+export function deserialize(id: number, done: (err: any, user?: IUserModel) => void): void {
     UserService.findById(id).then((user) => {
         done(undefined, user);
     }).catch((err) => {

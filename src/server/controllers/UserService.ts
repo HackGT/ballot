@@ -1,51 +1,38 @@
-import { IUserModel } from '../models/UserModel';
-import { query } from '../db';
+import { IUserModel, Users } from '../models/UserModel';
+// import { query } from '../db';
 import { Logger } from '../util/Logger';
+import * as Promise from 'bluebird';
 
 const logger = Logger('controllers/UserService');
 
 export class UserService {
 
-    public static find(): Promise<IUserModel[] | undefined> {
-        return query(`SELECT * FROM users`)
-            .then((res) => {
-                logger.info('Listing all users');
-                return res.rows as IUserModel[];
-            }).catch((err) => {
-                logger.error('Find Failed with: ', err);
+    public static find(): Promise<IUserModel[]> {
+        return Users.sync()
+            .then(() => Users.findAll())
+            .then((users) => users.map((user) => user.toJSON()))
+            .catch((err) => {
+                logger.error('find failed with: ', err);
+                return [];
+            });
+    }
+
+    public static findById(id: number): Promise<IUserModel | undefined> {
+        return Users.sync()
+            .then(() => Users.findById(id))
+            .then((user) => user ? user.toJSON() : undefined)
+            .catch((err) => {
+                logger.error('findById failed with: ', err);
                 return undefined;
             });
     }
 
-    public static findById(id: string): Promise<IUserModel | undefined> {
-        return query(`SELECT * FROM users WHERE userid='${id}'`)
-            .then((res) => {
-                logger.info('Searching for user: ', id);
-                if (res.rows.length === 0) {
-                    return undefined;
-                }
-                return res.rows[0] as IUserModel;
-            }).catch((err) => {
-                logger.error('FindById Failed with: ', err);
-                return undefined;
-            });
-    }
-
-    public static findByEmail(email: string, service?: string): Promise<IUserModel | undefined> {
-        let querystr = `SELECT * FROM users WHERE email='${email}'`;
-        if (service) {
-            querystr += `, service='${service}'`;
-        }
-
-        return query(querystr)
-            .then((res) => {
-                logger.info('Searching for user: ', email);
-                if (res.rows.length === 0) {
-                    return undefined;
-                }
-                return res.rows[0] as IUserModel;
-            }).catch((err) => {
-                logger.error('FindByEmail Failed with: ', err);
+    public static findByEmail(email: string): Promise<IUserModel | undefined> {
+        return Users.sync()
+            .then(() => Users.findOne({ where: { email } }))
+            .then((user) => user ? user.toJSON() : undefined)
+            .catch((err) => {
+                logger.error('findByEmail failed with: ', err);
                 return undefined;
             });
     }
@@ -53,63 +40,55 @@ export class UserService {
     public static create(user: IUserModel): Promise<IUserModel | undefined> {
         // TODO: user validation
 
-        return query(`INSERT INTO users(email, name, userClass, hash, salt)
-                        VALUES('${user.email}', '${user.name}', ${user.userClass}, '', '')`)
-            .then((res) => {
-                logger.info('Creating user: ', user.email);
-                return user;
-            }).catch(err => {
-                logger.error('Create Failed with: ', err);
+        return Users.sync()
+            .then(() => Users.create(user))
+            .then((newUser) => newUser.toJSON())
+            .catch((err) => {
+                logger.error('create failed with: ', err);
                 return undefined;
             });
     }
 
-    public static update(email: string, user: any): Promise<IUserModel | undefined> {
-        // TODO: user validation
+    public static update(id: number, user: any): Promise<IUserModel | undefined> {
 
-        // build 'SET' query
-        let updateStr = '';
-        for (const key of ['email', 'name', 'userClass', 'hash', 'salt']) {
-            if (key in user) {
-                updateStr += `${key}='${user[key]}', `;
-            }
-        }
-
-        // Remove the extra comma and space
-        if (updateStr.length !== 0) {
-            updateStr = updateStr.substring(0, updateStr.length - 2);
-        } else {
-            throw new Error('user should have valid attributes to be updated');
-        }
-
-        return query(`UPDATE users
-                        SET ${updateStr}
-                        WHERE email='${email}'`)
-            .then((res) => {
-                logger.info('Updating user: ', email);
-                return user;
+        return Users.sync()
+            .then(() => Users.update(user, { where: { user_id: id }, returning: true }))
+            .then(val => {
+                const [num, users] = val;
+                if (num === 0) {
+                    logger.error('update id matched no existing user');
+                    return undefined;
+                } else if (num > 1) {
+                    logger.error('updated too many users');
+                    return undefined;
+                }
+                return users[0]!.toJSON();
             }).catch((err) => {
-                logger.error('Updated Failed with: ', err);
+                logger.error('update failed with: ', err);
                 return undefined;
             });
     }
 
-    public static delete(email: string): Promise<void> {
-        return query(`DELETE FROM users WHERE email='${email}'`)
-            .then((res) => {
-                logger.info('Deleting user: ', email);
-            }).catch((err) => {
-                logger.error('Delete failed with: ', err);
+    public static delete(id: number): Promise<void> {
+        return Users.sync()
+            .then(() => Users.destroy({ where: { user_id: id } }))
+            .then((num) => {
+                if (num === 0) {
+                    logger.error('delete deleted no rows');
+                    throw new Error('No rows deleted');
+                } else if (num > 1) {
+                    logger.error('delete deleted more than one row');
+                    throw new Error('More than one row deleted');
+                }
             });
     }
 
     public static isEmpty(): Promise<boolean> {
-        return query('SELECT count(*) FROM (SELECT 1 FROM users LIMIT 1)')
-            .then((res) => {
-                console.log(res);
-                return true;
-            }).catch((err) => {
-                logger.error('isEmpty query failed with: ', err);
+        return Users.sync()
+            .then(() => Users.count())
+            .then((num) => num === 0)
+            .catch((err) => {
+                logger.error('isEmpty failed with: ', err);
                 return false;
             });
     }
