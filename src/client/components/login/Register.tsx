@@ -1,11 +1,12 @@
 import * as React from "react";
-import './Register.scss';
+import '../Login.scss';
 import { Link } from 'react-router-dom';
 
 class Register extends React.Component {
     render() {
         return (
-            <div id="register-form">
+            <div id="form">
+            <h2>Register</h2>
                 <form method="POST" action="/auth/signup">
                     <input name="name" type="text" placeholder="Name" /><br />
                     <input name="email" type="text" placeholder="Email" /><br />

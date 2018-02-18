@@ -1,17 +1,17 @@
 import * as React from "react";
 import { Link } from 'react-router-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Authorization from "./Auth";
-import YesSession from './YesSession';
+import { Route } from 'react-router-dom';
+import Authorization from "../Auth";
+import YesSession from '../YesSession';
 import LoginButtons from './LoginButtons';
-import './Login.scss';
 
 const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
 
 class Login extends React.Component {
     render() {
         return (
-            <div id="login-form">
+            <div id="form">
+                <h2>Login</h2>
                 <Route path="/login" component={UserAuth(YesSession)} />
                 <LoginButtons />
 

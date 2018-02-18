@@ -5,11 +5,10 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from "redux";
 import Authorization from "./components/Auth";
 import AppContainer from "./components/AppContainer";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
 import NoSession from "./components/NoSession";
-import { number } from './reducers/index';
-import { StoreState } from './types/index';
+import './global.scss';
 
 const UserNone = Authorization(['None']);
 const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
@@ -19,8 +18,8 @@ ReactDOM.render(
         <div>
             <Route exact path="/" component={UserAuth(AppContainer)} />
             <Switch>
-                <Route path="/login" component={Login} />
-                <Route path="/register" component={Register} />
+                <Route path="/login" component={LoginPage} />
+                <Route path="/register" component={RegisterPage} />
                 <Route path="/" component={UserNone(NoSession)} />
             </Switch>
         </div>
