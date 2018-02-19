@@ -53,8 +53,21 @@ export class UserService {
     public static create(user: IUserModel): Promise<IUserModel | undefined> {
         // TODO: user validation
 
-        return query(`INSERT INTO users(email, name, userClass, hash, salt)
-                        VALUES('${user.email}', '${user.name}', ${user.userClass}, '${user.hash}', '${user.salt}')`)
+        let insertInto = '';
+        let value = '';
+        if (user.github) {
+            insertInto = 'github';
+            value = user.github;
+        } else if (user.facebook) {
+            insertInto = 'facebook';
+            value = user.facebook;
+        } else if (user.google) {
+            insertInto = 'google';
+            value = user.google;
+        }
+
+        return query(`INSERT INTO users(email, name, userClass, hash, salt, ${insertInto})
+                        VALUES('${user.email}', '${user.name}', ${user.userClass}, '${user.hash}', '${user.salt}', '${value}')`)
             .then((res) => {
                 logger.info('Creating user: ', user.email);
                 return user;
