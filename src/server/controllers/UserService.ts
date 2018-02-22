@@ -1,7 +1,7 @@
 import { IUserModel, Users } from '../models/UserModel';
-// import { query } from '../db';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
+import { printAndThrowError } from '../util/common';
 
 const logger = Logger('controllers/UserService');
 
@@ -11,62 +11,44 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
-            .catch((err) => {
-                logger.error('find failed with: ', err);
-                return [];
-            });
+            .catch(printAndThrowError('find', logger));
     }
 
     public static findById(id: number): Promise<IUserModel | undefined> {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
-            .catch((err) => {
-                logger.error('findById failed with: ', err);
-                return undefined;
-            });
+            .catch(printAndThrowError('findById', logger));
     }
 
     public static findByEmail(email: string): Promise<IUserModel | undefined> {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
-            .catch((err) => {
-                logger.error('findByEmail failed with: ', err);
-                return undefined;
-            });
+            .catch(printAndThrowError('findByEmail', logger));
     }
 
     public static create(user: IUserModel): Promise<IUserModel | undefined> {
-        // TODO: user validation
-
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
-            .catch((err) => {
-                logger.error('create failed with: ', err);
-                return undefined;
-            });
+            .catch(printAndThrowError('create', logger));
     }
 
-    public static update(id: number, user: any): Promise<IUserModel | undefined> {
+    public static update(id: number, user: Partial<IUserModel>): Promise<IUserModel | undefined> {
 
         return Users.sync()
-            .then(() => Users.update(user, { where: { user_id: id }, returning: true }))
+            .then(() => Users.update(user as IUserModel, { where: { user_id: id }, returning: true }))
             .then(val => {
                 const [num, users] = val;
                 if (num === 0) {
                     logger.error('update id matched no existing user');
                     return undefined;
                 } else if (num > 1) {
-                    logger.error('updated too many users');
-                    return undefined;
+                    throw new Error('Update query modified more than one user');
                 }
                 return users[0]!.toJSON();
-            }).catch((err) => {
-                logger.error('update failed with: ', err);
-                return undefined;
-            });
+            }).catch(printAndThrowError('update', logger));
     }
 
     public static delete(id: number): Promise<void> {
@@ -74,22 +56,17 @@ export class UserService {
             .then(() => Users.destroy({ where: { user_id: id } }))
             .then((num) => {
                 if (num === 0) {
-                    logger.error('delete deleted no rows');
                     throw new Error('No rows deleted');
                 } else if (num > 1) {
-                    logger.error('delete deleted more than one row');
                     throw new Error('More than one row deleted');
                 }
-            });
+            }).catch(printAndThrowError('delete', logger));
     }
 
     public static isEmpty(): Promise<boolean> {
         return Users.sync()
             .then(() => Users.count())
             .then((num) => num === 0)
-            .catch((err) => {
-                logger.error('isEmpty failed with: ', err);
-                return false;
-            });
+            .catch(printAndThrowError('isEmpty', logger));
     }
 }

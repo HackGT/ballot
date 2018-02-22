@@ -5,12 +5,13 @@ import { Criteria } from './CriteriaModel';
 import { Users } from './UserModel';
 
 // Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
-const { INTEGER, SMALLINT, DATE } = Sequelize;
+const { INTEGER, SMALLINT, DATE, ENUM } = Sequelize;
 
 export enum BallotStatus {
-    unfilled = 0,
-    filled = 1,
-    reviewed = 2,
+    Pending = 'Pending',
+    Assigned = 'Assigned',
+    Submitted = 'Submitted',
+    Reviewed = 'Reviewed',
 }
 
 export interface IBallotModel {
@@ -42,7 +43,7 @@ export const Ballots: Sequelize.Model<undefined, IBallotModel> =
                 model: Users, key: 'user_id',
             },
         },
-        status: { type: SMALLINT, allowNull: false },
+        status: { type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'), allowNull: false },
         score: { type: SMALLINT },
         score_submitted_at: { type: DATE },
     });

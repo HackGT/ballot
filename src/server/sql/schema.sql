@@ -1,8 +1,10 @@
+CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner')
+
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
     email character varying(254) NOT NULL,
     name character varying(64) NOT NULL UNIQUE,
-    user_class smallint NOT NULL DEFAULT 0,
+    user_class userclass NOT NULL DEFAULT 'Pending',
     salt character varying(32),
     hash character varying(128),
     github text,
@@ -25,7 +27,7 @@ CREATE TABLE projects (
 CREATE TABLE categories (
     category_id serial PRIMARY KEY,
     name character varying(64) NOT NULL,
-    isPrimary boolean NOT NULL,
+    is_primary boolean NOT NULL,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
 );
@@ -41,13 +43,14 @@ CREATE TABLE criteria (
     updated_at timestamptz DEFAULT now()
 );
 
+CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed')
 CREATE TABLE ballots (
     ballot_id serial PRIMARY KEY,
     project_id integer NOT NULL REFERENCES projects,
     criteria_id integer NOT NULL REFERENCES criteria,
     user_id integer NOT NULL REFERENCES users,
     judge_priority integer NOT NULL,
-    status smallint NOT NULL,
+    ballot_status ballotstatus NOT NULL,
     score smallint,
     score_submitted_at timestamptz,
     created_at timestamptz DEFAULT now(),

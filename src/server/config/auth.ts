@@ -8,8 +8,7 @@ import { Strategy, Profile } from 'passport';
 import { UserService } from '../controllers/UserService';
 import { UserClass, IUserModel } from '../models/UserModel';
 import { Request } from 'express';
-import * as crypto from 'crypto';
-import { pbkdf2Async } from '../util/common';
+import { pbkdf2Async, hashPassword } from '../util/common';
 
 const logger = Logger('config/auth');
 
@@ -65,17 +64,15 @@ if (Environment.allowLocalAuth()) {
                     return done(undefined, false);
                 }
 
-                const salt = crypto.randomBytes(32);
-                const hash = await pbkdf2Async(password, salt, 3000);
-
+                const {salt, hash} = await hashPassword(password);
 
                 if (isEmpty) {
                     user = await UserService.create({
                         name,
                         email,
                         user_class: UserClass.Owner,
-                        salt: salt.toString('hex'),
-                        hash: hash.toString('hex'),
+                        salt,
+                        hash,
                     });
                 } else {
                     if (user === undefined) {
@@ -83,8 +80,8 @@ if (Environment.allowLocalAuth()) {
                             name,
                             email,
                             user_class: UserClass.Pending,
-                            salt: salt.toString('hex'),
-                            hash: hash.toString('hex'),
+                            salt,
+                            hash,
                         });
                     } else {
                         // TODO: display this issue using express.flash middleware
@@ -150,7 +147,7 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
                     user = await UserService.create({
                         name: profile.displayName,
                         email: profile.emails[0].value,
-                        user_class: 0,
+                        user_class: UserClass.Pending,
                         [serviceName]: getIdFromProfile(profile),
                     });
                     // If the found profile doesn't exist in the found user

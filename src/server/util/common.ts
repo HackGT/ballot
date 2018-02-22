@@ -15,3 +15,17 @@ export function pbkdf2Async(password: string | Buffer,
         });
     });
 }
+
+export async function hashPassword(password: string): Promise<{ salt: string, hash: string }> {
+    const salt = crypto.randomBytes(32);
+    const hash = await pbkdf2Async(password, salt, 3000);
+
+    return { salt: salt.toString('hex'), hash: hash.toString('hex') };
+}
+
+export function printAndThrowError(service: string, logger: any): (err: Error) => never {
+    return (err) => {
+        logger.error(`${service} failed with error: `, err);
+        throw err;
+    };
+}

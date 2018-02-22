@@ -1,7 +1,6 @@
 import { UserService } from '../../controllers/UserService';
-import { IUserModel, UserClass } from '../../models/UserModel';
-import * as crypto from 'crypto';
-import { pbkdf2Async } from '../../util/common';
+import { IUserModel } from '../../models/UserModel';
+import { hashPassword } from '../../util/common';
 import { UserFilter } from '../types/user';
 
 
@@ -34,22 +33,16 @@ const resolvers = {
             return user;
         },
         changePassword: async (obj: any, args: any, context: any) => {
-            const salt = crypto.randomBytes(32);
-            const hash = await pbkdf2Async(args.newPassword, salt, 3000);
+
+            const { salt, hash } = await hashPassword(args.password);
 
             const user = await UserService.update(args.id, { hash, salt });
 
             return user;
         },
         changeUserClass: async (obj: any, args: any, context: any) => {
-            const user = await UserService.update(args.id, { user_class: UserClass[args.newClass] });
+            const user = await UserService.update(args.id, { user_class: args.newClass });
             return user;
-        },
-    },
-
-    User: {
-        user_class: (obj: any, args: any, context: any) => {
-            return UserClass[obj.user_class];
         },
     },
 };
