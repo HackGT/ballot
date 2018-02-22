@@ -1,4 +1,4 @@
-# Ballot
+# Ballot [![Build Status](https://travis-ci.org/HackGT/ballot.svg?branch=master)](https://travis-ci.org/HackGT/ballot)
 
 Stack ranking solution for judge assignment, management, and scoring.
 
