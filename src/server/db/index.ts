@@ -1,17 +1,26 @@
-import { Pool } from 'pg';
+import * as Sequelize from 'sequelize';
+import { Environment } from '../config/Environment';
 
+const config = Environment.getDatabaseConfig();
 
-// const isProduction = process.env.NODE_ENV === 'production';
+if (config === undefined) {
+    throw new Error('Expected: PostgresQL Configuration in Environment Variables');
+}
 
-// const pool = new Pool({
-//     host: isProduction ? config.pgsql_hostname_prod : config.pgsql_hostname_dev, // Can override by env var: PGHOST
-//     database: config.pgsql_database, // Can override by env var: PGDATABASE
-//     user: config.pgsql_username, // Can override by env var: PGUSER
-//     password: config.pgsql_password, // Can override by env var: PGPASSWORD
-//     port: config.pgsql_port, // Can override by env var: PGPORT
-// });
-
-export const pool = new Pool();
-
-// Initializes a connection pool
-export const query = (text: string, params?: any[]) => pool.query(text, params);
+export const sequelize = new Sequelize(config.database, config.username, config.password, {
+    host: config.host,
+    port: config.port,
+    dialect: 'postgres',
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+    },
+    operatorsAliases: false,
+    define: {
+        timestamps: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+    },
+});
