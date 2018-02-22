@@ -28,9 +28,9 @@ First, clone the repository and run `npm install`. This will create a `.env` fil
 | AUTH_AUTH_GOOGLE_CALLBACK_URL   |  For authentication, necessary for Google OAuth                                                     |
 | AUTH_ALLOW_LOCAL                |  For authentication, necessary for Local Authentication                                             |
 
-You must have at least one authentication strategy set up in order for the server to run properly.
+*You must have at least one authentication strategy set up in order for the server to run properly.*
 
-To build and run the server in development, run `npm start`.
+Once you have set your environment variables, you can build and run the server in development by running `npm start`.
 
 Visit `http://localhost:3000`, and you are good to go!
 
@@ -38,7 +38,7 @@ Visit `http://localhost:3000`, and you are good to go!
 
 ### Manual Deployment
 
-Run `npm build` to build the server followed by `npm serve` to serve the application in production.
+Run `npm run build` to build the server followed by `npm run serve` to serve the application in production.
 
 ### Docker
 
@@ -50,7 +50,7 @@ TODO: Heroku link
 
 ## Contributing
 
-We greatly appreciate all feature requests and contributions! See [`CONTRIBUTING.md`](https://github.com/AJLiu/hackgt-boilerplate/blob/master/CONTRIBUTING.md) if you want to get more involved.
+We greatly appreciate all feature requests and contributions! See [`CONTRIBUTING.md`](https://github.com/hackgt/ballot/blob/master/CONTRIBUTING.md) if you want to get more involved.
 
 ## License
 
