@@ -18,8 +18,10 @@ export interface ICategoryModel {
     crtieria: ICriteriaModel[];
 }
 
-export const Categories: Sequelize.Model<undefined, CategoryModel> =
-    sequelize.define<undefined, CategoryModel>('categories', {
+interface ICategoryInstance extends Sequelize.Instance<ICategoryModel> {
+}
+
+export const Categories: Sequelize.Model<ICategoryInstance, ICategoryModel> = sequelize.define<ICategoryInstance, ICategoryModel>('categories', 
         category_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
         is_primary: { type: BOOLEAN, allowNull: false },
