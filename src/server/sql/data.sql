@@ -5,9 +5,9 @@
 
 -- Users
 INSERT INTO users(email, name, user_class)
-    VALUES ('test1@hack.gt', 'Some guys name', 2),
-           ('test2@gatech.edu', 'Some judge name', 1),
-           ('letmein@gmail.com', 'Some random dudes name', 0)
+    VALUES ('test1@hack.gt', 'Some guys name', 'Owner'),
+           ('test2@gatech.edu', 'Some judge name', 'Judge'),
+           ('letmein@gmail.com', 'Some random dudes name', 'Pending')
 
 -- projects
 
