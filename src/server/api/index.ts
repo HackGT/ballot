@@ -4,10 +4,13 @@ import user from './types/user';
 import root from './types/';
 import userResolver from './resolvers/userResolver';
 
+import project from './types/project';
+import projectResolver from './resolvers/projectResolver';
+
 
 const schema = mergeSchemas({
-    schemas: [user, root],
-    resolvers: [userResolver],
+    schemas: [user, project, root],
+    resolvers: [userResolver, projectResolver],
 });
 
 export default schema;

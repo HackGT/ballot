@@ -1,4 +1,4 @@
-CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner')
+CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner');
 
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
@@ -43,7 +43,7 @@ CREATE TABLE criteria (
     updated_at timestamptz DEFAULT now()
 );
 
-CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed')
+CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed');
 CREATE TABLE ballots (
     ballot_id serial PRIMARY KEY,
     project_id integer NOT NULL REFERENCES projects,
@@ -66,7 +66,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER update_ballot_score_submit_time
-    BEFORE UPDATE 
+    BEFORE UPDATE
     ON public.ballots
     FOR EACH ROW
     WHEN (OLD.score IS DISTINCT FROM NEW.score)

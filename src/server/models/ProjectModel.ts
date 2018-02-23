@@ -17,8 +17,11 @@ export interface IProjectModel extends ProjectModel {
     categories: ICategoryModel[];
 }
 
-export const Projects: Sequelize.Model<undefined, ProjectModel> =
-    sequelize.define<undefined, ProjectModel>('projects', {
+interface IProjectInstance extends Sequelize.Instance<IProjectModel> {
+}
+
+export const Projects: Sequelize.Model<IProjectInstance, ProjectModel> =
+    sequelize.define<IProjectInstance, ProjectModel>('projects', {
         project_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         devpost_id: { type: STRING(64), allowNull: false, unique: true },
         name: { type: STRING(64), allowNull: false },
