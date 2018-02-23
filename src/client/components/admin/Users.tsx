@@ -5,9 +5,9 @@ interface UsersProps {}
 
 const Users: React.SFC<UsersProps> = (props) => {
     return (
-        <div id='register-form'>
-            <h1>Welcome!</h1>
-            <p>You have been approved as a Users!</p>
+        <div>
+            <h1>Users</h1>
+            <p>This is where user management will be.</p>
         </div>
     );
 };

@@ -16,11 +16,11 @@ const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
 ReactDOM.render(
     <Router>
         <div>
-            <Route exact path='/' component={UserAuth(AppContainer)} />
+            <Route component={UserAuth(AppContainer)} />
             <Switch>
                 <Route path='/login' component={LoginPage} />
                 <Route path='/register' component={RegisterPage} />
-                <Route path='/' component={UserNone(NoSession)} />
+                <Route component={UserNone(NoSession)} />
             </Switch>
         </div>
     </Router>,

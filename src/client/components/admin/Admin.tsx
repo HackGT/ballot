@@ -5,9 +5,9 @@ interface AdminProps {}
 
 const Admin: React.SFC<AdminProps> = (props) => {
     return (
-        <div id='register-form'>
+        <div>
             <h1>Welcome!</h1>
-            <p>You have been approved as a admin!</p>
+            <p>You are an admin.</p>
         </div>
     );
 };

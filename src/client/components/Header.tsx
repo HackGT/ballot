@@ -1,12 +1,13 @@
 import * as React from 'react';
-// import './Header.scss';
+import { Link } from 'react-router-dom';
+import './Header.scss';
 
 interface HeaderProps {}
 
 const Header: React.SFC<HeaderProps> = (props) => {
     return (
-        <div>
-            <h1>Ballot @ HackGT</h1>
+        <div className='header'>
+            <h1><Link to='/'>Ballot @ HackGT</Link></h1>
         </div>
     );
 };
