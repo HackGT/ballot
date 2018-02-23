@@ -1,0 +1,37 @@
+@import './../util/variables.scss';
+
+div.login {
+    text-align: center;
+    form {
+        input {
+            display: block;
+            font-size: 1.1em;
+            margin: 0 auto 10px auto;
+            border: none;
+            outline: none;
+            &[type=submit] {
+                background: $colorAccent;
+                color: $colorText;
+                padding: 10px 50px;
+            }
+    
+            &[type=submit]:hover {
+                background: $colorAccent - 15;
+                color: $colorText;
+                padding: 10px 50px;
+                cursor: pointer;
+            }
+    
+            &[type=submit]:active {
+                background: $colorAccent - 25;
+            }
+    
+            &[type=text], &[type=password] {
+                width: 80%;
+                max-width: 250px;
+                padding: 20px 20px;
+                border: 2px solid $colorText;
+            }
+        }
+    }
+}

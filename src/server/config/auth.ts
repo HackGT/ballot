@@ -89,6 +89,7 @@ if (Environment.allowLocalAuth()) {
                         return done(undefined, false);
                     }
                 }
+                return done(undefined, false);
             } else {
                 if (!user || !user.salt || !user.hash) {
                     // TODO: display this issue using express.flash middleware
@@ -101,7 +102,7 @@ if (Environment.allowLocalAuth()) {
                 } else {
                     // TODO: display this issue using express.flash middleware
                     logger.error(`Attempted local acccount sign in - Wrong password`);
-                    done(undefined, user);
+                    done(undefined, false);
                 }
             }
         }));

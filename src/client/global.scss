@@ -1,0 +1,13 @@
+@import './util/variables.scss';
+
+* {
+    font-family: 'Barlow', sans-serif;
+    background: $colorBackground;
+    color: $colorText;
+    padding: 0;
+    margin: 0;
+}
+
+h1 {
+    font-size: 2.5em;
+}

@@ -3,10 +3,10 @@ CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner');
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
     email character varying(254) NOT NULL,
-    name character varying(64) NOT NULL UNIQUE,
+    name character varying(64) NOT NULL,
     user_class userclass NOT NULL DEFAULT 'Pending',
-    salt character varying(32),
-    hash character varying(128),
+    salt character varying(64),
+    hash character varying(256),
     github text,
     google text,
     facebook text,
