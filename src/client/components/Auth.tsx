@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Redirect } from 'react-router-dom';
 
-const Authorization = (allowedRoles: string[]) => (WrappedComponent: React.ComponentClass) => {
+const Authorization = (allowedRoles: string[]) => (WrappedComponent: React.ComponentClass<any> | React.StatelessComponent<any>) => {
     return class WithAuthorization extends React.Component<{}, { user: {role: string} }> {
         constructor(props: any) {
             super(props);
@@ -9,31 +9,33 @@ const Authorization = (allowedRoles: string[]) => (WrappedComponent: React.Compo
             this.state = {
                 user: {
                     role: '',
-                }
+                },
             };
         }
 
-        async componentDidMount() {
+        public async componentDidMount(): Promise<void> {
             const self = this;
-            const userModel = ['Pending', 'Judge', 'Admin', 'Owner', 'None'];
-            let result = await fetch('/auth/user_data/class', {
-                credentials: "same-origin",
+            const userModel = ['Pending', 'Judge', 'Admin', 'Owner'];
+            const result = await fetch('/auth/user_data/class', {
+                credentials: 'same-origin',
             });
-            let data = await result.json();
-            if (data.a >= 0 && data.a <= 4) {
-                self.setState({user: {role: userModel[data.a]}});
+            const data = await result.json();
+            if (userModel.includes(data.a)) {
+                self.setState({user: {role: data.a}});
+            } else {
+                self.setState({user: {role: 'None'}});
             }
         }
 
-        render() {
+        public render(): React.ReactElement<any> {
             const { role } = this.state.user;
-            if (allowedRoles.indexOf(role) > -1) {
+            if (allowedRoles.includes(role)) {
                 return <WrappedComponent {...this.props} />;
             } else {
-                return '';
+                return null;
             }
         }
-    }
-}
+    };
+};
 
 export default Authorization;

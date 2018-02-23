@@ -1,30 +1,30 @@
-import * as React from "react";
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
-import Authorization from "../Auth";
+import Authorization from '../Auth';
 import YesSession from '../YesSession';
 import LoginButtons from './LoginButtons';
 
 const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
 
-class Login extends React.Component {
-    render() {
-        return (
-            <div id="form">
-                <h2>Login</h2>
-                <Route path="/login" component={UserAuth(YesSession)} />
-                <LoginButtons />
+interface LoginProps {}
 
-                <form action="/auth/login" method="POST">
-                    <input name="email" type="text" placeholder="Email" /><br />
-                    <input name="password" type="password" placeholder="Password" /><br />
-                    <input type="submit" value="Login" />
-                </form>
+const Login: React.SFC<LoginProps> = (props) => {
+    return (
+        <div className='login'>
+            <h2>Login</h2>
+            <Route path='/login' component={UserAuth(YesSession)} />
+            <LoginButtons />
 
-                <Link to="/register">Register</Link>
-            </div>
-        )
-    };
-}
+            <form action='/auth/login' method='POST'>
+                <input name='email' type='text' placeholder='Email' />
+                <input name='password' type='password' placeholder='Password' />
+                <input type='submit' value='Login' />
+            </form>
 
-export default Login
+            <Link to='/register'>Register</Link>
+        </div>
+    );
+};
+
+export default Login;

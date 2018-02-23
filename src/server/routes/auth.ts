@@ -20,7 +20,7 @@ router.get('/user_data', (req, res) => {
             userid: req.user.userid,
             email: req.user.email,
             name: req.user.name,
-            userclass: req.user.userclass,
+            user_class: req.user.user_class,
         });
     }
 });
@@ -32,7 +32,7 @@ router.get('/user_data/class', (req, res) => {
         });
     } else {
         res.json({
-            a: req.user.userclass,
+            a: req.user.user_class,
         });
     }
 });

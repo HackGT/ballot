@@ -1,10 +1,12 @@
-import * as React from "react";
+import * as React from 'react';
 import './Login.scss';
 import Login from './login/Login';
 import Header from './Header';
 import Navigation from './Navigation';
 
-const LoginPage = (props: any) => {
+interface LoginPageProps {}
+
+const LoginPage: React.SFC<LoginPageProps> = (props) => {
     return (
         <div>
             <Header />
@@ -12,6 +14,6 @@ const LoginPage = (props: any) => {
             <Login />
         </div>
     );
-}
+};
 
-export default LoginPage
+export default LoginPage;

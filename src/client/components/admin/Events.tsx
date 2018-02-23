@@ -1,15 +1,15 @@
-import * as React from "react";
+import * as React from 'react';
 // import './Events.scss';
 
-class Events extends React.Component {
-    render() {
-        return (
-            <div id="register-form">
-                <h1>Welcome!</h1>
-                <p>You have been approved as a Events!</p>
-            </div>
-        )
-    };
-}
+interface EventsProps {}
 
-export default Events
+const Events: React.SFC<EventsProps> = (props) => {
+    return (
+        <div id='register-form'>
+            <h1>Welcome!</h1>
+            <p>You have been approved as a Events!</p>
+        </div>
+    );
+};
+
+export default Events;

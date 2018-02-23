@@ -1,23 +1,13 @@
-import { makeExecutableSchema } from 'graphql-tools';
-const { mergeTypes, mergeResolvers } = require('merge-graphql-schemas');
+import { mergeSchemas } from 'graphql-tools';
+
 import user from './types/user';
-import query from './types/query';
-import mutation from './types/mutation';
+import root from './types/';
 import userResolver from './resolvers/userResolver';
 
-const typeDefs = mergeTypes([
-    user,
-    query,
-    mutation,
-]);
 
-const resolvers = mergeResolvers([
-    userResolver,
-]);
-
-const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
+const schema = mergeSchemas({
+    schemas: [user, root],
+    resolvers: [userResolver],
 });
 
 export default schema;

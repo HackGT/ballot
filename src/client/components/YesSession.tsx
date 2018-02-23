@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Redirect } from 'react-router-dom';
 
-class YesSession extends React.Component {
-    render() {
-        return (
-            <Redirect to="/" />
-        )
-    };
-}
+interface YesSessionProps {}
 
-export default YesSession
+const YesSession: React.SFC<YesSessionProps> = (props) => {
+    return (
+        <Redirect to='/' />
+    );
+};
+
+export default YesSession;

@@ -18,7 +18,7 @@ gulp.task('watch', (done) => {
 gulp.task('build', ['lint', 'build:server', 'build:client']);
 
 gulp.task('lint', () => {
-    return gulp.src('src/**/*.ts')
+    return gulp.src(['src/**/*.ts', 'src/**/*.tsx'])
         .pipe(tslint({
             formatter: "prose"
         }))

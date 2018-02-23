@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Redirect } from 'react-router-dom';
 
-class NoSession extends React.Component {
-    render() {
-        return (
-            <Redirect from="*" to="/login" />
-        )
-    };
-}
+interface NoSessionProps {}
 
-export default NoSession
+const NoSession: React.SFC<NoSessionProps> = (props) => {
+    return (
+        <Redirect from='*' to='/login' />
+    );
+};
+
+export default NoSession;

@@ -1,22 +1,21 @@
-import * as React from "react";
-import '../Login.scss';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-class Register extends React.Component {
-    render() {
-        return (
-            <div id="form">
-            <h2>Register</h2>
-                <form method="POST" action="/auth/signup">
-                    <input name="name" type="text" placeholder="Name" /><br />
-                    <input name="email" type="text" placeholder="Email" /><br />
-                    <input name="password" type="password" placeholder="Password" /><br />
-                    <input type="submit" value="Register" />
-                </form>
-                <Link to="/login">Back</Link>
-            </div>
-        )
-    };
-}
+interface RegisterProps {}
 
-export default Register
+const Register: React.SFC<RegisterProps> = (props) => {
+    return (
+        <div className='login'>
+        <h2>Register</h2>
+            <form method='POST' action='/auth/signup'>
+                <input name='name' type='text' placeholder='Name' />
+                <input name='email' type='text' placeholder='Email' />
+                <input name='password' type='password' placeholder='Password' />
+                <input type='submit' value='Register' />
+            </form>
+            <Link to='/login'>Back</Link>
+        </div>
+    );
+};
+
+export default Register;
