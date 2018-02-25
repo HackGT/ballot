@@ -1,0 +1,37 @@
+@import './../../util/variables.scss';
+    
+div.user-table {
+    width: 100%;
+    table {
+        width: 100%;
+
+        td {
+            padding: 5px 0;
+        }
+
+        td:last-child {
+            width: 10px;
+        }
+    }
+}
+
+div.class-selector {
+    white-space: nowrap;
+    button {
+        font-family: inherit;
+        font-size: inherit;
+        outline: none;
+        display: inline-block;
+        padding: 5px 10px;
+        border: 1px solid $colorText;
+    }
+
+    button:hover, button.selected:hover {
+        background: $colorAccent;
+        cursor: pointer;
+    }
+
+    button.selected {
+        background: $colorBackground + 50;
+    }
+}

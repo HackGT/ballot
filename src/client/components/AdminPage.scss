@@ -7,10 +7,11 @@ div.admin-container {
 }
 
 div.admin-left {
-    width: 200px;
+    width: 150px;
 }
 
 div.admin-right {
-    width: auto;
+    // width: auto;
+    flex-grow: 1;
     min-width: 400px;
 }
