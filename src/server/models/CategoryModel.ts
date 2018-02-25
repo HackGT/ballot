@@ -5,12 +5,6 @@ import { ICriteriaModel } from './CriteriaModel';
 // Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
 const { INTEGER, STRING, BOOLEAN } = Sequelize;
 
-interface CategoryModel {
-    category_id: number;
-    name: string;
-    is_primary: boolean;
-}
-
 export interface ICategoryModel {
     category_id: number;
     name: string;

@@ -11,14 +11,14 @@ export interface ICriteriaModel {
     rubric: string;
     min_score: number;
     max_score: number;
-}
-
-interface CriteriaModel extends ICriteriaModel {
     category_id: number;
 }
 
-export const Criteria: Sequelize.Model<undefined, CriteriaModel> =
-    sequelize.define<undefined, CriteriaModel>('criteria', {
+interface ICriteriaInstance extends Sequelize.Instance<ICriteriaModel> {
+}
+
+export const Criteria: Sequelize.Model<ICriteriaInstance, ICriteriaModel> =
+    sequelize.define<ICriteriaInstance, ICriteriaModel>('criteria', {
         criteria_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
         rubric: { type: STRING(512) },
