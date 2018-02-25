@@ -43,14 +43,14 @@ export class CategoryService {
     }
 
     public static addCriteria(category_id: number, name: string, rubric: string,
-                              min_score: number, max_score: number): Promise<ICriteriaModel | undefined> {
+                              min_score: number, max_score: number): Promise<ICategoryModel | undefined> {
         return Criteria.sync()
             .then(() => Criteria.findOrCreate({ where: { category_id, name, rubric, min_score, max_score}}))
             .spread((criteria, created) => {
                 if (!created) {
                     throw new Error('Criteria Already Exists!');
                 } else {
-                    return criteria as ICriteriaModel;
+                    return CategoryService.findById((criteria as ICriteriaModel).category_id);
                 }
             })
             .catch(printAndThrowError('addCriteria', logger));
