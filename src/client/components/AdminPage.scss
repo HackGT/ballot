@@ -1,0 +1,16 @@
+@import './../util/variables.scss';
+
+div.admin-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+div.admin-left {
+    width: 200px;
+}
+
+div.admin-right {
+    width: auto;
+    min-width: 400px;
+}
