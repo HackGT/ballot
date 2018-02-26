@@ -3,8 +3,10 @@ import * as ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import Authorization from './components/Auth';
-import AppContainer from './components/AppContainer';
+import rootReducer from './reducers/rootReducer';
+import App from './components/App';
+import Authorization from './components/Authorization';
+import FetcherContainer from './containers/FetcherContainer';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import NoSession from './components/NoSession';
@@ -13,16 +15,21 @@ import './global.scss';
 const UserNone = Authorization(['None']);
 const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
 
+const store = createStore(rootReducer);
+
 ReactDOM.render(
     <Router>
-        <div>
-            <Route exact path='/' component={UserAuth(AppContainer)} />
-            <Switch>
-                <Route path='/login' component={LoginPage} />
-                <Route path='/register' component={RegisterPage} />
-                <Route path='/' component={UserNone(NoSession)} />
-            </Switch>
-        </div>
+    	<Provider store={store}>
+            <div>
+                <FetcherContainer />
+                <Route exact path='/' component={UserAuth(App)} />
+                <Switch>
+                    <Route path='/login' component={LoginPage} />
+                    <Route path='/register' component={RegisterPage} />
+                    <Route path='/' component={UserNone(NoSession)} />
+                </Switch>
+            </div>
+        </Provider>
     </Router>,
     document.getElementById('app') as HTMLElement
 );

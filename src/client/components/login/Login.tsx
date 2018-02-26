@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
-import Authorization from '../Auth';
+import Authorization from '../Authorization';
 import YesSession from '../YesSession';
 import LoginButtons from './LoginButtons';
 
