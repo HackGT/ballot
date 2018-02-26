@@ -6,20 +6,26 @@ type Query {
 }
 
 type Mutation {
-    changeName(id: Int!, newName: String!): Project
-    changeTableNumber(id: Int!, newTableNumber: Int!): Project
-    changeExpoNumber(id: Int!, newExpoNUmber: Int!): Project
+    createProject(input: ProjectInput): Project
+    updateProject(id: Int!, input: ProjectInput): Project
 }
 
 # Filters for retrieving users
 input ProjectFilter {
     # a unique identifer, will return one project
     project_id: Int,
-    name: String
+    devpost_id: String
+}
+
+input ProjectInput {
+  devpost_id: String,
+  name: String,
+  table_number: Int,
+  expo_number: Int
 }
 
 type Project {
-    projecct_id: Int,
+    project_id: Int,
     devpost_id: String,
     name: String,
     table_number: Int,
@@ -27,7 +33,7 @@ type Project {
 }`;
 
 export interface ProjectFilter {
-    name?: string;
+    devpost_id?: string;
     project_id?: number;
 }
 

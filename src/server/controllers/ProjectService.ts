@@ -1,4 +1,6 @@
 import { IProjectModel, Projects } from '../models/ProjectModel';
+import { ProjectCategories } from '../models/ProjectCategory';
+import * as Sequelize from 'sequelize';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
 import { printAndThrowError } from '../util/common';
@@ -7,25 +9,70 @@ const logger = Logger('controllers/ProjectService');
 
 export class ProjectService {
 
-  public static find(): Promise<IProjectModel[]> {
+  public static find(getCategories?: boolean): Promise<IProjectModel[]> {
     return Projects.sync()
-      .then(() => Projects.findAll())
+      .then(() => ProjectCategories.sync())
+      .then(() => {
+        if (getCategories) {
+          return Projects.findAll({
+            include: [{
+              model: ProjectCategories,
+              where: {project_id: Sequelize.col('project.project_id')},
+              required: true,
+            }],
+          });
+        } else {
+          return Projects.findAll();
+        }
+      })
       .then((projects) => projects.map((project) => project.toJSON()))
       .catch(printAndThrowError('find', logger));
   }
 
-  public static findById(id: number): Promise<IProjectModel | undefined> {
+  public static findById(id: number, getCategories?: boolean): Promise<IProjectModel | undefined> {
     return Projects.sync()
-      .then(() => Projects.findById(id))
+      .then(() => ProjectCategories.sync())
+      .then(() => {
+        if (getCategories) {
+          return Projects.findOne({
+            include: [{
+              model: ProjectCategories,
+              where: {project_id: Sequelize.col('project.project_id')},
+              required: true,
+            }],
+            where: {
+              project_id: id,
+            },
+          });
+        } else {
+          return Projects.findById(id);
+        }
+      })
       .then((project) => project ? project.toJSON() : undefined)
       .catch(printAndThrowError('findById', logger));
   }
 
-  public static findByName(name: string): Promise<IProjectModel | undefined> {
+  public static findByDevpostId(devpostId: string, getCategories?: boolean): Promise<IProjectModel | undefined> {
     return Projects.sync()
-        .then(() => Projects.findOne({ where: { name } }))
+        .then(() => ProjectCategories.sync())
+        .then(() => {
+          if (getCategories) {
+            return Projects.findOne({
+              include: [{
+                model: ProjectCategories,
+                where: {project_id: Sequelize.col('project.project_id')},
+                required: true,
+              }],
+              where: {
+                devpost_id: devpostId,
+              },
+            });
+          } else {
+            return Projects.findOne({ where: { devpost_id: devpostId } });
+          }
+        })
         .then((project) => project ? project.toJSON() : undefined)
-        .catch(printAndThrowError('findByName', logger));
+        .catch(printAndThrowError('findByDevpostId', logger));
   }
 
   public static create(project: IProjectModel): Promise<IProjectModel | undefined> {
@@ -36,7 +83,6 @@ export class ProjectService {
   }
 
   public static update(id: number, project: Partial<IProjectModel>): Promise<IProjectModel | undefined> {
-
     return Projects.sync()
       .then(() => Projects.update(project as IProjectModel, { where: { project_id: id}, returning: true}))
       .then(val => {

@@ -5,14 +5,14 @@ import { ProjectFilter } from '../types/project';
 const resolvers = {
   Query: {
     projects: async (obj: any, args: { filters?: ProjectFilter }, context: any) => {
-      if (args.filters && args.filters.name && args.filters.project_id) {
+      if (args.filters && args.filters.devpost_id && args.filters.project_id) {
         throw new Error('name and proejct_id are both unique identifiers, use only one');
       }
 
       let projects: IProjectModel[];
 
-      if (args.filters && args.filters.name) {
-        const res = await ProjectService.findByName(args.filters.name as string);
+      if (args.filters && args.filters.devpost_id) {
+        const res = await ProjectService.findByDevpostId(args.filters.devpost_id as string);
         projects = res ? [res] : [];
       } else if (args.filters && args.filters.project_id) {
         const res = await ProjectService.findById(args.filters.project_id as number);
@@ -25,16 +25,12 @@ const resolvers = {
   },
 
   Mutation: {
-    changeName: async (obj: any, args: any, context: any) => {
-      const project = await ProjectService.update(args.id, { name: args.newName });
+    createProject: async (obj: any, args: any, context: any) => {
+      const project = await ProjectService.create(args.input);
       return project;
     },
-    changeTableNumber: async (obj: any, args: any, context: any) => {
-      const project = await ProjectService.update(args.id, { table_number: args.newTableNumber });
-      return project;
-    },
-    changeExpoNumber: async (obj: any, args: any, context: any) => {
-      const project = await ProjectService.update(args.id, { expo_number: args.newExpoNumber });
+    updateProject: async (obj: any, args: any, context: any) => {
+      const project = await ProjectService.update(args.id, args.input);
       return project;
     },
   },

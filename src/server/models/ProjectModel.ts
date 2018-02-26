@@ -14,7 +14,7 @@ interface ProjectModel {
 }
 
 export interface IProjectModel extends ProjectModel {
-    categories: ICategoryModel[];
+    categories?: ICategoryModel[];
 }
 
 interface IProjectInstance extends Sequelize.Instance<IProjectModel> {
