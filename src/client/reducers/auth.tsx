@@ -1,13 +1,13 @@
-import { UPDATE_CLASS } from '../actions/Fetcher';
+import { UPDATE_CLASS } from '../actions/profile';
 import Action from '../types/Action';
 import { AuthState } from '../types/State';
 import { UpdateClassActionType } from '../types/UpdateClass';
 
-const auth = (state: AuthState, actionAny: Action): AuthState => {
-    if (state === undefined) {
-        return { role: null };
-    }
+const initState: AuthState = {
+    role: undefined,
+};
 
+const auth = (state: AuthState = initState, actionAny: Action): AuthState => {
     switch (actionAny.type) {
         case UPDATE_CLASS:
             const action = actionAny as UpdateClassActionType;

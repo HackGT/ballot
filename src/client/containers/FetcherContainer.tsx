@@ -1,29 +1,37 @@
 import { connect } from 'react-redux';
-import Fetcher from '../components/Fetcher';
+import * as React from 'react';
 
-import { updateClass } from '../actions/Fetcher';
+import { fetchProfileClass } from '../actions/profile';
 import Action from '../types/Action';
 import { State } from '../types/State';
 
-const mapStateToProps = (state: State) => {
+interface DispatchToProps {
+    fetchProfileClass: () => void;
+}
+
+interface StateToProps {}
+
+class Fetcher extends React.Component<DispatchToProps & StateToProps> {
+    public componentWillMount(): void {
+        this.props.fetchProfileClass();
+    }
+
+    public render(): JSX.Element {
+        return null as JSX.Element;
+    }
+}
+
+const mapStateToProps = (state: State): StateToProps => {
     return {};
 };
 
-const mapDispatchToProps = (dispatch: (action: Action) => void) => {
-    return {
-        updateClass: () => {
-            fetch('/auth/user_data/class', {
-                credentials: 'same-origin',
-            }).then(result => result.json())
-              .then(updateClass)
-              .then(dispatch);
-        },
-    };
+const mapDispatchToProps = {
+    fetchProfileClass,
 };
 
-const FetcherContainer = connect(
+const FetcherContainer = connect<StateToProps, DispatchToProps>(
     mapStateToProps,
-    mapDispatchToProps,
+    mapDispatchToProps
 )(Fetcher);
 
 export default FetcherContainer;
