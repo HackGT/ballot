@@ -1,15 +1,12 @@
 import * as React from 'react';
 
 interface FetcherProps {
-    updateClass: (classJson: any) => void,
+    updateClass: () => void,
 };
 
 class Fetcher extends React.Component<FetcherProps> {
     componentWillMount() {
-        fetch('/auth/user_data/class', {
-            credentials: 'same-origin',
-        }).then(result => result.json())
-          .then(this.props.updateClass);
+        this.props.updateClass();
     }
 
     render() {

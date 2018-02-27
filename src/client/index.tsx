@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import rootReducer from './reducers/rootReducer';
+import rootReducer from './store/rootReducer';
 import App from './components/App';
 import Authorization from './components/Authorization';
 import FetcherContainer from './containers/FetcherContainer';
