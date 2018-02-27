@@ -55,7 +55,7 @@ try {
     app.use(passport.session());
 
     // Activate Routes
-    app.use('/', index);
+    app.use('/', express.static('./build/public'));
     app.use('/healthcheck', healthcheck);
     app.use('/auth', auth);
     app.use('/graphql', bodyParser.json(), graphqlExpress((req?: express.Request, res?: express.Response) => {
@@ -67,6 +67,7 @@ try {
         };
     }));
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+    app.use('*', index);
 
     // Start Server
     const port = Environment.getPort();
@@ -77,6 +78,3 @@ try {
     Logger('app').error('Server startup canceled due to missing dependencies');
     Logger('app').error(error);
 }
-
-
-

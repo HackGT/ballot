@@ -1,8 +1,14 @@
+import { sequelize } from '../db/index';
+import * as Sequelize from 'sequelize';
+
+// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+const { INTEGER, STRING, ENUM } = Sequelize;
+
 export interface IUserModel {
-    userId?: string;
-    name: string;
+    user_id?: number;
     email: string;
-    userClass: UserClass;
+    name: string;
+    user_class: UserClass;
     github?: string;
     google?: string;
     facebook?: string;
@@ -10,9 +16,24 @@ export interface IUserModel {
     hash?: string;
 }
 
-export enum UserClass {
-    'Pending' = 0, // Created account, must be approved by admin/owner
-    'Judge'   = 1,
-    'Admin'   = 2,
-    'Owner'   = 3,   // First User, cannot be removed by another admin.
+interface IUserInstance extends Sequelize.Instance<IUserModel> {
 }
+
+export enum UserClass {
+    Pending = 'Pending',
+    Judge = 'Judge',
+    Admin = 'Admin',
+    Owner = 'Owner',
+}
+
+export const Users: Sequelize.Model<IUserInstance, IUserModel> = sequelize.define<IUserInstance, IUserModel>('users', {
+    user_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
+    email: { type: STRING(254), allowNull: false, unique: true },
+    name: { type: STRING(64), allowNull: false },
+    user_class: { type: ENUM('Pending', 'Judge', 'Admin', 'Owner'), allowNull: false, defaultValue: 0 },
+    salt: { type: STRING(64) },
+    hash: { type: STRING(256) },
+    github: { type: STRING },
+    google: { type: STRING },
+    facebook: { type: STRING },
+});

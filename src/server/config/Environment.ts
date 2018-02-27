@@ -16,6 +16,14 @@ interface IGoogleConfig {
     callbackURL: string;
 }
 
+interface IDatabaseConfig {
+    host: string;
+    database: string;
+    username: string;
+    password: string;
+    port: number;
+}
+
 export class Environment {
     public static getPort(): string {
         return process.env.PORT || '3000';
@@ -33,6 +41,24 @@ export class Environment {
         return process.env.SESSION_SECRET || '';
     }
 
+    public static getDatabaseConfig(): IDatabaseConfig | undefined {
+        if (process.env.PGHOST === undefined ||
+        process.env.PGUSER === undefined ||
+        process.env.PGDATABASE === undefined ||
+        process.env.PGPASSWORD === undefined ||
+        process.env.PGPORT === undefined) {
+            return undefined;
+        }
+
+        return {
+            host: process.env.PGHOST,
+            port: parseInt((process.env.PGPORT) as string, 10),
+            database: process.env.PGDATABASE,
+            username: process.env.PGUSER,
+            password: process.env.PGPASSWORD,
+        } as IDatabaseConfig;
+    }
+
     public static getGithubAuth(): IGithubConfig | undefined {
         if (process.env.AUTH_GITHUB_ID !== undefined &&
             process.env.AUTH_GITHUB_SECRET !== undefined &&
@@ -40,7 +66,7 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_GITHUB_CALLBACK_URL,
             } as IGithubConfig;
         }
 
@@ -54,7 +80,8 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_FACEBOOK_CALLBACK_URL,
+                profileFields: ['id', 'name', 'email', 'displayName'],
             } as IFacebookConfig;
         }
 
@@ -68,7 +95,7 @@ export class Environment {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
+                callbackURL: process.env.AUTH_GOOGLE_CALLBACK_URL,
             } as IGoogleConfig;
         }
 
