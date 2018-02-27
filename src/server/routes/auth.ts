@@ -28,7 +28,7 @@ router.get('/user_data', (req, res) => {
 router.get('/user_data/class', (req, res) => {
     if (req.user === undefined) {
         res.json({
-            a: null,
+            a: undefined,
         });
     } else {
         res.json({
