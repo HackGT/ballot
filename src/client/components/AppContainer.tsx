@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Authorization from './Auth';
-import AdminPage from './AdminPage';
+import AdminPage from './admin/AdminPage';
 import Pending from './Pending';
 import Judge from './Judge';
 

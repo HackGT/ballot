@@ -6,8 +6,8 @@ interface AdminProps {}
 const Admin: React.SFC<AdminProps> = (props) => {
     return (
         <div>
-            <h1>Welcome!</h1>
-            <p>You are an admin.</p>
+            <h1>Administration Home</h1>
+            <p>This is the administration panel</p>
         </div>
     );
 };

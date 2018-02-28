@@ -7,7 +7,7 @@ interface HeaderProps {}
 const Header: React.SFC<HeaderProps> = (props) => {
     return (
         <div className='header'>
-            <h1><Link to='/'>Ballot @ HackGT</Link></h1>
+            <h1><Link to='/'>HackGT: Ballot</Link></h1>
         </div>
     );
 };

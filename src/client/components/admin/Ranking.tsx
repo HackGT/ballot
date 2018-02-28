@@ -1,7 +1,9 @@
 import * as React from 'react';
 // import './Ranking.scss';
 
-interface RankingProps {}
+interface RankingProps {
+    match: any;
+}
 
 const Ranking: React.SFC<RankingProps> = (props) => {
     return (

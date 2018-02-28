@@ -1,4 +1,4 @@
-@import './../util/variables.scss';
+@import '../../util/variables.scss';
 
 div.admin-container {
     display: flex;
@@ -8,6 +8,8 @@ div.admin-container {
 
 div.admin-left {
     width: 150px;
+    border-right: 1px solid #444444;
+    margin-right: 30px;
 }
 
 div.admin-right {

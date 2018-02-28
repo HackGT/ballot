@@ -5,15 +5,17 @@ nav.sidebar-nav {
 
     ul {
         li {
-            margin: 10px 0;
             list-style: none;
-
+            
             a {
+                border-left: 3px solid transparent;
+                padding: 10px;
+                display: block;
                 text-decoration: none;
             }
 
-            a:hover {
-                text-decoration: underline;
+            a:hover, a.active {
+                border-left: 3px solid $colorAccent;
             }
         }
     }
