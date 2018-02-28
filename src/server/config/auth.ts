@@ -6,7 +6,7 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy, Profile } from 'passport';
 import { UserService } from '../controllers/UserService';
-import { UserClass, IUserModel } from '../models/UserModel';
+import { UserClass, UserModel } from '../models/UserModel';
 import { Request } from 'express';
 import { pbkdf2Async, hashPassword } from '../util/common';
 
@@ -165,11 +165,11 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
     strategies.push(newStrategy);
 }
 
-export function serialize(user: IUserModel, done: (err: any, id?: number) => void): void {
+export function serialize(user: UserModel, done: (err: any, id?: number) => void): void {
     done(undefined, user.user_id);
 }
 
-export function deserialize(id: number, done: (err: any, user?: IUserModel) => void): void {
+export function deserialize(id: number, done: (err: any, user?: UserModel) => void): void {
     UserService.findById(id).then((user) => {
         done(undefined, user);
     }).catch((err) => {

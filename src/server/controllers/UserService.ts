@@ -1,44 +1,64 @@
-import { IUserModel, Users } from '../models/UserModel';
+import { UserModel, Users } from '../models/UserModel';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
 import { printAndThrowError } from '../util/common';
+import { can, Action, Target } from '../util/Permissions';
 
 const logger = Logger('controllers/UserService');
 
+export interface User extends UserModel {
+    can(action: Action, target?: Target): boolean
+}
+
+function attachInstanceMethods(user: UserModel | undefined): User | undefined {
+    if(!user) {
+        return undefined;
+    }
+
+    return {
+        ...user,
+        can
+    };
+}
+
 export class UserService {
 
-    public static find(): Promise<IUserModel[]> {
+    public static find(): Promise<UserModel[]> {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
+            .then((users) => users.map((user) => attachInstanceMethods(user)!))
             .catch(printAndThrowError('find', logger));
     }
 
-    public static findById(id: number): Promise<IUserModel | undefined> {
+    public static findById(id: number): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
+            .then(attachInstanceMethods)
             .catch(printAndThrowError('findById', logger));
     }
 
-    public static findByEmail(email: string): Promise<IUserModel | undefined> {
+    public static findByEmail(email: string): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
+            .then(attachInstanceMethods)
             .catch(printAndThrowError('findByEmail', logger));
     }
 
-    public static create(user: IUserModel): Promise<IUserModel | undefined> {
+    public static create(user: UserModel): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
+            .then(attachInstanceMethods)
             .catch(printAndThrowError('create', logger));
     }
 
-    public static update(id: number, user: Partial<IUserModel>): Promise<IUserModel | undefined> {
+    public static update(id: number, user: Partial<UserModel>): Promise<User | undefined> {
 
         return Users.sync()
-            .then(() => Users.update(user as IUserModel, { where: { user_id: id }, returning: true }))
+            .then(() => Users.update(user as UserModel, { where: { user_id: id }, returning: true }))
             .then(val => {
                 const [num, users] = val;
                 if (num === 0) {
@@ -48,7 +68,9 @@ export class UserService {
                     throw new Error('Update query modified more than one user');
                 }
                 return users[0]!.toJSON();
-            }).catch(printAndThrowError('update', logger));
+            })
+            .then(attachInstanceMethods)
+            .catch(printAndThrowError('update', logger));
     }
 
     public static delete(id: number): Promise<void> {

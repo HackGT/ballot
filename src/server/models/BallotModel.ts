@@ -14,7 +14,7 @@ export enum BallotStatus {
     Reviewed = 'Reviewed',
 }
 
-export interface IBallotModel {
+export interface BallotModel {
     ballot_id: number;
     project_id: number;
     criteria_id: number;
@@ -25,8 +25,8 @@ export interface IBallotModel {
     score_submitted_at: Date;
 }
 
-export const Ballots: Sequelize.Model<undefined, IBallotModel> =
-    sequelize.define<undefined, IBallotModel>('ballots', {
+export const Ballots: Sequelize.Model<undefined, BallotModel> =
+    sequelize.define<undefined, BallotModel>('ballots', {
         ballot_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         project_id: {
             type: INTEGER, allowNull: false, references: {

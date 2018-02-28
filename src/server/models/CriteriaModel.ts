@@ -5,15 +5,12 @@ import { Categories } from './CategoryModel';
 // Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
-export interface ICriteriaModel {
+export interface CriteriaModel {
     criteria_id: number;
     name: string;
     rubric: string;
     min_score: number;
     max_score: number;
-}
-
-interface CriteriaModel extends ICriteriaModel {
     category_id: number;
 }
 
