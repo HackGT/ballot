@@ -9,7 +9,7 @@
     "postinstall": "node ./scripts/postinstall.js",
     "serve": "gulp serve",
     "build": "gulp build",
-    "sqlinit": "node ./scripts/database"
+    "sqlinit": "node ./scripts/database.js"
   },
   "keywords": [],
   "author": "",

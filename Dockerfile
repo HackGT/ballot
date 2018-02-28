@@ -12,7 +12,7 @@ RUN apk update && apk add \
 RUN npm install npm@"~5.4.0" && rm -rf /usr/local/lib/node_modules && mv node_modules /usr/local/lib
 
 # Bundle Source
-RUN mkdir -p /usr/src/pipes
+RUN mkdir -p /usr/src/ballot
 WORKDIR /usr/src/ballot
 COPY . /usr/src/ballot
 RUN npm install
