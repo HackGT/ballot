@@ -34,7 +34,7 @@ export class Environment {
     }
 
     public static getUrl(): string {
-        return process.env.URL || '';
+        return process.env.URL || '127.0.0.1';
     }
 
     public static getSession(): string {
@@ -42,31 +42,28 @@ export class Environment {
     }
 
     public static getDatabaseConfig(): IDatabaseConfig | undefined {
-        if (process.env.PGHOST === undefined ||
-        process.env.PGUSER === undefined ||
-        process.env.PGDATABASE === undefined ||
-        process.env.PGPASSWORD === undefined ||
-        process.env.PGPORT === undefined) {
-            return undefined;
+        if (process.env.POSTGRES_URL &&
+            process.env.USERNAME &&
+            process.env.DBNAME) {
+            return {
+                host: process.env.POSTGRES_URL,
+                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
+                database: process.env.DBNAME,
+                username: process.env.USERNAME,
+                password: process.env.PGPASSWORD,
+            } as IDatabaseConfig;
         }
 
-        return {
-            host: process.env.PGHOST,
-            port: parseInt((process.env.PGPORT) as string, 10),
-            database: process.env.PGDATABASE,
-            username: process.env.PGUSER,
-            password: process.env.PGPASSWORD,
-        } as IDatabaseConfig;
+        return undefined;
     }
 
     public static getGithubAuth(): IGithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID !== undefined &&
-            process.env.AUTH_GITHUB_SECRET !== undefined &&
-            process.env.AUTH_GITHUB_CALLBACK_URL !== undefined) {
+        if (process.env.AUTH_GITHUB_ID &&
+            process.env.AUTH_GITHUB_SECRET) {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
-                callbackURL: process.env.AUTH_GITHUB_CALLBACK_URL,
+                callbackURL: '/auth/github/callback',
             } as IGithubConfig;
         }
 
@@ -74,13 +71,12 @@ export class Environment {
     }
 
     public static getFacebookAuth(): IFacebookConfig | undefined {
-        if (process.env.AUTH_FACEBOOK_ID !== undefined &&
-            process.env.AUTH_FACEBOOK_SECRET !== undefined &&
-            process.env.AUTH_FACEBOOK_CALLBACK_URL !== undefined) {
+        if (process.env.AUTH_FACEBOOK_ID &&
+            process.env.AUTH_FACEBOOK_SECRET) {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-                callbackURL: process.env.AUTH_FACEBOOK_CALLBACK_URL,
+                callbackURL: '/auth/facebook/callback',
                 profileFields: ['id', 'name', 'email', 'displayName'],
             } as IFacebookConfig;
         }
@@ -89,13 +85,12 @@ export class Environment {
     }
 
     public static getGoogleAuth(): IGoogleConfig | undefined {
-        if (process.env.AUTH_GOOGLE_ID !== undefined &&
-            process.env.AUTH_GOOGLE_SECRET !== undefined &&
-            process.env.AUTH_GOOGLE_CALLBACK_URL !== undefined) {
+        if (process.env.AUTH_GOOGLE_ID &&
+            process.env.AUTH_GOOGLE_SECRET) {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
-                callbackURL: process.env.AUTH_GOOGLE_CALLBACK_URL,
+                callbackURL: '/auth/google/callback',
             } as IGoogleConfig;
         }
 

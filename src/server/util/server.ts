@@ -30,4 +30,13 @@ export function verifyEnvironment(): void {
         warn('There are no activated authentication strategies!');
         throw new Error('missing authentication strategy');
     }
+
+    if (Environment.getDatabaseConfig() === undefined) {
+        warn('The configuration variables are not defined in environment variables!');
+        throw new Error('mising database envars');
+    }
+
+    if (Environment.getDatabaseConfig()!.password === undefined) {
+        warn('The database has no password set');
+    }
 }

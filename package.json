@@ -6,7 +6,10 @@
   "scripts": {
     "startdev": "webpack-dev-server --config ./src/client/webpack.config.js",
     "start": "gulp",
-    "postinstall": "node ./scripts/postinstall.js"
+    "postinstall": "node ./scripts/postinstall.js",
+    "serve": "gulp serve",
+    "build": "gulp build",
+    "sqlinit": "node ./scripts/database.js"
   },
   "keywords": [],
   "author": "",

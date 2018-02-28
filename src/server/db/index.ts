@@ -23,4 +23,5 @@ export const sequelize = new Sequelize(config.database, config.username, config.
         createdAt: 'created_at',
         updatedAt: 'updated_at',
     },
+    logging: false,
 });
