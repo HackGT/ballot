@@ -42,24 +42,24 @@ export class Environment {
     }
 
     public static getDatabaseConfig(): IDatabaseConfig | undefined {
-        if (process.env.POSTGRES_URL === undefined ||
-        process.env.USERNAME === undefined ||
-        process.env.DBNAME === undefined) {
-            return undefined;
+        if (process.env.POSTGRES_URL &&
+            process.env.USERNAME &&
+            process.env.DBNAME) {
+            return {
+                host: process.env.POSTGRES_URL,
+                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
+                database: process.env.DBNAME,
+                username: process.env.USERNAME,
+                password: process.env.PGPASSWORD,
+            } as IDatabaseConfig;
         }
 
-        return {
-            host: process.env.POSTGRES_URL,
-            port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
-            database: process.env.DBNAME,
-            username: process.env.USERNAME,
-            password: process.env.PGPASSWORD,
-        } as IDatabaseConfig;
+        return undefined;
     }
 
     public static getGithubAuth(): IGithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID !== undefined &&
-            process.env.AUTH_GITHUB_SECRET !== undefined) {
+        if (process.env.AUTH_GITHUB_ID &&
+            process.env.AUTH_GITHUB_SECRET) {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
@@ -71,8 +71,8 @@ export class Environment {
     }
 
     public static getFacebookAuth(): IFacebookConfig | undefined {
-        if (process.env.AUTH_FACEBOOK_ID !== undefined &&
-            process.env.AUTH_FACEBOOK_SECRET !== undefined) {
+        if (process.env.AUTH_FACEBOOK_ID &&
+            process.env.AUTH_FACEBOOK_SECRET) {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
@@ -85,8 +85,8 @@ export class Environment {
     }
 
     public static getGoogleAuth(): IGoogleConfig | undefined {
-        if (process.env.AUTH_GOOGLE_ID !== undefined &&
-            process.env.AUTH_GOOGLE_SECRET !== undefined) {
+        if (process.env.AUTH_GOOGLE_ID &&
+            process.env.AUTH_GOOGLE_SECRET) {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
