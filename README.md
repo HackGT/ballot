@@ -14,9 +14,9 @@ First, clone the repository and run `npm install`. This will create a `.env` fil
 | URL                             |  REQUIRED: The URL that the server is running on                                                    |
 | SESSION_SECRET                  |  REQUIRED: A private key used for all session tokens                                                |
 | NODE_ENV                        |  Used to determine whether the server is running in 'production' or 'development', defaults to dev  |
-| POSTGRES_URL                    |  REQUIRED: the host address of the Postgres server                                                  |
-| USERNAME                        |  REQUIRED: the username for the postgres server                                                     |
-| DBNAME                          |  REQUIRED: the database used for the application in postgres                                        |
+| PGURL                           |  REQUIRED: the host address of the Postgres server                                                  |
+| PGUSERNAME                      |  REQUIRED: the username for the postgres server                                                     |
+| PGDATABASE                      |  REQUIRED: the database used for the application in postgres                                        |
 | PGPASSWORD                      |  REQUIRED: the password for the postgres user                                                       |
 | PGPORT                          |  If we need a port to identify the postgres server, we use this                                     |
 | AUTH_GITHUB_ID                  |  For authentication, necessary for Github OAuth                                                     |

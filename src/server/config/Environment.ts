@@ -16,12 +16,16 @@ interface IGoogleConfig {
     callbackURL: string;
 }
 
-interface IDatabaseConfig {
+export interface IDatabaseConfig {
     host: string;
     database: string;
     username: string;
     password: string;
-    port: number;
+    port?: number;
+}
+
+export interface IDatabaseConfigURI {
+    uri: string;
 }
 
 export class Environment {
@@ -41,25 +45,25 @@ export class Environment {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): IDatabaseConfig | undefined {
-        if (process.env.POSTGRES_URL &&
-            process.env.USERNAME &&
-            process.env.DBNAME) {
+    public static getDatabaseConfig(): IDatabaseConfig | IDatabaseConfigURI | undefined {
+        if (process.env.PGURL &&
+            process.env.PGUSERNAME &&
+            process.env.PGDATABASE &&
+            process.env.PGPASSWORD) {
             return {
-                host: process.env.POSTGRES_URL,
+                host: process.env.PGURL,
                 port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
-                database: process.env.DBNAME,
-                username: process.env.USERNAME,
+                database: process.env.PGDATABASE,
+                username: process.env.PGUSERNAME,
                 password: process.env.PGPASSWORD,
-            } as IDatabaseConfig;
+            };
         }
 
-        if(!process.env.POSTGRES_URL)
-            throw new Error('Expected env POSTGRES_URL');
-        if(!process.env.USERNAME)
-            throw new Error('Expected env USERNAME');
-        if(!process.env.DBNAME)
-            throw new Error('Expected env DBNAME');
+        if (process.env.POSTGRES_URL) {
+            return {
+                uri: process.env.POSTGRES_URL,
+            };
+        }
 
         return undefined;
     }
