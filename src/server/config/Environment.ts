@@ -54,6 +54,13 @@ export class Environment {
             } as IDatabaseConfig;
         }
 
+        if(!process.env.POSTGRES_URL)
+            throw new Error('Expected env POSTGRES_URL');
+        if(!process.env.USERNAME)
+            throw new Error('Expected env USERNAME');
+        if(!process.env.DBNAME)
+            throw new Error('Expected env DBNAME');
+
         return undefined;
     }
 
