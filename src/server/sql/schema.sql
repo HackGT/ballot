@@ -2,7 +2,7 @@ CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner');
 
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
-    email character varying(254) NOT NULL,
+    email character varying(254) NOT NULL UNIQUE,
     name character varying(64) NOT NULL,
     user_class userclass NOT NULL DEFAULT 'Pending',
     salt character varying(64),

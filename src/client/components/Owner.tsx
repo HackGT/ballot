@@ -5,7 +5,7 @@ interface OwnerProps {}
 
 const Owner: React.SFC<OwnerProps> = (props) => {
     return (
-        <div id='register-form'>
+        <div>
             <h1>Welcome!</h1>
             <p>You have been approved as a Owner!</p>
         </div>

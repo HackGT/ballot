@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Header from '../Header';
 import Navigation from '../Navigation';
 import AdminContainer from './AdminContainer';
@@ -13,17 +13,22 @@ interface AdminPageProps {
     match: string;
 }
 
-const AdminPage: React.SFC<AdminPageProps> = (props) => {
-    return (
-        <div>
-            <Header />
-            <Navigation linkNames={['Home', 'Judging', 'Expo', 'Admin']} linkDests={['/', '/judging', '/expo', '/admin']}/>
-            <Route exact path='/' component={Status} />
-            <Route exact path='/judging' component={Judging} />
-            <Route exact path='/expo' component={Expo} />
-            <Route path='/admin' component={AdminContainer} />
-        </div>
-    );
+// const AdminPage: React.SFC<AdminPageProps> = (props) => {
+class AdminPage extends React.Component<AdminPageProps, {}> {
+    render() {
+        return (
+            <div>
+                <Header />
+                <Navigation linkNames={['Home', 'Judging', 'Expo', 'Admin']} linkDests={['/', '/judging', '/expo', '/admin']}/>
+                <Switch>
+                    <Route exact path='/judging' component={Judging} />
+                    <Route exact path='/expo' component={Expo} />
+                    <Route path='/admin' component={AdminContainer} />
+                    <Route exact path='/' component={Status} />
+                </Switch>
+            </div>
+        );
+    }
 };
 
 export default AdminPage;

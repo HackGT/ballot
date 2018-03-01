@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './Login.scss';
+import './LoginPage.scss';
 import Login from './login/Login';
 import Header from './Header';
 
