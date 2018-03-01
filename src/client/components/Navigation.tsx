@@ -1,13 +1,35 @@
 import * as React from 'react';
-// import './Navigation.scss';
+import { Link } from 'react-router-dom';
+import './Navigation.scss';
 
-interface NavigationProps {}
+interface NavigationProps {
+    linkNames: string[];
+    linkDests: string[];
+}
+
+interface NavigationElementProps {
+    linkName: string;
+    linkDest: string;
+}
 
 const Navigation: React.SFC<NavigationProps> = (props) => {
+    const navLinks = [];
+    for (let i = 0; i < props.linkNames.length; i++) {
+        navLinks.push(<NavigationElement key={i} linkName={props.linkNames[i]} linkDest={props.linkDests[i]}/>);
+    }
+
+    navLinks.push(<li key={props.linkNames.length}><a href='/auth/logout'>Logout</a></li>);
+
     return (
-        <div>
-            <p>Pretend there's navigation here for now plz. Thanks :)</p>
-        </div>
+        <nav className='nav'>
+            <ul>{navLinks}</ul>
+        </nav>
+    );
+};
+
+const NavigationElement: React.SFC<NavigationElementProps> = (props) => {
+    return (
+        <li><Link to={props.linkDest}>{props.linkName}</Link></li>
     );
 };
 

@@ -1,0 +1,22 @@
+@import './../../config/variables.scss';
+
+nav.sidebar-nav {
+    display: block;
+
+    ul {
+        li {
+            list-style: none;
+            
+            a {
+                border-left: 3px solid transparent;
+                padding: 10px;
+                display: block;
+                text-decoration: none;
+            }
+
+            a:hover, a.active {
+                border-left: 3px solid $colorAccent;
+            }
+        }
+    }
+}

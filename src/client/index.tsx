@@ -16,18 +16,18 @@ const UserNone = Authorization(['None']);
 const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
 
 ReactDOM.render(
-    <Router>
-        <Provider store={store}>
+    <Provider store={store}>
+        <Router>
             <div>
                 <FetcherContainer />
-                <Route exact path='/' component={UserAuth(App)} />
+                <Route component={UserAuth(App)} />
                 <Switch>
                     <Route path='/login' component={LoginPage} />
                     <Route path='/register' component={RegisterPage} />
-                    <Route path='/' component={UserNone(NoSession)} />
+                    <Route component={UserNone(NoSession)} />
                 </Switch>
             </div>
-        </Provider>
-    </Router>,
+        </Router>
+    </Provider>,
     document.getElementById('app') as HTMLElement
 );

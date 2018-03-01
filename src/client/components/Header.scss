@@ -1,0 +1,14 @@
+@import './../config/variables.scss';
+
+div.header {
+    text-align: center;
+    padding: 10px;
+
+    h1 {
+        font-size: 3em;
+    }
+
+    a {
+        text-decoration: none;
+    }
+}

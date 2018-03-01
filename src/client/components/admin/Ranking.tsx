@@ -1,13 +1,15 @@
 import * as React from 'react';
 // import './Ranking.scss';
 
-interface RankingProps {}
+interface RankingProps {
+    match: any;
+}
 
 const Ranking: React.SFC<RankingProps> = (props) => {
     return (
-        <div id='register-form'>
-            <h1>Welcome!</h1>
-            <p>You have been approved as a Ranking!</p>
+        <div>
+            <h1>Ranking</h1>
+            <p>This is where rankings will show up.</p>
         </div>
     );
 };
