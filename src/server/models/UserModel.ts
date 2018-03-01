@@ -30,7 +30,7 @@ export const Users: Sequelize.Model<IUserInstance, IUserModel> = sequelize.defin
     user_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: STRING(254), allowNull: false, unique: true },
     name: { type: STRING(64), allowNull: false },
-    user_class: { type: ENUM('Pending', 'Judge', 'Admin', 'Owner'), allowNull: false, defaultValue: 0 },
+    user_class: { type: ENUM('Pending', 'Judge', 'Admin', 'Owner'), allowNull: false, defaultValue: 'Pending' },
     salt: { type: STRING(64) },
     hash: { type: STRING(256) },
     github: { type: STRING },
