@@ -6,9 +6,9 @@ interface LoginButtonsProps {}
 const LoginButtons: React.SFC<LoginButtonsProps> = (props) => {
     return (
         <div>
-            {process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET ? <LoginButton name='Github' link='/auth/github/login' /> : ''}
-            {process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET ? <LoginButton name='Facebook' link='/auth/facebook/login' /> : ''}
-            {process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET ? <LoginButton name='Google' link='/auth/google/login' /> : ''}
+            {AUTH_ALLOW_GITHUB ? <LoginButton name='Github' link='/auth/github/login' /> : ''}
+            {AUTH_ALLOW_FACEBOOK ? <LoginButton name='Facebook' link='/auth/facebook/login' /> : ''}
+            {AUTH_ALLOW_GOOGLE ? <LoginButton name='Google' link='/auth/google/login' /> : ''}
         </div>
     );
 };

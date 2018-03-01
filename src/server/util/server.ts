@@ -1,4 +1,4 @@
-import { Environment } from '../config/Environment';
+import { Environment, DatabaseConfig } from '../config/Environment';
 import { Logger } from './Logger';
 import { strategies } from '../config/auth';
 
@@ -36,7 +36,7 @@ export function verifyEnvironment(): void {
         throw new Error('mising database envars');
     }
 
-    if (Environment.getDatabaseConfig()!.password === undefined) {
+    if ((Environment.getDatabaseConfig() as DatabaseConfig)!.password === undefined) {
         warn('The database has no password set');
     }
 }
