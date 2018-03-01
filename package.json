@@ -7,7 +7,7 @@
     "startdev": "webpack-dev-server --config ./src/client/webpack.config.js",
     "start": "gulp",
     "postinstall": "node ./scripts/postinstall.js",
-    "serve": "gulp serve",
+    "serve": "node ./build/app.js",
     "build": "gulp build",
     "sqlinit": "node ./scripts/database.js"
   },
