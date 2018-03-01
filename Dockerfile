@@ -17,11 +17,10 @@ WORKDIR /usr/src/ballot
 COPY . /usr/src/ballot
 RUN npm install
 # RUN npm run sqlinit
-RUN npm run build
 
 # Set Timezone to EST
 RUN apk add tzdata
 ENV TZ="/usr/share/zoneinfo/America/New_York"
 
 EXPOSE 3000
-CMD ["npm", "run", "serve"]
+CMD ["sh","-c","npm run build && npm run serve"]
