@@ -32,11 +32,13 @@ export function verifyEnvironment(): void {
     }
 
     if (Environment.getDatabaseConfig() === undefined) {
-        warn('The configuration variables are not defined in environment variables!');
+        warn('The configuration variables are not defined in environment ' +
+            'variables!');
         throw new Error('mising database envars');
     }
 
-    if ((Environment.getDatabaseConfig() as DatabaseConfig)!.password === undefined) {
+    if ((Environment.getDatabaseConfig() as DatabaseConfig)!
+        .password === undefined) {
         warn('The database has no password set');
     }
 }

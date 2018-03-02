@@ -23,7 +23,8 @@ input UserFilter {
     # user_class: UserClass
 }
 
-# Users can be pending approval to access the app, a judge, admin, or a non-removable admin (owner).
+# Users can be pending approval to access the app, a judge, admin,
+# or a non-removable admin (owner).
 enum UserClass {
     Pending
     Judge

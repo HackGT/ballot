@@ -45,14 +45,16 @@ export class Environment {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI | undefined {
+    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI
+        | undefined {
         if (process.env.PGURL &&
             process.env.PGUSERNAME &&
             process.env.PGDATABASE &&
             process.env.PGPASSWORD) {
             return {
                 host: process.env.PGURL,
-                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
+                port: process.env.PGPORT ?
+                    parseInt((process.env.PGPORT) as string, 10) : undefined,
                 database: process.env.PGDATABASE,
                 username: process.env.PGUSERNAME,
                 password: process.env.PGPASSWORD,
@@ -113,6 +115,7 @@ export class Environment {
 
     public static allowLocalAuth(): boolean {
         return !!process.env.AUTH_ALLOW_LOCAL &&
-            (process.env.AUTH_ALLOW_LOCAL as string)!.toLowerCase().trim() === 'true';
+            (process.env.AUTH_ALLOW_LOCAL as string)!
+                .toLowerCase().trim() === 'true';
     }
 }

@@ -1,10 +1,11 @@
 import { sequelize } from '../db/index';
 import * as Sequelize from 'sequelize';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER, STRING, ENUM } = Sequelize;
 
-export interface IUserModel {
+export interface UserModel {
     user_id?: number;
     email: string;
     name: string;
@@ -16,7 +17,7 @@ export interface IUserModel {
     hash?: string;
 }
 
-interface IUserInstance extends Sequelize.Instance<IUserModel> {
+interface UserInstance extends Sequelize.Instance<UserModel> {
 }
 
 export enum UserClass {
@@ -26,14 +27,18 @@ export enum UserClass {
     Owner = 'Owner',
 }
 
-export const Users: Sequelize.Model<IUserInstance, IUserModel> = sequelize.define<IUserInstance, IUserModel>('users', {
-    user_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-    email: { type: STRING(254), allowNull: false, unique: true },
-    name: { type: STRING(64), allowNull: false },
-    user_class: { type: ENUM('Pending', 'Judge', 'Admin', 'Owner'), allowNull: false, defaultValue: 'Pending' },
-    salt: { type: STRING(64) },
-    hash: { type: STRING(256) },
-    github: { type: STRING },
-    google: { type: STRING },
-    facebook: { type: STRING },
-});
+export const Users: Sequelize.Model<UserInstance, UserModel> =
+    sequelize.define<UserInstance, UserModel>('users', {
+        user_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
+        email: { type: STRING(254), allowNull: false, unique: true },
+        name: { type: STRING(64), allowNull: false },
+        user_class: {
+            type: ENUM('Pending', 'Judge', 'Admin', 'Owner'),
+            allowNull: false, defaultValue: 'Pending',
+        },
+        salt: { type: STRING(64) },
+        hash: { type: STRING(256) },
+        github: { type: STRING },
+        google: { type: STRING },
+        facebook: { type: STRING },
+    });

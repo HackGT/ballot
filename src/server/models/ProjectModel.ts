@@ -1,8 +1,9 @@
 import { sequelize } from '../db/index';
 import * as Sequelize from 'sequelize';
-import { ICategoryModel } from './CategoryModel';
+import { CategoryModelWithCriteria } from './CategoryModel';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
 interface ProjectModel {
@@ -13,8 +14,8 @@ interface ProjectModel {
     expo_number: number;
 }
 
-export interface IProjectModel extends ProjectModel {
-    categories: ICategoryModel[];
+export interface ProjectModelWithCategories extends ProjectModel {
+    categories: CategoryModelWithCriteria[];
 }
 
 export const Projects: Sequelize.Model<undefined, ProjectModel> =
