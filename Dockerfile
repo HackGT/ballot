@@ -12,6 +12,8 @@ RUN apk update && apk add \
 RUN npm install npm@"~5.4.0" && rm -rf /usr/local/lib/node_modules && mv node_modules /usr/local/lib
 
 # Bundle Source
+ENV AUTH_ALLOW_LOCAL="true"
+ENV AUTH_ALLOW_GITHUB="true"
 RUN mkdir -p /usr/src/ballot
 WORKDIR /usr/src/ballot
 COPY . /usr/src/ballot
