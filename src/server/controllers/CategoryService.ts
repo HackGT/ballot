@@ -15,23 +15,16 @@ export class CategoryService {
             .catch(printAndThrowError('find', logger));
     }
 
-    public static findById(category_id: number): Promise<ICategoryModel | undefined> {
+    public static findById(categoryId: number): Promise<ICategoryModel | undefined> {
         return Categories.sync()
-            .then(() => Categories.findById(category_id))
+            .then(() => Categories.findById(categoryId))
             .then((category) => category ? category.toJSON() : undefined)
             .catch(printAndThrowError('findById', logger));
     }
 
-    public static findByName(name: string): Promise<ICategoryModel | undefined> {
+    public static create(categoryId: number, name: string, isPrimary: boolean): Promise<ICategoryModel | undefined> {
         return Categories.sync()
-            .then(() => Categories.findOne({ where: { name }}))
-            .then((category) => category ? category.toJSON() : undefined)
-            .catch(printAndThrowError('findByName', logger));
-    }
-
-    public static createCategory(category_id: number, name: string, is_primary: boolean): Promise<ICategoryModel | undefined> {
-        return Categories.sync()
-            .then(() => Categories.findOrCreate({ where: { category_id, name, is_primary}}))
+            .then(() => Categories.findOrCreate({ where: { category_id: categoryId, name, is_primary: isPrimary } }))
             .spread((category, created) => {
                 if (!created) {
                     throw new Error('Category Already Exists!');
@@ -42,10 +35,10 @@ export class CategoryService {
             .catch(printAndThrowError('findByName', logger));
     }
 
-    public static addCriteria(category_id: number, name: string, rubric: string,
-                              min_score: number, max_score: number): Promise<ICategoryModel | undefined> {
+    public static addCriteria(categoryId: number, name: string, rubric: string,
+                              minScore: number, maxScore: number): Promise<ICategoryModel | undefined> {
         return Criteria.sync()
-            .then(() => Criteria.findOrCreate({ where: { category_id, name, rubric, min_score, max_score}}))
+            .then(() => Criteria.findOrCreate({ where: { category_id: categoryId, name, rubric, min_score: minScore, max_score: maxScore } }))
             .spread((criteria, created) => {
                 if (!created) {
                     throw new Error('Criteria Already Exists!');
@@ -54,11 +47,11 @@ export class CategoryService {
                 }
             })
             .catch(printAndThrowError('addCriteria', logger));
-        }
+    }
 
-    public static getCriteria(category_id: number): Promise<ICriteriaModel[]> {
+    public static getCriteria(categoryId: number): Promise<ICriteriaModel[]> {
         return Criteria.sync()
-            .then(() => Criteria.findAll({where : {category_id}}))
+            .then(() => Criteria.findAll({ where: { category_id: categoryId } }))
             .then((criteria) => criteria.map((criterion) => criterion.toJSON()))
             .catch(printAndThrowError('getCriteria', logger));
     }
