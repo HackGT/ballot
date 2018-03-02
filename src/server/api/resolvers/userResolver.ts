@@ -1,7 +1,9 @@
 import { UserService } from '../../controllers/UserService';
-import { IUserModel } from '../../models/UserModel';
+import { UserModel } from '../../models/UserModel';
 import { hashPassword } from '../../util/common';
 import { UserFilter } from '../types/user';
+import { Action } from '../../util/Permissions';
+import { ResolverContext } from '..';
 
 
 const resolvers = {
@@ -9,12 +11,16 @@ const resolvers = {
         users: async (obj: any,
                       args: { filters?: UserFilter },
                       context: any) => {
+            if (!context.user || !context.user.can(Action.ViewUsers)) {
+                throw new Error('You do not have permission to view users');
+            }
+
             if (args.filters && args.filters.email && args.filters.user_id) {
                 throw new Error('email and user_id are both unique ' +
                     'identifiers, use only one');
             }
 
-            let users: IUserModel[];
+            let users: UserModel[];
 
             if (args.filters && args.filters.email) {
                 const res = await UserService.findByEmail(
@@ -34,12 +40,23 @@ const resolvers = {
 
     Mutation: {
         changeName: async (obj: any, args: any, context: any) => {
+            if (!context.user || !context.user.can(Action.EditUser, args.id)) {
+                throw new Error('You do not have permission to edit this user');
+            }
+
             const user = await UserService.update(
                 args.id,
                 { name: args.newName });
             return user;
         },
-        changePassword: async (obj: any, args: any, context: any) => {
+        changePassword: async (obj: any,
+                               args: { id: number, password: string },
+                               context: ResolverContext) => {
+            if (!context.user ||
+                !context.user.can(Action.ChangePassword, args.id)) {
+                throw new Error('You do not have permission to change this ' +
+                    ' users password');
+            }
 
             const { salt, hash } = await hashPassword(args.password);
 
@@ -48,6 +65,11 @@ const resolvers = {
             return user;
         },
         changeUserClass: async (obj: any, args: any, context: any) => {
+            if (!context.user.can(Action.PromoteUser)) {
+                throw new Error('You do not have permission to change this ' +
+                    'users class');
+            }
+
             const user = await UserService.update(
                 args.id,
                 { user_class: args.newClass });
