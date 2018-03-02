@@ -1,27 +1,31 @@
-interface IGithubConfig {
+interface GithubConfig {
     clientID: string;
     clientSecret: string;
     callbackURL: string;
 }
 
-interface IFacebookConfig {
+interface FacebookConfig {
     clientID: string;
     clientSecret: string;
     callbackURL: string;
 }
 
-interface IGoogleConfig {
+interface GoogleConfig {
     clientID: string;
     clientSecret: string;
     callbackURL: string;
 }
 
-interface IDatabaseConfig {
+export interface DatabaseConfig {
     host: string;
     database: string;
     username: string;
     password: string;
-    port: number;
+    port?: number;
+}
+
+export interface DatabaseConfigURI {
+    uri: string;
 }
 
 export class Environment {
@@ -34,68 +38,76 @@ export class Environment {
     }
 
     public static getUrl(): string {
-        return process.env.URL || '';
+        return process.env.URL || '127.0.0.1';
     }
 
     public static getSession(): string {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): IDatabaseConfig | undefined {
-        if (process.env.PGHOST === undefined ||
-        process.env.PGUSER === undefined ||
-        process.env.PGDATABASE === undefined ||
-        process.env.PGPASSWORD === undefined ||
-        process.env.PGPORT === undefined) {
-            return undefined;
+    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI
+        | undefined {
+        if (process.env.PGURL &&
+            process.env.PGUSERNAME &&
+            process.env.PGDATABASE &&
+            process.env.PGPASSWORD) {
+            return {
+                host: process.env.PGURL,
+                port: process.env.PGPORT ?
+                    parseInt((process.env.PGPORT) as string, 10) : undefined,
+                database: process.env.PGDATABASE,
+                username: process.env.PGUSERNAME,
+                password: process.env.PGPASSWORD,
+            };
         }
 
-        return {
-            host: process.env.PGHOST,
-            port: parseInt((process.env.PGPORT) as string, 10),
-            database: process.env.PGDATABASE,
-            username: process.env.PGUSER,
-            password: process.env.PGPASSWORD,
-        } as IDatabaseConfig;
+        if (process.env.POSTGRES_URL) {
+            return {
+                uri: process.env.POSTGRES_URL,
+            };
+        }
+
+        return undefined;
     }
 
-    public static getGithubAuth(): IGithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID !== undefined &&
-            process.env.AUTH_GITHUB_SECRET !== undefined &&
-            process.env.AUTH_GITHUB_CALLBACK_URL !== undefined) {
+    public static getGithubAuth(): GithubConfig | undefined {
+        if (process.env.AUTH_GITHUB_ID &&
+            process.env.AUTH_GITHUB_SECRET &&
+            process.env.AUTH_ALLOW_GITHUB) {
             return {
                 clientID: process.env.AUTH_GITHUB_ID,
                 clientSecret: process.env.AUTH_GITHUB_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
-            } as IGithubConfig;
+                callbackURL: '/auth/github/callback',
+            } as GithubConfig;
         }
 
         return undefined;
     }
 
-    public static getFacebookAuth(): IFacebookConfig | undefined {
-        if (process.env.AUTH_FACEBOOK_ID !== undefined &&
-            process.env.AUTH_FACEBOOK_SECRET !== undefined &&
-            process.env.AUTH_FACEBOOK_CALLBACK_URL !== undefined) {
+    public static getFacebookAuth(): FacebookConfig | undefined {
+        if (process.env.AUTH_FACEBOOK_ID &&
+            process.env.AUTH_FACEBOOK_SECRET &&
+            process.env.AUTH_ALLOW_FACEBOOK) {
             return {
                 clientID: process.env.AUTH_FACEBOOK_ID,
                 clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
-            } as IFacebookConfig;
+                callbackURL: '/auth/facebook/callback',
+                profileFields: ['id', 'name', 'email', 'displayName'],
+            } as FacebookConfig;
         }
 
         return undefined;
     }
 
-    public static getGoogleAuth(): IGoogleConfig | undefined {
-        if (process.env.AUTH_GOOGLE_ID !== undefined &&
-            process.env.AUTH_GOOGLE_SECRET !== undefined &&
-            process.env.AUTH_GOOGLE_CALLBACK_URL !== undefined) {
+    public static getGoogleAuth(): GoogleConfig | undefined {
+        if (process.env.AUTH_GOOGLE_ID &&
+            process.env.AUTH_GOOGLE_SECRET &&
+            process.env.AUTH_ALLOW_GOOGLE) {
             return {
                 clientID: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
-                callbackURL: process.env.AUTH_CALLBACK_URL,
-            } as IGoogleConfig;
+                callbackURL: '/auth/google/callback',
+            } as GoogleConfig;
         }
 
         return undefined;
@@ -103,6 +115,7 @@ export class Environment {
 
     public static allowLocalAuth(): boolean {
         return !!process.env.AUTH_ALLOW_LOCAL &&
-            (process.env.AUTH_ALLOW_LOCAL as string)!.toLowerCase().trim() === 'true';
+            (process.env.AUTH_ALLOW_LOCAL as string)!
+                .toLowerCase().trim() === 'true';
     }
 }

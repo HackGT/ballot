@@ -1,4 +1,4 @@
-import { Environment } from '../config/Environment';
+import { Environment, DatabaseConfig } from '../config/Environment';
 import { Logger } from './Logger';
 import { strategies } from '../config/auth';
 
@@ -29,5 +29,16 @@ export function verifyEnvironment(): void {
     if (strategies.length === 0) {
         warn('There are no activated authentication strategies!');
         throw new Error('missing authentication strategy');
+    }
+
+    if (Environment.getDatabaseConfig() === undefined) {
+        warn('The configuration variables are not defined in environment ' +
+            'variables!');
+        throw new Error('mising database envars');
+    }
+
+    if ((Environment.getDatabaseConfig() as DatabaseConfig)!
+        .password === undefined) {
+        warn('The database has no password set');
     }
 }

@@ -1,0 +1,17 @@
+@import './../../config/variables.scss';
+
+.LoginButton {
+    margin: 5px;
+    display: inline-block;
+    border: 2px solid $colorText;
+    a {
+        display: block;
+        padding: 10px 15px;
+        text-decoration: none;
+        background: none;
+    }
+}
+
+.LoginButton:hover {
+    background: $colorBackground + 50;
+}

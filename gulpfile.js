@@ -11,14 +11,14 @@ const webpackConfig = require('./src/client/webpack.config.js');
 
 gulp.task('watch', (done) => {
     // unnecessary because of hot module reloading
-    // gulp.watch('src/client/**/*', ['lint', 'build:client']);
+    gulp.watch('src/client/**/*', ['lint', 'build:client']);
     gulp.watch('src/server/**/*', ['lint', 'build:server']);
 });
 
 gulp.task('build', ['lint', 'build:server', 'build:client']);
 
 gulp.task('lint', () => {
-    return gulp.src('src/**/*.ts')
+    return gulp.src(['src/**/*.ts', 'src/**/*.tsx'])
         .pipe(tslint({
             formatter: "prose"
         }))
@@ -42,7 +42,7 @@ gulp.task('build:client', () => {
     });
 });
 
-gulp.task('serve', ['lint', 'build:server'], () => {
+gulp.task('serve', ['lint', 'build:client', 'build:server'], () => {
     nodemon({
         script: path.join(__dirname, 'build/app.js'),
         watch: ['build/'],

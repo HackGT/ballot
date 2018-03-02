@@ -1,15 +1,18 @@
 import * as Sequelize from 'sequelize';
-import { Environment } from '../config/Environment';
+import {
+    Environment,
+    DatabaseConfigURI,
+    DatabaseConfig
+} from '../config/Environment';
 
 const config = Environment.getDatabaseConfig();
 
 if (config === undefined) {
-    throw new Error('Expected: PostgresQL Configuration in Environment Variables');
+    throw new Error('Expected: PostgresQL Configuration in Environment ' +
+        'Variables');
 }
 
-export const sequelize = new Sequelize(config.database, config.username, config.password, {
-    host: config.host,
-    port: config.port,
+const sequelizeOptions: Sequelize.Options = {
     dialect: 'postgres',
     pool: {
         max: 5,
@@ -23,4 +26,20 @@ export const sequelize = new Sequelize(config.database, config.username, config.
         createdAt: 'created_at',
         updatedAt: 'updated_at',
     },
-});
+    logging: false,
+};
+
+export let sequelize: Sequelize.Sequelize;
+
+if ((config as DatabaseConfigURI).uri !== undefined) {
+    sequelize = new Sequelize((config as DatabaseConfigURI).uri,
+        sequelizeOptions);
+} else {
+    sequelizeOptions.host = (config as DatabaseConfig).host;
+    sequelizeOptions.port = (config as DatabaseConfig).port;
+
+    sequelize = new Sequelize((config as DatabaseConfig).database,
+        (config as DatabaseConfig).username,
+        (config as DatabaseConfig).password,
+        sequelizeOptions);
+}

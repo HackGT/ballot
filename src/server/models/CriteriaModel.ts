@@ -2,10 +2,11 @@ import { sequelize } from '../db/index';
 import * as Sequelize from 'sequelize';
 import { Categories } from './CategoryModel';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
-export interface ICriteriaModel {
+export interface CriteriaModel {
     criteria_id: number;
     name: string;
     rubric: string;
@@ -14,11 +15,11 @@ export interface ICriteriaModel {
     category_id: number;
 }
 
-interface ICriteriaInstance extends Sequelize.Instance<ICriteriaModel> {
+interface CriteriaInstance extends Sequelize.Instance<CriteriaModel> {
 }
 
-export const Criteria: Sequelize.Model<ICriteriaInstance, ICriteriaModel> =
-    sequelize.define<ICriteriaInstance, ICriteriaModel>('criteria', {
+export const Criteria: Sequelize.Model<CriteriaInstance, CriteriaModel> =
+    sequelize.define<CriteriaInstance, CriteriaModel>('criteria', {
         criteria_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
         rubric: { type: STRING(512) },

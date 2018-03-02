@@ -1,12 +1,14 @@
+DROP TYPE IF EXISTS userclass CASCADE;
 CREATE TYPE userclass AS ENUM ('Pending', 'Judge', 'Admin', 'Owner');
 
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
-    email character varying(254) NOT NULL,
-    name character varying(64) NOT NULL UNIQUE,
+    email character varying(254) NOT NULL UNIQUE,
+    name character varying(64) NOT NULL,
     user_class userclass NOT NULL DEFAULT 'Pending',
-    salt character varying(32),
-    hash character varying(128),
+    salt character varying(64),
+    hash character varying(256),
     github text,
     google text,
     facebook text,
@@ -14,6 +16,7 @@ CREATE TABLE users (
     updated_at timestamptz DEFAULT now()
 );
 
+DROP TABLE IF EXISTS projects CASCADE;
 CREATE TABLE projects (
     project_id serial PRIMARY KEY,
     devpost_id text NOT NULL UNIQUE,
@@ -24,6 +27,7 @@ CREATE TABLE projects (
     updated_at timestamptz DEFAULT now()
 );
 
+DROP TABLE IF EXISTS categories CASCADE;
 CREATE TABLE categories (
     category_id serial PRIMARY KEY,
     name character varying(64) NOT NULL,
@@ -32,6 +36,7 @@ CREATE TABLE categories (
     updated_at timestamptz DEFAULT now()
 );
 
+DROP TABLE IF EXISTS criteria CASCADE;
 CREATE TABLE criteria (
     criteria_id serial PRIMARY KEY,
     name character varying(64) NOT NULL,
@@ -43,7 +48,10 @@ CREATE TABLE criteria (
     updated_at timestamptz DEFAULT now()
 );
 
+DROP TYPE IF EXISTS ballotstatus CASCADE;
 CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed');
+
+DROP TABLE IF EXISTS ballots;
 CREATE TABLE ballots (
     ballot_id serial PRIMARY KEY,
     project_id integer NOT NULL REFERENCES projects,
@@ -57,6 +65,7 @@ CREATE TABLE ballots (
     updated_at timestamptz DEFAULT now()
 );
 
+DROP FUNCTION IF EXISTS set_score_submit_time;
 CREATE FUNCTION set_score_submit_time()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -72,6 +81,7 @@ CREATE TRIGGER update_ballot_score_submit_time
     WHEN (OLD.score IS DISTINCT FROM NEW.score)
     EXECUTE PROCEDURE public.set_score_submit_time();
 
+DROP TABLE IF EXISTS project_categories;
 CREATE TABLE project_categories (
     project_id integer NOT NULL REFERENCES projects,
     category_id integer NOT NULL REFERENCES categories,
