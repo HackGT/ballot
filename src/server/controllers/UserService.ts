@@ -7,18 +7,7 @@ import { can, Action, Target } from '../util/Permissions';
 const logger = Logger('controllers/UserService');
 
 export interface User extends UserModel {
-    can(action: Action, target?: Target): boolean
-}
-
-function attachInstanceMethods(user: UserModel | undefined): User | undefined {
-    if(!user) {
-        return undefined;
-    }
-
-    return {
-        ...user,
-        can
-    };
+    can(action: Action, target?: Target): boolean;
 }
 
 export class UserService {
@@ -27,7 +16,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
-            .then((users) => users.map((user) => attachInstanceMethods(user)!))
+            .then((users) => users.map((userObj) => Object.setPrototypeOf(userObj, { can })!))
             .catch(printAndThrowError('find', logger));
     }
 
@@ -35,7 +24,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
-            .then(attachInstanceMethods)
+            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
             .catch(printAndThrowError('findById', logger));
     }
 
@@ -43,7 +32,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
-            .then(attachInstanceMethods)
+            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
             .catch(printAndThrowError('findByEmail', logger));
     }
 
@@ -51,7 +40,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
-            .then(attachInstanceMethods)
+            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
             .catch(printAndThrowError('create', logger));
     }
 
@@ -69,7 +58,7 @@ export class UserService {
                 }
                 return users[0]!.toJSON();
             })
-            .then(attachInstanceMethods)
+            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
             .catch(printAndThrowError('update', logger));
     }
 

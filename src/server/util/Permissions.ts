@@ -9,9 +9,10 @@ export enum Action {
     EditUser = 'EditUser',
     ViewUsers = 'ViewUsers',
     ChangePassword = 'ChangePassword',
-    CreateCategory = 'CreateCategory'
+    CreateCategory = 'CreateCategory',
 }
-export type Target = UserModel | BallotModel | CategoryModel | ProjectModel | number;
+export type Target = UserModel | BallotModel | CategoryModel |
+    ProjectModel | number;
 
 export function can(this: UserModel, action: Action, target?: Target): boolean {
     switch (action) {
