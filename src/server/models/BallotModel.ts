@@ -4,7 +4,8 @@ import { Projects } from './ProjectModel';
 import { Criteria } from './CriteriaModel';
 import { Users } from './UserModel';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER, SMALLINT, DATE, ENUM } = Sequelize;
 
 export enum BallotStatus {
@@ -43,7 +44,10 @@ export const Ballots: Sequelize.Model<undefined, BallotModel> =
                 model: Users, key: 'user_id',
             },
         },
-        status: { type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'), allowNull: false },
+        status: {
+            type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'),
+            allowNull: false,
+        },
         score: { type: SMALLINT },
         score_submitted_at: { type: DATE },
     });

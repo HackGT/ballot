@@ -50,7 +50,8 @@ if (Environment.allowLocalAuth()) {
             passwordField: 'password',
             passReqToCallback: true,
         },
-        async (req: Request, email: string, password: string, done: (error: any, user?: any) => void) => {
+        async (req: Request, email: string, password: string,
+               done: (error: any, user?: any) => void) => {
             let user = await UserService.findByEmail(email);
 
             if (req.path.match(/\/signup$/i)) {
@@ -60,11 +61,12 @@ if (Environment.allowLocalAuth()) {
 
                 if (!name || !email || !password) {
                     // TODO: display this issue using express.flash middleware
-                    logger.error(`Attempted local account signup - Missing name, email, password`);
+                    logger.error(`Attempted local account signup - Missing
+                     name, email, password`);
                     return done(undefined, false);
                 }
 
-                const {salt, hash} = await hashPassword(password);
+                const { salt, hash } = await hashPassword(password);
 
                 if (isEmpty) {
                     user = await UserService.create({
@@ -84,8 +86,10 @@ if (Environment.allowLocalAuth()) {
                             hash,
                         });
                     } else {
-                        // TODO: display this issue using express.flash middleware
-                        logger.error(`attempted local account signup - email already taken`);
+                        // TODO: display this issue using express.flash
+                        // middleware
+                        logger.error(`attempted local account signup - email
+                        already taken`);
                         return done(undefined, false);
                     }
                 }
@@ -93,15 +97,18 @@ if (Environment.allowLocalAuth()) {
             } else {
                 if (!user || !user.salt || !user.hash) {
                     // TODO: display this issue using express.flash middleware
-                    logger.error(`Attempted local account sign in - Wrong service`);
+                    logger.error(`Attempted local account sign in -
+                    Wrong service`);
                     return done(undefined, false);
                 }
-                const hash = await pbkdf2Async(password, Buffer.from(user.salt as string, 'hex'), 3000);
+                const hash = await pbkdf2Async(password,
+                    Buffer.from(user.salt as string, 'hex'), 3000);
                 if (hash.toString('hex') === user.hash) {
                     done(undefined, user);
                 } else {
                     // TODO: display this issue using express.flash middleware
-                    logger.error(`Attempted local acccount sign in - Wrong password`);
+                    logger.error(`Attempted local acccount sign in -
+                    Wrong password`);
                     done(undefined, false);
                 }
             }
@@ -118,22 +125,28 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
         logger.warn(`No ${serviceName} Authentication envars found. Skipping.`);
         return;
     }
-    logger.info(`${serviceName} envars found, enabling ${serviceName} Authentication`);
+    logger.info(`${serviceName} envars found, enabling ${serviceName}
+    Authentication`);
 
     const newStrategy = new strategy(config,
-        async (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any) => void) => {
+        async (accessToken: string, refreshToken: string, profile: Profile,
+               done: (error: any, user?: any) => void) => {
             // Sanity checks
             if (profile.emails === undefined) {
                 // TODO: display this issue using express.flash middleware
-                logger.error(`${serviceName} Login attempt without public email in ${serviceName} profile`);
+                logger.error(`${serviceName} Login attempt without public
+                email in ${serviceName} profile`);
                 return done(undefined, false);
-            } else if (profile.displayName === undefined || profile.displayName.trim() === '') {
+            } else if (profile.displayName === undefined ||
+                profile.displayName.trim() === '') {
                 // TODO: display this issue using express.flash middleware
-                logger.error(`${serviceName} Login attempt without a display name in ${serviceName} profile`);
+                logger.error(`${serviceName} Login attempt without a display
+                name in ${serviceName} profile`);
                 return done(undefined, false);
             }
             let user;
-            // If there does not exist any other user in the database, the first one should be "Owner"
+            // If there does not exist any other user in the database, the
+            // first one should be 'Owner'
             if (await UserService.isEmpty()) {
                 user = await UserService.create({
                     name: profile.displayName,
@@ -154,7 +167,8 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
                     // If the found profile doesn't exist in the found user
                 } else if (user[serviceName] !== getIdFromProfile(profile)) {
                     // TODO: display this issue using express.flash middleware
-                    logger.error(`Login attempt through ${serviceName} but account isn't integrated.`);
+                    logger.error(`Login attempt through ${serviceName} but
+                    account isn't integrated.`);
                     return done(undefined, false);
                 }
             }
@@ -165,11 +179,13 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
     strategies.push(newStrategy);
 }
 
-export function serialize(user: UserModel, done: (err: any, id?: number) => void): void {
+export function serialize(user: UserModel,
+                          done: (err: any, id?: number) => void): void {
     done(undefined, user.user_id);
 }
 
-export function deserialize(id: number, done: (err: any, user?: UserModel) => void): void {
+export function deserialize(id: number,
+                            done: (err: any, user?: UserModel) => void): void {
     UserService.findById(id).then((user) => {
         done(undefined, user);
     }).catch((err) => {

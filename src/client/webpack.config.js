@@ -2,8 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HTMLWebpackPlugin = require('html-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
-// const config = require('../../config.json');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const loadLandingPage = new HTMLWebpackPlugin({
     filename: 'index.html',
@@ -22,7 +22,6 @@ module.exports = {
     output: {
         filename: "bundle.js",
         path: path.resolve(__dirname, "../../build/public"),
-        // publicPath: config.server.url + '/app'
     },
 
     devtool: "source-map",
@@ -48,9 +47,11 @@ module.exports = {
         loadLandingPage,
         extractSass,
         new webpack.HotModuleReplacementPlugin(),
-        new Dotenv({
-            path: './.env',
-            safe: false,
+        new webpack.DefinePlugin({
+            'AUTH_ALLOW_GITHUB': JSON.stringify(process.env.AUTH_ALLOW_GITHUB),
+            'AUTH_ALLOW_GOOGLE': JSON.stringify(process.env.AUTH_ALLOW_GOOGLE),
+            'AUTH_ALLOW_FACEBOOK': JSON.stringify(process.env.AUTH_ALLOW_FACEBOOK),
+            'AUTH_ALLOW_LOCAL': JSON.stringify(process.env.AUTH_ALLOW_LOCAL),
         }),
     ],
 };

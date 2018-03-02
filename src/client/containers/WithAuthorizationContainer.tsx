@@ -12,14 +12,15 @@ interface StateToProps {
     role: string;
 }
 
-const WithAuthorization: React.SFC<StateToProps & WithAuthorizationProps> = (props) => {
-    const { allowedRoles, role, WrappedComponent } = props;
-    if (allowedRoles.includes(role)) {
-        return <WrappedComponent />;
-    } else {
-        return null;
-    }
-};
+const WithAuthorization: React.SFC<StateToProps & WithAuthorizationProps> =
+    (props) => {
+        const { allowedRoles, role, WrappedComponent } = props;
+        if (allowedRoles.includes(role)) {
+            return <WrappedComponent />;
+        } else {
+            return null;
+        }
+    };
 
 const mapStateToProps = (state: State): StateToProps => {
     return {

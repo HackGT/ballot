@@ -11,8 +11,9 @@ export interface ResolverContext {
 
 const schema = mergeSchemas({
     schemas: [user, root],
-    // TODO: Keep resolver argument type annotations without needing to cast the resolver to any
-    resolvers: [userResolver as any], 
+    // TODO: Keep resolver argument type annotations without needing to cast
+    // the resolver to any
+    resolvers: [userResolver as any],
 });
 
 export default schema;

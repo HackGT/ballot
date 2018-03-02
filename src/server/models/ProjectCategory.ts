@@ -3,7 +3,8 @@ import * as Sequelize from 'sequelize';
 import { Projects } from './ProjectModel';
 import { Categories } from './CategoryModel';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER } = Sequelize;
 
 export interface ProjectCategory {

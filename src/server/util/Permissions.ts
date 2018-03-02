@@ -19,6 +19,7 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
         case Action.PromoteUser:
         case Action.DeleteUser:
         case Action.CreateCategory:
+        case Action.ViewUsers:
             return this.user_class === UserClass.Admin ||
                 this.user_class === UserClass.Owner;
 

@@ -10,13 +10,19 @@ export interface User extends UserModel {
     can(action: Action, target?: Target): boolean;
 }
 
+function applyPrototypeFunctions(user: UserModel | undefined):
+    User | undefined {
+    return user ? Object.setPrototypeOf(user, { can }) : undefined;
+}
+
 export class UserService {
 
     public static find(): Promise<UserModel[]> {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
-            .then((users) => users.map((userObj) => Object.setPrototypeOf(userObj, { can })!))
+            .then((users) => users.map((user) =>
+                applyPrototypeFunctions(user)!))
             .catch(printAndThrowError('find', logger));
     }
 
@@ -24,7 +30,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
-            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findById', logger));
     }
 
@@ -32,7 +38,7 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
-            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findByEmail', logger));
     }
 
@@ -40,15 +46,18 @@ export class UserService {
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
-            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('create', logger));
     }
 
-    public static update(id: number, user: Partial<UserModel>): Promise<User | undefined> {
+    public static update(id: number,
+                         user: Partial<UserModel>):
+        Promise<UserModel | undefined> {
 
         return Users.sync()
-            .then(() => Users.update(user as UserModel, { where: { user_id: id }, returning: true }))
-            .then(val => {
+            .then(() => Users.update(user as UserModel,
+                { where: { user_id: id }, returning: true }))
+            .then((val) => {
                 const [num, users] = val;
                 if (num === 0) {
                     logger.error('update id matched no existing user');
