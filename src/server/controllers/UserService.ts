@@ -35,11 +35,14 @@ export class UserService {
             .catch(printAndThrowError('create', logger));
     }
 
-    public static update(id: number, user: Partial<IUserModel>): Promise<IUserModel | undefined> {
+    public static update(id: number,
+                         user: Partial<IUserModel>):
+                         Promise<IUserModel | undefined> {
 
         return Users.sync()
-            .then(() => Users.update(user as IUserModel, { where: { user_id: id }, returning: true }))
-            .then(val => {
+            .then(() => Users.update(user as IUserModel,
+                { where: { user_id: id }, returning: true }))
+            .then((val) => {
                 const [num, users] = val;
                 if (num === 0) {
                     logger.error('update id matched no existing user');

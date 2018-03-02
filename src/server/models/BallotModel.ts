@@ -4,7 +4,8 @@ import { Projects } from './ProjectModel';
 import { Criteria } from './CriteriaModel';
 import { Users } from './UserModel';
 
-// Catch-all import because we want SequelizeStatic.Model and not Sequelize.Model
+// Catch-all import because we want SequelizeStatic.Model and not
+// Sequelize.Model
 const { INTEGER, SMALLINT, DATE, ENUM } = Sequelize;
 
 export enum BallotStatus {
@@ -14,7 +15,7 @@ export enum BallotStatus {
     Reviewed = 'Reviewed',
 }
 
-export interface IBallotModel {
+export interface BallotModel {
     ballot_id: number;
     project_id: number;
     criteria_id: number;
@@ -25,8 +26,8 @@ export interface IBallotModel {
     score_submitted_at: Date;
 }
 
-export const Ballots: Sequelize.Model<undefined, IBallotModel> =
-    sequelize.define<undefined, IBallotModel>('ballots', {
+export const Ballots: Sequelize.Model<undefined, BallotModel> =
+    sequelize.define<undefined, BallotModel>('ballots', {
         ballot_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         project_id: {
             type: INTEGER, allowNull: false, references: {
@@ -43,7 +44,10 @@ export const Ballots: Sequelize.Model<undefined, IBallotModel> =
                 model: Users, key: 'user_id',
             },
         },
-        status: { type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'), allowNull: false },
+        status: {
+            type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'),
+            allowNull: false,
+        },
         score: { type: SMALLINT },
         score_submitted_at: { type: DATE },
     });

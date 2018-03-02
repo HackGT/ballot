@@ -58,14 +58,15 @@ try {
     app.use('/', express.static('./build/public'));
     app.use('/healthcheck', healthcheck);
     app.use('/auth', auth);
-    app.use('/graphql', bodyParser.json(), graphqlExpress((req?: express.Request, res?: express.Response) => {
-        return {
-            schema,
-            context: {
-                user: req!.user,
-            },
-        };
-    }));
+    app.use('/graphql', bodyParser.json(),
+        graphqlExpress((req?: express.Request, res?: express.Response) => {
+            return {
+                schema,
+                context: {
+                    user: req!.user,
+                },
+            };
+        }));
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
     app.use('*', index);
 
