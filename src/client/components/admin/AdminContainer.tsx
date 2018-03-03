@@ -18,7 +18,7 @@ const AdminContainer: React.SFC<AdminContainerProps> = (props) => {
     return (
         <div className='admin-container'>
             <div className='admin-left'>
-                <SidebarNavigation match={props.match} linkNames={['Home', 'Ranking', 'Events', 'Projects', 'Users']} linkDests={['/', '/ranking', '/events', '/projects', '/users']}/>
+                <SidebarNavigation match={props.match} linkNames={['Home', 'Ranking', 'Events', 'Projects', 'Users']} linkDests={['', '/ranking', '/events', '/projects', '/users']}/>
             </div>
             <div className='admin-right'>
             <Switch>

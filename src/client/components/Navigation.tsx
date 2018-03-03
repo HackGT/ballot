@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './Navigation.scss';
 
 interface NavigationProps {
@@ -29,7 +29,7 @@ const Navigation: React.SFC<NavigationProps> = (props) => {
 
 const NavigationElement: React.SFC<NavigationElementProps> = (props) => {
     return (
-        <li><Link to={props.linkDest}>{props.linkName}</Link></li>
+        <li><NavLink exact={props.linkDest === '/' ? true : false} activeClassName='active' to={props.linkDest}>{props.linkName}</NavLink></li>
     );
 };
 
