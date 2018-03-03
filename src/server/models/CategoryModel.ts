@@ -6,7 +6,7 @@ import { CriteriaModel } from './CriteriaModel';
 // Sequelize.Model
 const { INTEGER, STRING, BOOLEAN } = Sequelize;
 
-interface CategoryModel {
+export interface CategoryModel {
     category_id: number;
     name: string;
     is_primary: boolean;

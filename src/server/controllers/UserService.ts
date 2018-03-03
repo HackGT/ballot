@@ -1,4 +1,4 @@
-import { IUserModel, Users } from '../models/UserModel';
+import { UserModel, Users } from '../models/UserModel';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
 import { printAndThrowError } from '../util/common';
@@ -7,28 +7,28 @@ const logger = Logger('controllers/UserService');
 
 export class UserService {
 
-    public static find(): Promise<IUserModel[]> {
+    public static find(): Promise<UserModel[]> {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
             .catch(printAndThrowError('find', logger));
     }
 
-    public static findById(id: number): Promise<IUserModel | undefined> {
+    public static findById(id: number): Promise<UserModel | undefined> {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
             .catch(printAndThrowError('findById', logger));
     }
 
-    public static findByEmail(email: string): Promise<IUserModel | undefined> {
+    public static findByEmail(email: string): Promise<UserModel | undefined> {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
             .catch(printAndThrowError('findByEmail', logger));
     }
 
-    public static create(user: IUserModel): Promise<IUserModel | undefined> {
+    public static create(user: UserModel): Promise<UserModel | undefined> {
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
@@ -36,11 +36,11 @@ export class UserService {
     }
 
     public static update(id: number,
-                         user: Partial<IUserModel>):
-                         Promise<IUserModel | undefined> {
+                         user: Partial<UserModel>):
+                         Promise<UserModel | undefined> {
 
         return Users.sync()
-            .then(() => Users.update(user as IUserModel,
+            .then(() => Users.update(user as UserModel,
                 { where: { user_id: id }, returning: true }))
             .then((val) => {
                 const [num, users] = val;

@@ -1,5 +1,5 @@
 import { UserService } from '../../controllers/UserService';
-import { IUserModel } from '../../models/UserModel';
+import { UserModel } from '../../models/UserModel';
 import { hashPassword } from '../../util/common';
 import { UserFilter } from '../types/user';
 
@@ -14,7 +14,7 @@ const resolvers = {
                     'identifiers, use only one');
             }
 
-            let users: IUserModel[];
+            let users: UserModel[];
 
             if (args.filters && args.filters.email) {
                 const res = await UserService.findByEmail(

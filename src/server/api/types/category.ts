@@ -1,16 +1,21 @@
 const schema = `
 type Query {
-    categories(filters: CategoryFilter): [Category!]!
+    categories: [Category!]!
 }
 
 type Mutation {
-   createCategory(category_id: Int, name: String, is_primary: Boolean): Category!
-   addCriteria(category_id: Int, name: String, rubric: String, min_score: Int, max_score: Int): Category!
+   create(category_id: Int!, name: String!, is_primary: Boolean!): Category!
+   delete(category_id: Int!): Boolean
+   update(category_id: Int!, update: CategoryUpdate!): Category!
 }
 
 input CategoryFilter {
-    name: String
-    category_id: Int,
+    category_id: Int
+}
+
+input CategoryUpdate {
+    name: String,
+    is_primary: Boolean
 }
 
 type Category {
@@ -20,8 +25,12 @@ type Category {
 }`;
 
 export interface CategoryFilter {
-    name?: string;
     category_id?: number;
+}
+
+export interface CategoryUpdate {
+    name?: string;
+    is_primary?: boolean;
 }
 
 export default schema;
