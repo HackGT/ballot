@@ -12,7 +12,7 @@ export interface CategoryModel {
     is_primary: boolean;
 }
 
-export interface CategoryModelWithCriteria {
+export interface CategoryModelWithCriteria extends CategoryModel {
     criteria: CriteriaModel[];
 }
 

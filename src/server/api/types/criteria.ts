@@ -5,7 +5,8 @@ type Query {
 
 type Mutation {
     addCriterion(category_id: Int!, criteria_id: Int!, name: String!,
-    rubric: String!, min_score: Int!, max_score: Int!, category_id: Int!): Criteria!
+    rubric: String!, min_score: Int!, max_score: Int!, category_id: Int!)
+        : Criteria!
     updateCriterion(criteria_id: Int!, update: CriterionUpdate!): Criteria!
 }
 
@@ -27,10 +28,10 @@ type Criteria {
 }`;
 
 export interface CriterionUpdate {
-    name?: string,
-    rubric?: string,
-    min_score?: number,
-    max_score?: number,
-    category_id?: number
+    name?: string;
+    rubric?: string;
+    min_score?: number;
+    max_score?: number;
+    category_id?: number;
 }
 export default schema;
