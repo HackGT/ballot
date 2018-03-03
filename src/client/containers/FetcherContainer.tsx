@@ -1,5 +1,9 @@
 import { connect } from 'react-redux';
 import * as React from 'react';
+import {
+    ConditionalRender,
+    mapStateToAllProps,
+} from '../util/authorization';
 
 import { fetchProfileClass } from '../actions/profile';
 import Action from '../types/Action';
@@ -30,8 +34,8 @@ const mapDispatchToProps = {
 };
 
 const FetcherContainer = connect<StateToProps, DispatchToProps>(
-    mapStateToProps,
+    mapStateToAllProps(mapStateToProps),
     mapDispatchToProps
-)(Fetcher);
+)(ConditionalRender(Fetcher));
 
 export default FetcherContainer;

@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 import * as React from 'react';
-import { Redirect } from 'react-router-dom';
 import {
     ConditionalRender,
     mapStateToAllProps,
 } from '../util/authorization';
+
+import Pending from '../components/Pending';
 
 import { State } from '../types/State';
 
@@ -15,23 +16,14 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    console.log('nosession', state.auth.role, !state.auth.role);
-    return !state.auth.role;
+    return ['Pending', 'Judge', 'Admin', 'Owner'].includes(state.auth.role);
 };
 
-interface NoSessionProps {}
-
-const NoSession: React.SFC<NoSessionProps> = (props) => {
-    return (
-        <Redirect from='*' to='/login' />
-    );
-};
-
-const NoSessionContainer = connect<StateToProps>(
+const PendingContainer = connect<StateToProps>(
     mapStateToAllProps(
         mapStateToProps,
         mapStateToAuth,
     ),
-)(ConditionalRender(NoSession));
+)(ConditionalRender(Pending));
 
-export default NoSessionContainer;
+export default PendingContainer;

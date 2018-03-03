@@ -3,31 +3,27 @@ import * as ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import App from './components/App';
-import Authorization from './components/Authorization';
+import AppContainer from './containers/AppContainer';
 import FetcherContainer from './containers/FetcherContainer';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import './global.scss';
-import NoSession from './util/RedirectNoSession';
+import NoSessionContainer from './util/RedirectNoSession';
 import store from './store';
 
-const UserNone = Authorization(['None']);
-const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
-
 ReactDOM.render(
-    <Provider store={store}>
-        <Router>
+    <Router>
+        <Provider store={store}>
             <div>
                 <FetcherContainer />
-                <Route component={UserAuth(App)} />
+                <Route exact path='/' component={AppContainer} />
                 <Switch>
                     <Route path='/login' component={LoginPage} />
                     <Route path='/register' component={RegisterPage} />
-                    <Route component={UserNone(NoSession)} />
+                    <Route path='/' component={NoSessionContainer} />
                 </Switch>
             </div>
-        </Router>
-    </Provider>,
+        </Provider>
+    </Router>,
     document.getElementById('app') as HTMLElement
 );
