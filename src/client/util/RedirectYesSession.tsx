@@ -15,7 +15,7 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    return !!state.auth.role;
+    return state.auth.role !== 'None';
 };
 
 interface YesSessionProps {}

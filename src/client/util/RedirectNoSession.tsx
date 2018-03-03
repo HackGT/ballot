@@ -15,15 +15,14 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    console.log('nosession', state.auth.role, !state.auth.role);
-    return !state.auth.role;
+    return state.auth.role === 'None';
 };
 
 interface NoSessionProps {}
 
 const NoSession: React.SFC<NoSessionProps> = (props) => {
     return (
-        <Redirect from='*' to='/login' />
+        <Redirect to="/login" />
     );
 };
 

@@ -8,7 +8,6 @@ import FetcherContainer from './containers/FetcherContainer';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import './global.scss';
-import NoSessionContainer from './util/RedirectNoSession';
 import store from './store';
 
 ReactDOM.render(
@@ -16,11 +15,10 @@ ReactDOM.render(
         <Provider store={store}>
             <div>
                 <FetcherContainer />
-                <Route exact path='/' component={AppContainer} />
                 <Switch>
                     <Route path='/login' component={LoginPage} />
                     <Route path='/register' component={RegisterPage} />
-                    <Route path='/' component={NoSessionContainer} />
+                    <Route path='/' component={AppContainer} />
                 </Switch>
             </div>
         </Provider>

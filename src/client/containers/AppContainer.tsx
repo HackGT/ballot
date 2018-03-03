@@ -5,7 +5,7 @@ import {
     mapStateToAllProps,
 } from '../util/authorization';
 
-import Pending from '../components/Pending';
+import App from '../components/App';
 
 import { State } from '../types/State';
 
@@ -15,15 +15,8 @@ const mapStateToProps = (state: State): StateToProps => {
     return {};
 };
 
-const mapStateToAuth = (state: State): boolean => {
-    return ['Pending', 'Judge', 'Admin', 'Owner'].includes(state.auth.role);
-};
+const AppContainer = connect<StateToProps>(
+    mapStateToAllProps(mapStateToProps),
+)(ConditionalRender(App));
 
-const PendingContainer = connect<StateToProps>(
-    mapStateToAllProps(
-        mapStateToProps,
-        mapStateToAuth,
-    ),
-)(ConditionalRender(Pending));
-
-export default PendingContainer;
+export default AppContainer;
