@@ -1,5 +1,4 @@
 import { CategoryModel, Categories } from '../models/CategoryModel';
-import { CriteriaModel, Criteria } from '../models/CriteriaModel';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
 import { printAndThrowError } from '../util/common';
@@ -56,5 +55,5 @@ export class CategoryService {
                 }
                 return categories[0]!.toJSON();
             }).catch(printAndThrowError('update', logger));
-        }
+    }
 }
