@@ -10,8 +10,8 @@ import categoryResolver from './resolvers/categoryResolver';
 import criteriaResolver from './resolvers/criteriaResolver';
 
 const schema = mergeSchemas({
-    schemas: [user, category, root],
-    resolvers: [userResolver, categoryResolver],
+    schemas: [user, category, criteria, root],
+    resolvers: [userResolver, categoryResolver, criteriaResolver],
 });
 
 export default schema;

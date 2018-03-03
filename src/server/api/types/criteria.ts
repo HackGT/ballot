@@ -1,4 +1,8 @@
 const schema = `
+type Query {
+    criteria: [Criteria!]!
+}
+
 type Criteria {
     criteria_id: Int,
     name: String,

@@ -31,7 +31,11 @@ const resolvers = {
         update: async (obj: any, args: {category_id?: number, update?: CategoryUpdate},
             context: any) => {
             if (args.category_id && args.update) {
-                CategoryService.update(args.category_id, args.update);
+                let updated = await CategoryService.update(args.category_id, args.update);
+                if (!updated) {
+                    throw new Error('failed to update category');
+                }
+                return updated as CategoryModel;
             } else {
                 throw new Error('must include category_id and update');
             }

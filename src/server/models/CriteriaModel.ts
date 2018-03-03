@@ -7,7 +7,7 @@ import { Categories } from './CategoryModel';
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
 export interface CriteriaModel {
-    criteria_id: number;
+    criteria_id?: number;
     name: string;
     rubric: string;
     min_score: number;
