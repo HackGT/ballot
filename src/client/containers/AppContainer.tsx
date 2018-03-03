@@ -16,7 +16,7 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const AppContainer = connect<StateToProps>(
-    mapStateToAllProps(mapStateToProps),
+    mapStateToAllProps<StateToProps, {}>(mapStateToProps),
 )(ConditionalRender(App));
 
 export default AppContainer;

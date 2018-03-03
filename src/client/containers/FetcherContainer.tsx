@@ -34,7 +34,7 @@ const mapDispatchToProps = {
 };
 
 const FetcherContainer = connect<StateToProps, DispatchToProps>(
-    mapStateToAllProps(mapStateToProps),
+    mapStateToAllProps<StateToProps, {}>(mapStateToProps),
     mapDispatchToProps
 )(ConditionalRender(Fetcher));
 

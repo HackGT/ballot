@@ -20,7 +20,7 @@ const mapStateToAuth = (state: State): boolean => {
 };
 
 const JudgeContainer = connect<StateToProps>(
-    mapStateToAllProps(
+    mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth,
     ),

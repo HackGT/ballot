@@ -20,7 +20,7 @@ const mapStateToAuth = (state: State): boolean => {
 };
 
 const PendingContainer = connect<StateToProps>(
-    mapStateToAllProps(
+    mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth,
     ),
