@@ -2,8 +2,18 @@ import { UserModel, Users } from '../models/UserModel';
 import { Logger } from '../util/Logger';
 import * as Promise from 'bluebird';
 import { printAndThrowError } from '../util/common';
+import { can, Action, Target } from '../util/Permissions';
 
 const logger = Logger('controllers/UserService');
+
+export interface User extends UserModel {
+    can(action: Action, target?: Target): boolean;
+}
+
+function applyPrototypeFunctions(user: UserModel | undefined):
+    User | undefined {
+    return user ? Object.setPrototypeOf(user, { can }) : undefined;
+}
 
 export class UserService {
 
@@ -11,33 +21,38 @@ export class UserService {
         return Users.sync()
             .then(() => Users.findAll())
             .then((users) => users.map((user) => user.toJSON()))
+            .then((users) => users.map((user) =>
+                applyPrototypeFunctions(user)!))
             .catch(printAndThrowError('find', logger));
     }
 
-    public static findById(id: number): Promise<UserModel | undefined> {
+    public static findById(id: number): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.findById(id))
             .then((user) => user ? user.toJSON() : undefined)
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findById', logger));
     }
 
-    public static findByEmail(email: string): Promise<UserModel | undefined> {
+    public static findByEmail(email: string): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.findOne({ where: { email } }))
             .then((user) => user ? user.toJSON() : undefined)
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findByEmail', logger));
     }
 
-    public static create(user: UserModel): Promise<UserModel | undefined> {
+    public static create(user: UserModel): Promise<User | undefined> {
         return Users.sync()
             .then(() => Users.create(user))
             .then((newUser) => newUser.toJSON())
+            .then(applyPrototypeFunctions)
             .catch(printAndThrowError('create', logger));
     }
 
     public static update(id: number,
                          user: Partial<UserModel>):
-                         Promise<UserModel | undefined> {
+        Promise<UserModel | undefined> {
 
         return Users.sync()
             .then(() => Users.update(user as UserModel,
@@ -51,7 +66,9 @@ export class UserService {
                     throw new Error('Update query modified more than one user');
                 }
                 return users[0]!.toJSON();
-            }).catch(printAndThrowError('update', logger));
+            })
+            .then((userObj) => Object.setPrototypeOf(userObj, { can }))
+            .catch(printAndThrowError('update', logger));
     }
 
     public static delete(id: number): Promise<void> {

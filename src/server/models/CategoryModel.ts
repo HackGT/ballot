@@ -6,21 +6,19 @@ import { CriteriaModel } from './CriteriaModel';
 // Sequelize.Model
 const { INTEGER, STRING, BOOLEAN } = Sequelize;
 
-export interface CategoryModel {
+export interface CategoryModelWithoutCriteria {
     category_id: number;
     name: string;
     is_primary: boolean;
 }
 
-export interface CategoryModelWithCriteria extends CategoryModel {
+export interface CategoryModel extends CategoryModelWithoutCriteria {
     criteria: CriteriaModel[];
 }
 
-interface CategoryInstance extends Sequelize.Instance<CategoryModel> {
-}
-
-export const Categories: Sequelize.Model<CategoryInstance, CategoryModel> =
-    sequelize.define<CategoryInstance, CategoryModel>('categories', {
+export const Categories: Sequelize.Model<undefined,
+    CategoryModelWithoutCriteria> =
+    sequelize.define<undefined, CategoryModel>('categories', {
         category_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
         is_primary: { type: BOOLEAN, allowNull: false },
