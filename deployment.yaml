@@ -16,4 +16,3 @@ wants:
 
 env:
     NODE_ENV: production
-    AUTH_ALLOW_LOCAL: true

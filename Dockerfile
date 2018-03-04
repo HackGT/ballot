@@ -12,15 +12,18 @@ RUN apk update && apk add \
 RUN npm install npm@"~5.4.0" && rm -rf /usr/local/lib/node_modules && mv node_modules /usr/local/lib
 
 # Bundle Source
+ENV AUTH_ALLOW_LOCAL="true"
+ENV AUTH_ALLOW_GITHUB="true"
 RUN mkdir -p /usr/src/ballot
 WORKDIR /usr/src/ballot
 COPY . /usr/src/ballot
 RUN npm install
 # RUN npm run sqlinit
+RUN npm run build
 
 # Set Timezone to EST
 RUN apk add tzdata
 ENV TZ="/usr/share/zoneinfo/America/New_York"
 
 EXPOSE 3000
-CMD ["sh","-c","npm run build && npm run serve"]
+CMD ["npm", "run", "serve"]

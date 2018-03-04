@@ -1,10 +1,15 @@
 import * as Sequelize from 'sequelize';
-import { Environment, IDatabaseConfigURI, IDatabaseConfig } from '../config/Environment';
+import {
+    Environment,
+    DatabaseConfigURI,
+    DatabaseConfig
+} from '../config/Environment';
 
 const config = Environment.getDatabaseConfig();
 
 if (config === undefined) {
-    throw new Error('Expected: PostgresQL Configuration in Environment Variables');
+    throw new Error('Expected: PostgresQL Configuration in Environment ' +
+        'Variables');
 }
 
 const sequelizeOptions: Sequelize.Options = {
@@ -26,14 +31,15 @@ const sequelizeOptions: Sequelize.Options = {
 
 export let sequelize: Sequelize.Sequelize;
 
-if ((config as IDatabaseConfigURI).uri !== undefined) {
-    sequelize = new Sequelize((config as IDatabaseConfigURI).uri, sequelizeOptions);
+if ((config as DatabaseConfigURI).uri !== undefined) {
+    sequelize = new Sequelize((config as DatabaseConfigURI).uri,
+        sequelizeOptions);
 } else {
-    sequelizeOptions.host = (config as IDatabaseConfig).host;
-    sequelizeOptions.port = (config as IDatabaseConfig).port;
+    sequelizeOptions.host = (config as DatabaseConfig).host;
+    sequelizeOptions.port = (config as DatabaseConfig).port;
 
-    sequelize = new Sequelize((config as IDatabaseConfig).database,
-        (config as IDatabaseConfig).username,
-        (config as IDatabaseConfig).password,
+    sequelize = new Sequelize((config as DatabaseConfig).database,
+        (config as DatabaseConfig).username,
+        (config as DatabaseConfig).password,
         sequelizeOptions);
 }
