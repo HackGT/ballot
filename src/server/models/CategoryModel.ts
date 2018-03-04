@@ -1,6 +1,6 @@
 import { sequelize } from '../db/index';
 import * as Sequelize from 'sequelize';
-import { CriteriaModel, Criteria, CriteriaInstance } from './CriteriaModel';
+import { CriteriaModel, CriteriaInstance } from './CriteriaModel';
 
 // Catch-all import because we want SequelizeStatic.Model and not
 // Sequelize.Model

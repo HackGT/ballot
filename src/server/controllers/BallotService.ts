@@ -1,12 +1,8 @@
 import { Logger } from '../util/Logger';
 import { printAndThrowError } from '../util/common';
-import { ProjectModel, Projects } from '../models/ProjectModel';
 import { BallotModel, BallotStatus, Ballots, BallotInstance } from '../models/BallotModel';
 import { sequelize } from '../db';
-import * as Sequelize from 'sequelize';
 import * as BPromise from 'bluebird';
-import { Criteria } from '../models/CriteriaModel';
-import { Users } from '../models/UserModel';
 
 const logger = Logger('controllers/BallotService');
 
