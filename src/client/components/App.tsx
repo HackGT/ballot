@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter as Router,Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import AdminPageContainer from '../containers/admin/AdminPageContainer';
 import JudgeContainer from '../containers/judging/JudgeContainer';
 import NoSessionContainer from '../util/RedirectNoSession';

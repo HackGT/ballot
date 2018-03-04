@@ -4,7 +4,7 @@ import Admin from './Admin';
 import Ranking from './Ranking';
 import Events from './Events';
 import Projects from './Projects';
-import Users from './Users';
+import UserContainer from './UserContainer';
 import Header from '../Header';
 import Navigation from '../Navigation';
 import SidebarNavigation from './SidebarNavigation';
@@ -18,15 +18,27 @@ const AdminContainer: React.SFC<AdminContainerProps> = (props) => {
     return (
         <div className='admin-container'>
             <div className='admin-left'>
-                <SidebarNavigation match={props.match} linkNames={['Home', 'Ranking', 'Events', 'Projects', 'Users']} linkDests={['', '/ranking', '/events', '/projects', '/users']}/>
+                <SidebarNavigation
+                    match={props.match}
+                    linkNames={[
+                        'Home', 'Ranking', 'Events', 'Projects', 'Users',
+                    ]}
+                    linkDests={[
+                        '', '/ranking', '/events', '/projects', '/users',
+                    ]}/>
             </div>
             <div className='admin-right'>
             <Switch>
-                <Route path={`${props.match.url}/ranking`} component={Ranking} />
-                <Route path={`${props.match.url}/events`} component={Events} />
-                <Route path={`${props.match.url}/projects`} component={Projects} />
-                <Route path={`${props.match.url}/users`} component={Users} />
-                <Route path={`${props.match.url}`} component={Admin} />
+                <Route path={`${props.match.url}/ranking`}
+                    component={Ranking} />
+                <Route path={`${props.match.url}/events`}
+                    component={Events} />
+                <Route path={`${props.match.url}/projects`}
+                    component={Projects} />
+                <Route path={`${props.match.url}/users`}
+                    component={UserContainer} />
+                <Route path={`${props.match.url}`}
+                    component={Admin} />
             </Switch>
             </div>
         </div>

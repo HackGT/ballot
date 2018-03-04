@@ -22,8 +22,8 @@ const mapStateToAuth = (state: State): boolean => {
 const JudgeContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
-        mapStateToAuth,
-    ),
+        mapStateToAuth
+    )
 )(ConditionalRender(Judge));
 
 export default JudgeContainer;

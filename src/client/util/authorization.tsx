@@ -2,8 +2,14 @@ import * as React from 'react';
 import { State } from '../types/State';
 
 export const mapStateToAllProps = <PropsType extends object, OwnPropsType>(
-    mapStateToProps: (state: State, ownProps: OwnPropsType | undefined) => PropsType,
-    mapStateToAuth?: (state: State, ownProps: OwnPropsType | undefined) => boolean,
+    mapStateToProps: (
+        state: State,
+        ownProps: OwnPropsType | undefined
+    ) => PropsType,
+    mapStateToAuth?: (
+        state: State,
+        ownProps: OwnPropsType | undefined
+    ) => boolean
 ) => (state: State, ownProps: OwnPropsType) => ({
         // typescript is garbage exhibit A
         // https://github.com/Microsoft/TypeScript/issues/14409
@@ -12,7 +18,7 @@ export const mapStateToAllProps = <PropsType extends object, OwnPropsType>(
     });
 
 export const ConditionalRender = (
-    WrappedComponent: React.ComponentClass<any> |React.StatelessComponent<any>
+    WrappedComponent: React.ComponentClass<any> | React.StatelessComponent<any>
     // typescript is garbage exhibit B
     // https://github.com/Microsoft/TypeScript/issues/4922
 ) => <PropsType extends any>(props: PropsType) => {

@@ -18,7 +18,11 @@ const Navigation: React.SFC<NavigationProps> = (props) => {
     this.navLinks = [];
 
     for (let i = 0; i < props.linkNames.length; i++) {
-        this.navLinks.push(<NavigationElement key={i} linkName={props.linkNames[i]} linkDest={props.linkDests[i]} match={props.match}/>);
+        this.navLinks.push(<NavigationElement
+            key={i}
+            linkName={props.linkNames[i]}
+            linkDest={props.linkDests[i]}
+            match={props.match}/>);
     }
 
     return (
@@ -30,7 +34,14 @@ const Navigation: React.SFC<NavigationProps> = (props) => {
 
 const NavigationElement: React.SFC<NavigationElementProps> = (props) => {
     return (
-        <li><NavLink exact activeClassName='active' to={props.match.url + props.linkDest}>{props.linkName}</NavLink></li>
+        <li>
+            <NavLink
+            exact
+            activeClassName='active'
+            to={props.match.url + props.linkDest}>
+                {props.linkName}
+            </NavLink>
+        </li>
     );
 };
 

@@ -22,8 +22,8 @@ const mapStateToAuth = (state: State): boolean => {
 const PendingContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
-        mapStateToAuth,
-    ),
+        mapStateToAuth
+    )
 )(ConditionalRender(Pending));
 
 export default PendingContainer;

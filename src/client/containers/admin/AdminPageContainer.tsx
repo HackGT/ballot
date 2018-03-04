@@ -22,8 +22,8 @@ const mapStateToAuth = (state: State): boolean => {
 const AdminPageContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
-        mapStateToAuth,
-    ),
+        mapStateToAuth
+    )
 )(ConditionalRender(AdminPage));
 
 export default AdminPageContainer;

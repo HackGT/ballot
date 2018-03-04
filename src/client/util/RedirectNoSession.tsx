@@ -22,15 +22,15 @@ interface NoSessionProps {}
 
 const NoSession: React.SFC<NoSessionProps> = (props) => {
     return (
-        <Redirect to="/login" />
+        <Redirect to='/login' />
     );
 };
 
 const NoSessionContainer = connect<StateToProps>(
     mapStateToAllProps(
         mapStateToProps,
-        mapStateToAuth,
-    ),
+        mapStateToAuth
+    )
 )(ConditionalRender(NoSession));
 
 export default NoSessionContainer;

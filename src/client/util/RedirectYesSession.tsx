@@ -29,8 +29,8 @@ const YesSession: React.SFC<YesSessionProps> = (props) => {
 const YesSessionContainer = connect<StateToProps>(
     mapStateToAllProps(
         mapStateToProps,
-        mapStateToAuth,
-    ),
+        mapStateToAuth
+    )
 )(ConditionalRender(YesSession));
 
 export default YesSessionContainer;
