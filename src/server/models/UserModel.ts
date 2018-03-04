@@ -30,7 +30,12 @@ export enum UserClass {
 export const Users: Sequelize.Model<UserInstance, UserModel> =
     sequelize.define<UserInstance, UserModel>('users', {
         user_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-        email: { type: STRING(254), allowNull: false, unique: true },
+        email: {
+            type: STRING(254),
+            allowNull: false,
+            unique: true,
+            validate: { isEmail: true },
+        },
         name: { type: STRING(64), allowNull: false },
         user_class: {
             type: ENUM('Pending', 'Judge', 'Admin', 'Owner'),

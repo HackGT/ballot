@@ -26,6 +26,9 @@ export interface BallotModel {
     score_submitted_at: Date;
 }
 
+export interface BallotInstance extends Sequelize.Instance<BallotModel> {
+}
+
 export const Ballots: Sequelize.Model<undefined, BallotModel> =
     sequelize.define<undefined, BallotModel>('ballots', {
         ballot_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
