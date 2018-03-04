@@ -7,7 +7,7 @@ import { Categories } from './CategoryModel';
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
 export interface CriteriaModel {
-    criteria_id: number;
+    criteria_id?: number;
     name: string;
     rubric: string;
     min_score: number;
@@ -15,16 +15,20 @@ export interface CriteriaModel {
     category_id: number;
 }
 
-export const Criteria: Sequelize.Model<undefined, CriteriaModel> =
-    sequelize.define<undefined, CriteriaModel>('criteria', {
+export interface CriteriaInstance extends Sequelize.Instance<CriteriaModel> {
+}
+
+export const Criteria: Sequelize.Model<CriteriaInstance, CriteriaModel> =
+    sequelize.define<CriteriaInstance, CriteriaModel>('criteria', {
         criteria_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
         rubric: { type: STRING(512) },
-        min_score: { type: SMALLINT },
-        max_score: { type: SMALLINT },
+        min_score: { type: SMALLINT, defaultValue: 1 },
+        max_score: { type: SMALLINT, defaultValue: 5 },
         category_id: {
             type: INTEGER, allowNull: false, references: {
                 model: Categories, key: 'category_id',
             },
         },
     });
+

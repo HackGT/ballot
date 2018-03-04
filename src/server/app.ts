@@ -16,13 +16,16 @@ import { strategies, serialize, deserialize } from './config/auth';
 import * as bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import schema from './api';
-
+import { sync } from './models';
 
 const app = express();
 
 // Throw any errors if missing configurations
 try {
     verifyEnvironment();
+
+    // Sync database
+    sync();
 
     // Integrate Helmet
     app.use(helmet());
