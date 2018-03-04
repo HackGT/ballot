@@ -8,9 +8,18 @@ import { Logger } from '../util/Logger';
 const logger = Logger('models:sync');
 
 export async function sync(): Promise<void> {
-    Criteria.belongsTo(Categories, { foreignKey: 'category_id' });
+    Criteria.hasOne(Categories, { foreignKey: 'category_id' });
     Categories.hasMany(Criteria,
         { foreignKey: 'category_id', sourceKey: 'category_id' });
+
+    Ballots.belongsTo(Users, { foreignKey: 'user_id' });
+    Ballots.belongsTo(Criteria, { foreignKey: 'criteria_id' });
+    Ballots.belongsTo(Projects, { foreignKey: 'project_id' });
+
+    Projects.belongsToMany(Categories,
+        { through: 'project_categories', foreignKey: 'project_id' });
+    Categories.belongsToMany(Projects,
+        { through: 'project_categories', foreignKey: 'category_id' });
 
     const promises = [
         Categories.sync(),

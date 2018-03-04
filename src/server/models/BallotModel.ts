@@ -16,21 +16,21 @@ export enum BallotStatus {
 }
 
 export interface BallotModel {
-    ballot_id: number;
+    ballot_id?: number;
     project_id: number;
     criteria_id: number;
     user_id: number;
     judge_priority: number;
-    status: BallotStatus;
-    score: number;
-    score_submitted_at: Date;
+    ballot_status: BallotStatus;
+    score?: number;
+    score_submitted_at?: Date;
 }
 
 export interface BallotInstance extends Sequelize.Instance<BallotModel> {
 }
 
-export const Ballots: Sequelize.Model<undefined, BallotModel> =
-    sequelize.define<undefined, BallotModel>('ballots', {
+export const Ballots: Sequelize.Model<BallotInstance, BallotModel> =
+    sequelize.define<BallotInstance, BallotModel>('ballots', {
         ballot_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         project_id: {
             type: INTEGER, allowNull: false, references: {
@@ -47,7 +47,8 @@ export const Ballots: Sequelize.Model<undefined, BallotModel> =
                 model: Users, key: 'user_id',
             },
         },
-        status: {
+        judge_priority: { type: INTEGER, allowNull: false },
+        ballot_status: {
             type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'),
             allowNull: false,
         },

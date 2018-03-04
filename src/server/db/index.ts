@@ -26,7 +26,7 @@ const sequelizeOptions: Sequelize.Options = {
         createdAt: 'created_at',
         updatedAt: 'updated_at',
     },
-    logging: false,
+    logging: !Environment.isProduction(),
 };
 
 export let sequelize: Sequelize.Sequelize;
