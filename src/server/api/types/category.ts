@@ -1,19 +1,19 @@
 const schema = `
 type Query {
-    categories: [Category!]!
+    categories(filters: CategoryFilter): [Category!]!
 }
 
 type Mutation {
-   create(category_id: Int!, name: String!, is_primary: Boolean!): Category!
-   delete(category_id: Int!): Boolean
-   update(category_id: Int!, update: CategoryUpdate!): Category!
+   createCategory(name: String!, is_primary: Boolean!): Category!
+   deleteCategory(category_id: Int!): Boolean
+   updateCategory(category_id: Int!, update: PartialCategory!): Category!
 }
 
 input CategoryFilter {
     category_id: Int
 }
 
-input CategoryUpdate {
+input PartialCategory {
     name: String,
     is_primary: Boolean
 }
@@ -21,8 +21,12 @@ input CategoryUpdate {
 type Category {
     category_id: Int,
     name: String,
-    is_primary: Boolean
-}`;
+    is_primary: Boolean,
+    criteria: [Criterion!]
+}
+
+# Fake type - defined in criteria.ts
+type Criterion`;
 
 export interface CategoryFilter {
     category_id?: number;

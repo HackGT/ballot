@@ -1,48 +1,77 @@
 import { CategoryService } from '../../controllers/CategoryService';
 import { CategoryModel } from '../../models/CategoryModel';
-import { CategoryUpdate } from '../types/category';
+import { CategoryUpdate, CategoryFilter } from '../types/category';
+import { Action } from '../../util/Permissions';
 
 
 const resolvers = {
     Query: {
-        categories: async (obj: any, args: any, context: any) => {
+        categories: async (obj: any, args: { filters?: CategoryFilter },
+                           context: any) => {
+            if (!context.user || !context.user.can(Action.ViewCategories)) {
+                throw new Error('You do not have permission to ' +
+                    ' view categories');
+            }
+
             let categories: CategoryModel[];
-            categories = await CategoryService.find();
+
+            if (args.filters && args.filters.category_id) {
+                const res = await CategoryService
+                    .findById(args.filters.category_id);
+                categories = res ? [res] : [];
+            } else {
+                categories = await CategoryService.find();
+            }
+
             return categories;
         },
     },
     Mutation: {
-        create: async (obj: any, args: any, context: any) => {
-            let category = undefined;
-            if (args.name && args.category_id && args.is_primary) {
-                category = await CategoryService.create(args.category_id,
-                                                        args.name,
-                                                        args.is_primary);
-            } else {
-                throw new Error('must include category_id, name, is_primary');
+        createCategory: async (obj: any, args: any, context: any) => {
+            if (!context.user || !context.user.can(Action.CreateCategory)) {
+                throw new Error('You do not have permission to create' +
+                    ' categories');
             }
+
+            let category = undefined;
+            category = await CategoryService.create({
+                name: args.name,
+                is_primary: args.is_primary,
+            });
             return category;
         },
-        delete: async (obj: any, args: any, context: any) => {
+        deleteCategory: async (obj: any, args: any, context: any) => {
+            if (!context.user || !context.user.can(Action.DeleteCategory)) {
+                throw new Error('You do not have permission to delete'
+                    + ' categories');
+            }
+
             if (args.category_id) {
                 CategoryService.delete(args.category_id);
             } else {
                 throw new Error('must specify category_id');
             }
         },
-        update: async (obj: any,
-                       args: {category_id?: number, update?: CategoryUpdate},
-                       context: any) => {
-            if (args.category_id && args.update) {
-                let updated = await CategoryService.update(args.category_id,
-                                                           args.update);
-                if (!updated) {
-                    throw new Error('failed to update category');
-                }
-                return updated as CategoryModel;
-            } else {
-                throw new Error('must include category_id and update');
+        updateCategory: async (obj: any,
+                               args: {
+                                   category_id?: number,
+                                   update?: CategoryUpdate
+                               },
+                               context: any) => {
+
+            if (!context.user || !context.user.can(Action.UpdateCategory)) {
+                throw new Error('You do not have permission to update' +
+                    ' categories');
             }
+
+            const updated =
+                await CategoryService.update(args.category_id!,
+                    args.update!);
+            if (!updated) {
+                throw new Error('failed to update category');
+            }
+            return updated as CategoryModel;
+
         },
     },
 };

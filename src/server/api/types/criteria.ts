@@ -1,16 +1,16 @@
 const schema = `
 type Query {
-    criteria: [Criteria!]!
+    criteria: [Criterion!]!
 }
 
 type Mutation {
-    addCriterion(category_id: Int!, criteria_id: Int!, name: String!,
+    addCriterion(category_id: Int!, name: String!,
     rubric: String!, min_score: Int!, max_score: Int!, category_id: Int!)
-        : Criteria!
-    updateCriterion(criteria_id: Int!, update: CriterionUpdate!): Criteria!
+        : Criterion!
+    updateCriterion(criteria_id: Int!, update: PartialCriterion!): Criterion!
 }
 
-input CriterionUpdate {
+input PartialCriterion {
     name: String,
     rubric: String,
     min_score: Int,
@@ -18,7 +18,7 @@ input CriterionUpdate {
     category_id: Int
 }
 
-type Criteria {
+type Criterion {
     criteria_id: Int,
     name: String,
     rubric: String,

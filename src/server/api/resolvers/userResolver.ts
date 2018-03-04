@@ -3,7 +3,6 @@ import { UserModel } from '../../models/UserModel';
 import { hashPassword } from '../../util/common';
 import { UserFilter } from '../types/user';
 import { Action } from '../../util/Permissions';
-import { ResolverContext } from '..';
 
 
 const resolvers = {
@@ -50,17 +49,17 @@ const resolvers = {
             return user;
         },
         changePassword: async (obj: any,
-                               args: { id: number, password: string },
-                               context: ResolverContext) => {
+                               args: { id?: number, password?: string },
+                               context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ChangePassword, args.id)) {
                 throw new Error('You do not have permission to change this ' +
                     ' users password');
             }
 
-            const { salt, hash } = await hashPassword(args.password);
+            const { salt, hash } = await hashPassword(args.password!);
 
-            const user = await UserService.update(args.id, { hash, salt });
+            const user = await UserService.update(args.id!, { hash, salt });
 
             return user;
         },
