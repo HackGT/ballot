@@ -1,19 +1,29 @@
 import { mergeSchemas } from 'graphql-tools';
 
-import user from './types/user';
 import root from './types/';
-import userResolver from './resolvers/userResolver';
-import { User } from '../controllers/UserService';
+import user from './types/user';
+import criteria from './types/criteria';
+import category from './types/category';
+import ballot from './types/ballot';
 
-export interface ResolverContext {
-    user: User;
-}
+import userResolver from './resolvers/userResolver';
+import categoryResolver from './resolvers/categoryResolver';
+import criteriaResolver from './resolvers/criteriaResolver';
+import ballotResolver from './resolvers/ballotResolver';
 
 const schema = mergeSchemas({
-    schemas: [user, root],
-    // TODO: Keep resolver argument type annotations without needing to cast
-    // the resolver to any
-    resolvers: [userResolver as any],
+    schemas: [
+        user,
+        criteria,
+        category,
+        ballot,
+        root],
+    resolvers: [
+        userResolver,
+        categoryResolver,
+        criteriaResolver,
+        ballotResolver,
+    ],
 });
 
 export default schema;
