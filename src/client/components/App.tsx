@@ -1,24 +1,20 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Pending from './Pending';
-import Admin from './Admin';
-import Judge from './Judge';
-import Authorization from './Authorization';
+import AdminPageContainer from '../containers/admin/AdminPageContainer';
+import JudgeContainer from '../containers/judging/JudgeContainer';
+import NoSessionContainer from '../util/RedirectNoSession';
+import PendingContainer from '../containers/PendingContainer';
 
-const UserPending = Authorization(['Pending']);
-const UserJudge = Authorization(['Judge']);
-const UserAdmin = Authorization(['Admin', 'Owner']);
-const UserOwner = Authorization(['Owner']);
-
-const App: React.SFC < {} > = (props): JSX.Element => (
-    <Router>
+const App: React.SFC < {} > = (props): JSX.Element => {
+    return (
         <div>
-            <Route exact path='/' component={UserPending(Pending)} />
-            <Route exact path='/' component={UserJudge(Judge)} />
-            <Route exact path='/' component={UserAdmin(Admin)} />
+            <NoSessionContainer />
+            <Route component={PendingContainer} />
+            <Route component={JudgeContainer} />
+            <Route component={AdminPageContainer} />
         </div>
-    </Router>
-);
+    );
+};
 
 
 export default App;

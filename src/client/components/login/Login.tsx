@@ -1,13 +1,10 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
-import Authorization from '../Authorization';
 import LoginButtons from './LoginButtons';
-import YesSession from '../../util/RedirectYesSession';
+import YesSessionContainer from '../../util/RedirectYesSession';
 
-const UserAuth = Authorization(['Pending', 'Judge', 'Admin', 'Owner']);
-
-interface LoginProps { }
+interface LoginProps {}
 
 const Login: React.SFC<LoginProps> = (props) => {
     const localAuthForm = <form action='/auth/login' method='POST'>
@@ -19,7 +16,7 @@ const Login: React.SFC<LoginProps> = (props) => {
     return (
         <div className='login'>
             <h2>Login</h2>
-            <Route path='/login' component={UserAuth(YesSession)} />
+            <Route path='/login' component={YesSessionContainer} />
             <LoginButtons />
             {AUTH_ALLOW_LOCAL ? localAuthForm : ''}
 
