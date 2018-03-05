@@ -1,14 +1,14 @@
 import * as React from 'react';
 import UserClassSelector from './UserClassSelector';
 
-interface UserTableRowProps {
+export interface UserTableRowType {
     user_id: number;
     name: string;
     email: string;
     user_class: string;
 }
 
-const UserTableRow: React.SFC<UserTableRowProps> = (props) => {
+const UserTableRow: React.SFC<UserTableRowType> = (props) => {
     return (
         <tr>
             <td>{props.name}</td>

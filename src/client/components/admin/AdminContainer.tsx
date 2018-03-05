@@ -4,7 +4,7 @@ import Admin from './Admin';
 import Ranking from './Ranking';
 import Events from './Events';
 import Projects from './Projects';
-import UserContainer from './UserContainer';
+import Users from './Users';
 import Header from '../Header';
 import Navigation from '../Navigation';
 import SidebarNavigation from './SidebarNavigation';
@@ -36,7 +36,7 @@ const AdminContainer: React.SFC<AdminContainerProps> = (props) => {
                 <Route path={`${props.match.url}/projects`}
                     component={Projects} />
                 <Route path={`${props.match.url}/users`}
-                    component={UserContainer} />
+                    component={Users} />
                 <Route path={`${props.match.url}`}
                     component={Admin} />
             </Switch>
