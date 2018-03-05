@@ -34,7 +34,7 @@ const resolvers = {
                     };
                 }));
 
-            return ret ? ret : [];
+            return ret || [];
         },
     },
 };
