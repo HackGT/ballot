@@ -14,6 +14,9 @@ export enum Action {
     CreateCategory = 'CreateCategory',
     DeleteCategory = 'DeleteCategory',
     UpdateCategory = 'UpdateCategory',
+
+    ViewBallot = 'ViewBallot',
+    ScoreBallot = 'ScoreBallot',
 }
 export type Target = UserModel | BallotModel | CategoryModel |
     ProjectModel | number;
@@ -32,10 +35,16 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
 
         case Action.EditUser:
         case Action.ChangePassword:
-        case Action.ViewCategories:
+        case Action.ScoreBallot:
+        case Action.ViewBallot:
             return this.user_class === UserClass.Admin ||
                 this.user_class === UserClass.Owner ||
                 this.user_id === (target as number);
+
+        case Action.ViewCategories:
+            return this.user_class === UserClass.Admin ||
+                this.user_class === UserClass.Owner ||
+                this.user_class === UserClass.Judge;
     }
 
     return false;
