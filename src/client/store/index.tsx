@@ -2,9 +2,11 @@ import { combineReducers, createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 
 import auth from '../reducers/auth';
+import ballotset from '../reducers/ballotset';
 
 const reducer = combineReducers({
     auth,
+    ballotset,
 });
 
 export default createStore(
