@@ -13,7 +13,7 @@ import { State, BallotSetState, BallotState } from '../../types/State';
 interface StateToProps extends BallotSetState {}
 interface DispatchToProps {
     updateBallot: (ballot: BallotState) => void;
-    loadNextBallotSets: () => void;
+    loadNextBallotSets: (nextBallotSet: BallotSetState) => void;
 }
 
 const mapStateToProps = (state: State): StateToProps => {
@@ -24,8 +24,12 @@ const mapStateToProps = (state: State): StateToProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<any>) => {
     return {
-        loadNextBallotSets: () => { dispatch(loadNextBallotSets()); },
-        updateBallot: (ballot: BallotState) => { dispatch(updateBallot(ballot)); },
+        loadNextBallotSets: (nextBallotSet: BallotSetState) => {
+            dispatch(loadNextBallotSets(nextBallotSet));
+        },
+        updateBallot: (ballot: BallotState) => {
+            dispatch(updateBallot(ballot));
+        },
     };
 };
 

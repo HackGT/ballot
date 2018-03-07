@@ -6,7 +6,7 @@ import 'react-rater/lib/react-rater.css';
 
 interface CriterionProps {
     ballot_id: number;
-    score: number;
+    score?: number;
     criteria_id: number;
     name: string;
     rubric: string;
@@ -21,8 +21,10 @@ interface CriterionProps {
 const Criterion: React.SFC<CriterionProps> = (props) => {
     return (
         <div>
-            <h3 style={{ fontSize: '3em' }}>{props.name}</h3>
-            <p style={{ fontSize: '2em' }}>{props.rubric}</p>
+            <h3 style={{ fontSize: '2em' }}>
+                {props.name + ` ${props.score}/${props.max_score}`}
+            </h3>
+            <p style={{ fontSize: '1em' }}>{props.rubric}</p>
             <Rater
                 style={{ fontSize: '3em' }}
                 total={props.max_score}
@@ -33,12 +35,13 @@ const Criterion: React.SFC<CriterionProps> = (props) => {
                     }
                 }}
             />
-            <hr />
+            <br />
         </div>
     );
 };
 
 Criterion.defaultProps = {
+    score: 0,
     min_score: 0,
     max_score: 5,
 };

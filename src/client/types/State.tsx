@@ -9,8 +9,8 @@ export interface BallotState {
     user_id: number;
     judge_priority: number;
     ballot_status: any;
-    score: number;
-    score_submitted_at: any;
+    score?: number;
+    score_submitted_at?: any;
     criteria: {
         name: string;
         rubric: string;

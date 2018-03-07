@@ -1,5 +1,5 @@
 import { Dispatch } from 'react-redux';
-import { BallotState } from '../types/State';
+import { BallotState, BallotSetState } from '../types/State';
 import Action from '../types/Action';
 
 export const LOAD_NEXT_BALLOT_SET = 'LOAD_NEXT_BALLOT_SET';
@@ -13,12 +13,12 @@ export interface UpdateBallotAction extends Action {
     ballot: BallotState;
 }
 
-export const loadNextBallotSets: () => LoadNextBallotSetAction = () => {
-    // TODO: Dispatch a thunk, fetch through GraphQL with query nextBallotSet
-    return {
-        type: LOAD_NEXT_BALLOT_SET,
-        ballots: [],
-    };
+export const loadNextBallotSets: (nextBallotSet: BallotSetState)
+    => LoadNextBallotSetAction = (nextBallotSet) => {
+        return {
+            type: LOAD_NEXT_BALLOT_SET,
+            ballots: nextBallotSet.ballots,
+        };
 };
 
 export const updateBallot: (ballot: BallotState)
