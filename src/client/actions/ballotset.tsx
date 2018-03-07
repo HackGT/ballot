@@ -21,7 +21,8 @@ export const loadNextBallotSets: () => LoadNextBallotSetAction = () => {
     };
 };
 
-export const updateBallot: (ballot: BallotState) => UpdateBallotAction = (ballot: BallotState) => {
+export const updateBallot: (ballot: BallotState)
+    => UpdateBallotAction = (ballot: BallotState) => {
     return {
         type: UPDATE_BALLOT,
         ballot,

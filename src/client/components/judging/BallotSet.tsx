@@ -38,7 +38,8 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                             max_score={ballot.criteria.max_score}
                             catagory_id={ballot.criteria.catagory_id}
                             onRate={(rating) => {
-                                const newBallot = Object.assign({}, ballot, { score: rating });
+                                const newBallot = Object.assign(
+                                    {}, ballot, { score: rating });
                                 props.updateBallot(newBallot);
                             }}
                         />
