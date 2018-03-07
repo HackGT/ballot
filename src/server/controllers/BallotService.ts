@@ -77,7 +77,7 @@ export class BallotService {
 
     public static getNextProject(userId: number, asJson: boolean = true):
         BPromise<Array<(BallotModel | BallotInstance)>> {
-
+        // TODO: Make this a Project that includes ballots
         return Ballots.findAll({
             where: {
                 user_id: userId,
@@ -133,9 +133,10 @@ export class BallotService {
         }
 
         // Assign the next round of ballots
+       // TODO: Return a Project that includes ballots
         return await Ballots.update(
             { ballot_status: BallotStatus.Assigned } as any, {
-                where: { judge_priority: priority!, user_id: userId },
+                where: { judge_priority: 1 + priority!, user_id: userId },
                 returning: true,
             })
             .then((val) => {
