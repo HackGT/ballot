@@ -17,7 +17,7 @@ router.get('/user_data', (req, res) => {
         res.json({});
     } else {
         res.json({
-            userid: req.user.userid,
+            user_id: req.user.user_id,
             email: req.user.email,
             name: req.user.name,
             user_class: req.user.user_class,
