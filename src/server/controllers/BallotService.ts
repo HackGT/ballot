@@ -41,6 +41,7 @@ export class BallotService {
                 AVG(b.score), COUNT(b.score) FROM
             projects AS a
             INNER JOIN ballots AS b ON a.project_id = b.project_id
+                AND b.ballot_status = 'Submitted'
             INNER JOIN criteria AS c ON b.criteria_id = c.criteria_id
             INNER JOIN categories AS d ON c.category_id = d.category_id
             GROUP BY a.project_id, c.criteria_id, d.name
@@ -146,6 +147,48 @@ export class BallotService {
             .then((ballots) => ballots.map((ballot) => asJson ?
                 ballot.toJSON() : ballot))
             .catch(printAndThrowError('getNextProject', logger));
+    }
+
+    public static async skipProject(userId: number):
+        Promise<BallotModel[] | undefined> {
+        // Fetch the ballots currently assigned to the judge
+        const curBallots = await
+            this.getNextProject(userId, false) as BallotInstance[];
+
+        // Write the scores for each ballot
+        let projectId: number | undefined;
+        let priority: number;
+        for (const ballot of curBallots) {
+
+            const id: number = ballot.get('ballot_id');
+
+            if (projectId && projectId !== ballot.get('project_id')) {
+                logger.error(`Ballot ${id} does not match the others
+                (project ${projectId} !== ${ballot.get('project_id')})`);
+            }
+            projectId = ballot.get('project_id');
+            priority = ballot.get('judge_priority');
+
+            ballot.set('ballot_status', BallotStatus.Skipped);
+            ballot.save();
+        }
+
+        // Assign the next round of ballots
+        // TODO: Return a Project that includes ballots
+        return await Ballots.update(
+            { ballot_status: BallotStatus.Assigned } as any, {
+                where: { judge_priority: 1 + priority!, user_id: userId },
+                returning: true,
+            })
+            .then((val) => {
+                const [num, newBallots] = val;
+                if (num === 0) {
+                    logger.info('No more ballots to assign.');
+                    return undefined;
+                }
+                return newBallots.map((ballot) => ballot.toJSON());
+            })
+            .catch(printAndThrowError('scoreProject', logger));
     }
 
     /*

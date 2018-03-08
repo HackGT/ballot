@@ -49,7 +49,7 @@ CREATE TABLE criteria (
 );
 
 DROP TYPE IF EXISTS ballotstatus CASCADE;
-CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed');
+CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Skipped');
 
 DROP TABLE IF EXISTS ballots;
 CREATE TABLE ballots (

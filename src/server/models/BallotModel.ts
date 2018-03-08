@@ -12,7 +12,7 @@ export enum BallotStatus {
     Pending = 'Pending',
     Assigned = 'Assigned',
     Submitted = 'Submitted',
-    Reviewed = 'Reviewed',
+    Skipped = 'Skipped',
 }
 
 export interface BallotModel {
@@ -49,7 +49,7 @@ export const Ballots: Sequelize.Model<BallotInstance, BallotModel> =
         },
         judge_priority: { type: INTEGER, allowNull: false },
         ballot_status: {
-            type: ENUM('Pending', 'Assigned', 'Submitted', 'Reviewed'),
+            type: ENUM('Pending', 'Assigned', 'Submitted', 'Skipped'),
             allowNull: false,
         },
         score: { type: SMALLINT },
