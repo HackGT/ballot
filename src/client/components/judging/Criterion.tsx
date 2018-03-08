@@ -2,7 +2,7 @@ import * as React from 'react';
 // import Rater from 'react-rater'; // No type def yet
 const Rater = require('react-rater').default;
 import 'react-rater/lib/react-rater.css';
-// import './Judging.scss';
+import './Criterion.scss';
 
 interface CriterionProps {
     ballot_id: number;
@@ -20,7 +20,7 @@ interface CriterionProps {
 // TODO: Make min_score actually useful
 const Criterion: React.SFC<CriterionProps> = (props) => {
     return (
-        <div>
+        <div className='Criterion'>
             <h3 style={{ fontSize: '2em' }}>
                 {props.name + ` ${props.score}/${props.max_score}`}
             </h3>
