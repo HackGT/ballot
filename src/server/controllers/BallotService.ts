@@ -16,7 +16,66 @@ interface ProjectScores {
     score: number;
 }
 
+export interface CriteriaRanking {
+    name: string;
+    category_id: string;
+    category_name: string;
+    ranking: [{
+        name: string;
+        project_id: string;
+        score: number;
+        judge_count: number;
+    }];
+}
+
+export interface Ranking {
+    [criteriaId: string]: CriteriaRanking;
+}
+
 export class BallotService {
+
+    public static async getRanking(): Promise<Ranking> {
+        const avgScores = await sequelize.query(
+            `SELECT a.name AS project_name, a.project_id, c.name AS
+                criteria_name, c.criteria_id, d.name AS category_name,
+                AVG(b.score), COUNT(b.score) FROM
+            projects AS a
+            INNER JOIN ballots AS b ON a.project_id = b.project_id
+            INNER JOIN criteria AS c ON b.criteria_id = c.criteria_id
+            INNER JOIN categories AS d ON c.category_id = d.category_id
+            GROUP BY a.project_id, c.criteria_id, d.name
+            ORDER BY AVG(b.score) DESC;
+            `, {
+                type: sequelize.QueryTypes.SELECT,
+            });
+
+
+        const criteria: Ranking = {};
+        for (const row of avgScores) {
+            if (row.criteria_id in criteria) {
+                criteria[row.criteria_id].ranking.push({
+                    name: row.project_name,
+                    project_id: row.project_id,
+                    score: parseInt(row.avg, 10),
+                    judge_count: parseInt(row.count, 10),
+                });
+            } else {
+                criteria[row.criteria_id] = {
+                    name: row.criteria_name,
+                    category_id: row.category_id,
+                    category_name: row.category_name,
+                    ranking: [{
+                        name: row.project_name,
+                        project_id: row.project_id,
+                        score: parseInt(row.avg, 10),
+                        judge_count: parseInt(row.count, 10),
+                    }],
+                };
+            }
+        }
+
+        return criteria;
+    }
 
     public static async batchCreate(assignments: BatchProjectAssignments[]):
         Promise<void> {
@@ -97,7 +156,7 @@ export class BallotService {
         Promise<BallotModel[] | undefined> {
 
         // Build a dictionary to make things easier
-        const scoreDict: { [ballotId: number]: number } = {};
+        const scoreDict: { [ballotId: number]: number; } = {};
         for (const ballot of ballots) {
             scoreDict[ballot.ballotId] = ballot.score;
         }
@@ -133,7 +192,7 @@ export class BallotService {
         }
 
         // Assign the next round of ballots
-       // TODO: Return a Project that includes ballots
+        // TODO: Return a Project that includes ballots
         return await Ballots.update(
             { ballot_status: BallotStatus.Assigned } as any, {
                 where: { judge_priority: 1 + priority!, user_id: userId },
