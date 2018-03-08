@@ -11,84 +11,69 @@ interface BallotSetProps extends BallotSetState {
 
 const BallotSet: React.SFC<BallotSetProps> = (props) => {
     // Check if there is any ballot set loaded. If not, fetch new ballot set
-    if (props.ballots.length === 0) {
+    function loadNext(mode: string): void {
         fetch('/auth/user_data/', { credentials: 'same-origin' })
-            .then((result) => result.json())
-            .then((userData) => {
-                // TODO: understand why userid is not being fetched correctly
-                const userid = userData.userid;
-                const query = `
-                    {
-                        nextBallotSet(user_id: ${userid}) {
-                            ballot_id,
-                            project_id,
-                            criteria_id,
-                            user_id,
-                            judge_priority,
-                            ballot_status
-                        }
+        .then((result) => result.json())
+        .then((userData) => {
+            const user_id = userData.user_id;
+            const query = `
+                {
+                    nextBallotSet(user_id: ${user_id}) {
+                        ballot_id,
+                        project_id,
+                        criteria_id,
+                        judge_priority,
+                        ballot_status
                     }
-                `;
-                fetch('/graphql', {
-                    credentials: 'same-origin',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    // body: JSON.stringify({
-                    //     query: query.replace(/\s/g, ''),
-                    // }),
-                    body: JSON.stringify({ query }),
-                })
-                .then((response) => response.json())
-                .then((json) => {
-                    // const nextBallotSet = json.data.nextBallotSet;
-                    // if (!nextBallotSet || nextBallotSet.length === 0) {
-                    //     return;
-                    // }
-                    // props.loadNextBallotSets(nextBallotSet);
-
-                    // For Testing:
-                    props.loadNextBallotSets({
-                        ballots: [
-                            {
-                                ballot_id: 2,
-                                project_id: 30,
-                                criteria_id: 1,
-                                user_id: 1,
-                                judge_priority: 1,
-                                ballot_status: 'Assigned',
-                                criteria: {
-                                    name: 'Use of Tensorflow',
-                                    rubric: 'This is a sample rubric blah blah',
-                                    catagory_id: 1,
-                                    catagory: {
-                                        name: 'Machine Learning Track',
-                                        is_primary: true,
-                                    },
-                                },
-                            },
-                            {
-                                ballot_id: 3,
-                                project_id: 30,
-                                criteria_id: 2,
-                                user_id: 1,
-                                judge_priority: 1,
-                                ballot_status: 'Assigned',
-                                criteria: {
-                                    name: 'Use of Scikit-learn',
-                                    rubric: 'This is a sample rubric lol lol',
-                                    catagory_id: 1,
-                                    catagory: {
-                                        name: 'Machine Learning Track',
-                                        is_primary: true,
-                                    },
-                                },
-                            },
-                        ],
-                    });
+                    criteria {
+                        criteria_id,
+                        name,
+                        rubric,
+                        min_score,
+                        max_score,
+                        category_id
+                    }
+                    categories {
+                        category_id,
+                        name,
+                        is_primary
+                    }
+                }
+            `;
+            fetch('/graphql', {
+                credentials: 'same-origin',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                const nextBallotSet = json.data.nextBallotSet;
+                if (mode === 'NO_LOAD_ON_EMPTY_RESPONSE'
+                    && (nextBallotSet.length === 0)) {
+                    return;
+                }
+                nextBallotSet.forEach((ballot: BallotState) => {
+                    ballot.criteria = json.data.criteria
+                    .filter((criterion: any) => {
+                        return criterion.criteria_id
+                            === ballot.criteria_id;
+                    })[0];
+                    ballot.criteria.category = json.data.categories
+                    .filter((category: any) => {
+                        return category.category_id
+                            === ballot.criteria.category_id;
+                    })[0];
                 });
+                props.loadNextBallotSets({ ballots: nextBallotSet });
             });
+        });
+    }
+
+    if (props.ballots.length === 0) {
+        loadNext('NO_LOAD_ON_EMPTY_RESPONSE');
         return (
             <div>
                 <p>There's currently no assigned project to view.</p>
@@ -97,7 +82,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
     }
     return (
         <div>
-            <h3>Catagory: {props.ballots[0].criteria.catagory.name}</h3>
+            <h3>Category: {props.ballots[0].criteria.category.name}</h3>
             <h1>Project {props.ballots[0].project_id}</h1>
             <br />
             <hr />
@@ -114,7 +99,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                             rubric={ballot.criteria.rubric}
                             min_score={ballot.criteria.min_score}
                             max_score={ballot.criteria.max_score}
-                            catagory_id={ballot.criteria.catagory_id}
+                            category_id={ballot.criteria.category_id}
                             onRate={(rating) => {
                                 const newBallot = Object.assign(
                                     {}, ballot, { score: rating });
@@ -128,7 +113,49 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                 id='submit-ballots'
                 className='SubmitButton'
                 onClick={() => {
-                    console.log('Submit Ballots');
+                    fetch('/auth/user_data/', { credentials: 'same-origin' })
+                    .then((result) => result.json())
+                    .then((userData) => {
+                        const user_id = userData.user_id;
+                        const scores = props.ballots.map((ballot) => {
+                            if (!ballot.score || ballot.score === 0) {
+                                // TODO: No ballot score entry
+                                // Shall we notify user?
+                                ballot.score = 0;
+                            }
+                            return {
+                                ballot_id: ballot.ballot_id,
+                                score: ballot.score,
+                            };
+                        });
+                        const stringifiedScores
+                            = JSON.stringify(scores).replace(/"/g, '');
+                        const query = `
+                            mutation {
+                                scoreProject(
+                                    user_id: ${user_id},
+                                    scores: ${stringifiedScores}
+                                ){
+                                    score,
+                                    score_submitted_at
+                                }
+                            }
+                        `;
+                        fetch('/graphql', {
+                            credentials: 'same-origin',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ query }),
+                        })
+                        .then((response) => response.json())
+                        .then((json) => {
+                            // When successful, load the next
+                            console.log(json);
+                            loadNext('LOAD_ON_EMPTY_RESPONSE');
+                        });
+                    });
                 }}
             >
                 Submit Ballots

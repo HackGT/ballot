@@ -6,7 +6,7 @@ export interface BallotState {
     ballot_id: number;
     project_id: number;
     criteria_id: number;
-    user_id: number;
+    // user_id: number;
     judge_priority: number;
     ballot_status: any;
     score?: number;
@@ -16,8 +16,8 @@ export interface BallotState {
         rubric: string;
         min_score?: number;
         max_score?: number;
-        catagory_id: number;
-        catagory: {
+        category_id: number;
+        category: {
             name: string;
             is_primary: boolean;
         }

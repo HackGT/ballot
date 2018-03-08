@@ -12,7 +12,7 @@ interface CriterionProps {
     rubric: string;
     min_score?: number;
     max_score?: number;
-    catagory_id: number;
+    category_id: number;
     onRate: (rating: number) => void;
 }
 
