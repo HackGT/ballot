@@ -3,16 +3,16 @@
  * Run this if you want to populate your database with test data
  */
 
--- Users
-INSERT INTO users(email, name, user_class)
-    VALUES ('test1@hack.gt', 'Some guys name', 'Owner'),
-           ('test2@gatech.edu', 'Some ML judge', 'Judge'),
-           ('test3@gatech.edu', 'Some other ML judge', 'Judge'),
-           ('test4@gatech.edu', 'Some third ML judge', 'Judge'),
-           ('test5@gatech.edu', 'Some UI judge', 'Judge'),
-           ('test6@gatech.edu', 'Some Other UI judge', 'Judge'),
-           ('test7@gatech.edu', 'Some Third UI judge', 'Judge'),
-           ('letmein@gmail.com', 'Some random dudes name', 'Pending');
+-- Users (all passwords are 'password')
+INSERT INTO users(email, name, user_class, salt, hash)
+    VALUES ('test1@hack.gt', 'Some guys name', 'Owner', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test2@gatech.edu', 'Some ML judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test3@gatech.edu', 'Some other ML judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test4@gatech.edu', 'Some third ML judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test5@gatech.edu', 'Some UI judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test6@gatech.edu', 'Some Other UI judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('test7@gatech.edu', 'Some Third UI judge', 'Judge', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e'),
+           ('letmein@gmail.com', 'Some random dudes name', 'Pending', 'b3195525f8f84b10adc85ada7deab84a30c579e777ae27973c92f812d84476e3', '46b0d61cccb35a2b4e15796abaf66c4daf50b9fc0a0efe3fee825b375301eb0dbabb2193926113b970f8b6285fdb56436c7d58dd13c0424356e0457cc71e7496a0dde47046d19f2dcde24e6956aa0599340c8b080c582a5cb7171193e7167894a0406f610e9f98eaa1ff4de4f5b010b1105985d9fa1d7eb255df8b9151230d5e');
 
 -- projects
 INSERT INTO projects(devpost_id, name, table_number, expo_number)

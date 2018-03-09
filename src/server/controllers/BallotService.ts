@@ -16,8 +16,9 @@ interface ProjectScores {
     score: number;
 }
 
-export interface CriteriaRanking {
-    name: string;
+export interface Ranking {
+    criteria_id: string;
+    criteria_name: string;
     category_id: string;
     category_name: string;
     ranking: [{
@@ -25,33 +26,29 @@ export interface CriteriaRanking {
         project_id: string;
         score: number;
         judge_count: number;
+        devpost_id: string;
     }];
-}
-
-export interface Ranking {
-    [criteriaId: string]: CriteriaRanking;
 }
 
 export class BallotService {
 
-    public static async getRanking(): Promise<Ranking> {
+    public static async getRanking(): Promise<Ranking[]> {
         const avgScores = await sequelize.query(
             `SELECT a.name AS project_name, a.project_id, c.name AS
                 criteria_name, c.criteria_id, d.name AS category_name,
-                AVG(b.score), COUNT(b.score) FROM
-            projects AS a
+                d.category_id, AVG(b.score), COUNT(b.score), a.devpost_id
+            FROM projects AS a
             INNER JOIN ballots AS b ON a.project_id = b.project_id
                 AND b.ballot_status = 'Submitted'
             INNER JOIN criteria AS c ON b.criteria_id = c.criteria_id
             INNER JOIN categories AS d ON c.category_id = d.category_id
-            GROUP BY a.project_id, c.criteria_id, d.name
-            ORDER BY AVG(b.score) DESC;
+            GROUP BY a.project_id, c.criteria_id, d.name, d.category_id
+            ORDER BY d.category_id, AVG(b.score);
             `, {
                 type: sequelize.QueryTypes.SELECT,
             });
 
-
-        const criteria: Ranking = {};
+        const criteria: {[key: string]: Ranking} = {};
         for (const row of avgScores) {
             if (row.criteria_id in criteria) {
                 criteria[row.criteria_id].ranking.push({
@@ -59,10 +56,12 @@ export class BallotService {
                     project_id: row.project_id,
                     score: parseInt(row.avg, 10),
                     judge_count: parseInt(row.count, 10),
+                    devpost_id: row.devpost_id,
                 });
             } else {
                 criteria[row.criteria_id] = {
-                    name: row.criteria_name,
+                    criteria_name: row.criteria_name,
+                    criteria_id: row.criteria_id,
                     category_id: row.category_id,
                     category_name: row.category_name,
                     ranking: [{
@@ -70,12 +69,13 @@ export class BallotService {
                         project_id: row.project_id,
                         score: parseInt(row.avg, 10),
                         judge_count: parseInt(row.count, 10),
+                        devpost_id: row.devpost_id,
                     }],
                 };
             }
         }
 
-        return criteria;
+        return Object.values(criteria);
     }
 
     public static async batchCreate(assignments: BatchProjectAssignments[]):
