@@ -17,6 +17,7 @@ export enum Action {
 
     ViewBallot = 'ViewBallot',
     ScoreBallot = 'ScoreBallot',
+    ViewRanking = 'ViewRanking',
 }
 export type Target = UserModel | BallotModel | CategoryModel |
     ProjectModel | number;
@@ -30,6 +31,7 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
         case Action.CreateCategory:
         case Action.DeleteCategory:
         case Action.UpdateCategory:
+        case Action.ViewRanking:
             return this.user_class === UserClass.Admin ||
                 this.user_class === UserClass.Owner;
 

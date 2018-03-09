@@ -5,9 +5,9 @@ import { ProjectScores } from '../types/ballot';
 
 const resolvers = {
     Query: {
-        nextBallotSet: async (obj: any,
-                              args: { user_id?: number },
-                              context: any) => {
+        nextBallotSet: (obj: any,
+                        args: { user_id?: number },
+                        context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ViewBallot, args.user_id)) {
                 throw new Error('You do not have permission to view ballots');
@@ -15,9 +15,28 @@ const resolvers = {
 
             return BallotService.getNextProject(args.user_id!);
         },
+        getRanking: async (obj: any, args: any, context: any) => {
+            if (!context.user ||
+                !context.user.can(Action.ViewRanking, args.user_id)) {
+                throw new Error('You do not have permission to view ballots');
+            }
+
+            console.log(JSON.stringify(await BallotService.getRanking()));
+            return BallotService.getRanking() || [];
+        },
     },
 
     Mutation: {
+        skipProject: (obj: any, args: { user_id?: number }, context: any) => {
+            if (!context.user ||
+                !context.user.can(Action.ScoreBallot, args.user_id)) {
+                throw new Error('You do not have permission to score ballots');
+            }
+
+            const ret = BallotService.skipProject(args.user_id!);
+            return ret || [];
+        },
+
         scoreProject: (obj: any,
                        args: { user_id?: number, scores?: ProjectScores[] },
                        context: any) => {
