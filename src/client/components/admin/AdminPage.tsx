@@ -13,24 +13,21 @@ interface AdminPageProps {
     match: string;
 }
 
-// const AdminPage: React.SFC<AdminPageProps> = (props) => {
-class AdminPage extends React.Component<AdminPageProps, {}> {
-    public render(): React.ReactElement<HTMLDivElement> {
-        return (
-            <div>
-                <Header />
-                <Navigation
-                    linkNames={['Home', 'Judging', 'Expo', 'Admin']}
-                    linkDests={['/', '/judging', '/expo', '/admin']}/>
-                <Switch>
-                    <Route exact path='/judging' component={Judging} />
-                    <Route exact path='/expo' component={Expo} />
-                    <Route path='/admin' component={AdminContainer} />
-                    <Route exact path='/' component={Status} />
-                </Switch>
-            </div>
-        );
-    }
-}
+const AdminPage: React.SFC<AdminPageProps> = (props) => {
+    return (
+        <div>
+            <Header />
+            <Navigation
+                linkNames={['Home', 'Judging', 'Expo', 'Admin']}
+                linkDests={['/', '/judging', '/expo', '/admin']} />
+            <Switch>
+                <Route exact path='/judging' component={Judging} />
+                <Route exact path='/expo' component={Expo} />
+                <Route path='/admin' component={AdminContainer} />
+                <Route exact path='/' component={Status} />
+            </Switch>
+        </div>
+    );
+};
 
 export default AdminPage;
