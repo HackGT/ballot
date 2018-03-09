@@ -9,6 +9,7 @@ import { Environment } from './config/Environment';
 import healthcheck from './routes/healthcheck';
 import auth from './routes/auth';
 import index from './routes/index';
+import batchupload from './routes/batchupload';
 import { Logger } from './util/Logger';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -61,6 +62,7 @@ try {
     app.use('/', express.static('./build/public'));
     app.use('/healthcheck', healthcheck);
     app.use('/auth', auth);
+    app.use('/batchupload', batchupload);
     app.use('/graphql', bodyParser.json(),
         graphqlExpress((req?: express.Request, res?: express.Response) => {
             return {
