@@ -4,6 +4,7 @@ import { ProjectModel, Projects, ProjectInstance } from '../models/ProjectModel'
 import { sequelize } from '../db';
 
 const logger = Logger('controllers/ProjectService');
+const csv = require('csv');
 
 interface ProjectSerializer {
     [index: string]: any;
@@ -19,18 +20,40 @@ interface CategoryQueryResult {
 }
 
 export class ProjectService {
+    public static async serializeProjects(projects: string):
+        Promise<void> {
+            const parent = this;
+            let projectsSerialized : ProjectSerializer[] = [];
+            csv.parse(projects, function(err: any, data: string[][]) {
+                let columns : string[] = data.shift()!.filter(header => Object.keys(parent.ProjectsToModel).includes(header));
+                for (const row of data) {
+                    let counter : number = 0;
+                    let project : ProjectSerializer = {
+                        categories: []
+                    };
+                    while (counter < columns.length) {
+                        let column : string = columns[counter]
+                        if (column == 'categories') {
+                            project[parent.ProjectsToModel[column]] = row[counter].split(",");
+                        } else {
+                            project[parent.ProjectsToModel[column]] = row[counter];
+                        }
+                        counter += 1;
+                    };
+                    projectsSerialized.push(project);
+                }
+                console.log(projectsSerialized);
+                parent.batchUploadProjects(projectsSerialized);
+            });
+        }
+
     public static async batchUploadProjects(projects: ProjectSerializer[]):
         Promise<void> {
             // Serialize BatchProjects to Batch Model:
             const projectModels: ProjectModel[] = [];
             const categoryMappings: CategoryMapper = {};
             for (const project of projects) {
-                const projectDetails: any = {};
-                for (const key of Object.keys(this.ProjectsToModel)) {
-                    if (key !== 'PRIMARY_INDEX') {
-                        projectDetails[this.ProjectsToModel[key]] = project[key];
-                    }
-                }
+                const projectDetails: any = project;
 
                 const projectCategoryInfo:
                     CategoryQueryResult[] =
@@ -44,10 +67,11 @@ export class ProjectService {
                             type: sequelize.QueryTypes.SELECT,
                         });
                 
-                categoryMappings[project[this.ProjectsToModel.PRIMARY_INDEX]] = projectCategoryInfo;
+                categoryMappings[projectDetails[this.ProjectsToModel.PRIMARY_INDEX]] = projectCategoryInfo;
+
                 projectModels.push(projectDetails);
             }
-
+            console.log(categoryMappings);
             await Projects.bulkCreate(projectModels, {returning: true})
                 .catch(printAndThrowError('batchCreate', logger)).then((instances: ProjectInstance[]) => {
                     for (const instance of instances) {
@@ -64,6 +88,7 @@ export class ProjectService {
         devpost_link: 'devpost_id',
         project_name: 'name',
         location: 'table_number',
-        PRIMARY_INDEX: 'devpost_link',
+        categories: 'categories',
+        PRIMARY_INDEX: 'devpost_id',
     };
 }
