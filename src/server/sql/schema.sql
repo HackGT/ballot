@@ -65,7 +65,7 @@ CREATE TABLE ballots (
     updated_at timestamptz DEFAULT now()
 );
 
-DROP FUNCTION IF EXISTS set_score_submit_time;
+DROP FUNCTION IF EXISTS set_score_submit_time();
 CREATE FUNCTION set_score_submit_time()
 RETURNS TRIGGER AS $$
 BEGIN
