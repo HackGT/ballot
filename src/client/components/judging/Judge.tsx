@@ -3,7 +3,7 @@ import Header from '../Header';
 import Navigation from '../Navigation';
 import { Switch, Route } from 'react-router';
 import Judging from './Judging';
-import Expo from '../expo/Expo';
+import ExpoPage from '../expo/ExpoPage';
 import Status from '../Status';
 // import './Judge.scss';
 
@@ -18,7 +18,7 @@ const Judge: React.SFC<JudgeProps> = (props) => {
                 linkDests={['/', '/judging', '/expo']} />
             <Switch>
                 <Route exact path='/judging' component={Judging} />
-                <Route exact path='/expo' component={Expo} />
+                <Route exact path='/expo' component={ExpoPage} />
                 <Route exact path='/' component={Status} />
             </Switch>
         </div>

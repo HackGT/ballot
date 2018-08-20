@@ -28,7 +28,16 @@ export interface BallotSetState {
     ballots: BallotState[];
 }
 
+export interface ProjectState {
+    project_id: number;
+    devpost_id: number;
+    name: string;
+    table_number: number;
+    expo_number: number;
+}
+
 export interface State {
     auth: AuthState;
     ballotset: BallotSetState;
+    projects: ProjectState[];
 }

@@ -3,12 +3,12 @@ import { Switch, Route, match } from 'react-router-dom';
 import Admin from './Admin';
 import Ranking from './Ranking';
 import Events from './Events';
-import Projects from './Projects';
 import Users from './Users';
 import Header from '../Header';
 import Navigation from '../Navigation';
 import SidebarNavigation from './SidebarNavigation';
 import './AdminContainer.scss';
+import { ProjectsContainer } from '../../containers/expo/ExpoContainer';
 
 interface AdminContainerProps {
     match: any;
@@ -34,7 +34,7 @@ const AdminContainer: React.SFC<AdminContainerProps> = (props) => {
                 <Route path={`${props.match.url}/events`}
                     component={Events} />
                 <Route path={`${props.match.url}/projects`}
-                    component={Projects} />
+                    component={ProjectsContainer} />
                 <Route path={`${props.match.url}/users`}
                     component={Users} />
                 <Route path={`${props.match.url}`}

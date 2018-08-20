@@ -16,5 +16,4 @@ const App: React.SFC < {} > = (props): JSX.Element => {
     );
 };
 
-
 export default App;

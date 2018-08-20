@@ -135,6 +135,15 @@ export class BallotService {
             .catch(printAndThrowError('batchCreate', logger));
     }
 
+    // TODO
+    public static bulkAssignBallots(): Promise<void> {
+        const assignments: BatchProjectAssignments[] = [];
+
+        // Take all of the ballots marked as pending and assign them.
+
+        return this.batchCreate(assignments);
+    }
+
     public static getNextProject(userId: number, asJson: boolean = true):
         BPromise<Array<(BallotModel | BallotInstance)>> {
         // TODO: Make this a Project that includes ballots

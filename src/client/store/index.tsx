@@ -3,10 +3,12 @@ import thunk from 'redux-thunk';
 
 import auth from '../reducers/auth';
 import ballotset from '../reducers/ballotset';
+import projects from '../reducers/projects';
 
 const reducer = combineReducers({
     auth,
     ballotset,
+    projects,
 });
 
 export default createStore(

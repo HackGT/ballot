@@ -6,7 +6,7 @@ import AdminContainer from './AdminContainer';
 import AdminNavigation from './SidebarNavigation';
 import Status from '../Status';
 import Judging from '../judging/Judging';
-import Expo from '../expo/Expo';
+import ExpoPage from '../expo/ExpoPage';
 // import './AdminPage.scss';
 
 interface AdminPageProps {
@@ -22,7 +22,7 @@ const AdminPage: React.SFC<AdminPageProps> = (props) => {
                 linkDests={['/', '/judging', '/expo', '/admin']} />
             <Switch>
                 <Route exact path='/judging' component={Judging} />
-                <Route exact path='/expo' component={Expo} />
+                <Route exact path='/expo' component={ExpoPage} />
                 <Route path='/admin' component={AdminContainer} />
                 <Route exact path='/' component={Status} />
             </Switch>

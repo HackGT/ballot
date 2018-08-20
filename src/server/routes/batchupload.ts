@@ -1,5 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { ProjectService, ProjectSerializer } from '../controllers/ProjectService';
+import {
+    ProjectService,
+    // ProjectSerializer
+} from '../controllers/ProjectService';
 
 const multiparty = require('multiparty');
 const fs = require('fs');
@@ -9,12 +12,12 @@ const form = new multiparty.Form();
 const router = Router();
 
 interface CSVPATH {
-    path: string
-};
+    path: string;
+}
 
 interface FileInfo {
-    [index: string] : CSVPATH[]
-};
+    [index: string]: CSVPATH[];
+}
 
 // const fakecsv: ProjectSerializer = [{
 // 	devpost_link: 'https://devpost.com/foo',
@@ -34,12 +37,12 @@ interface FileInfo {
 // }]
 
 router.post('/', (req: Request, res: Response) => {
-    form.parse(req, function(err: any, fields: any, files: FileInfo) {  
+    form.parse(req, (err: any, fields: any, files: FileInfo) => {
        if (!files) { return; }
-       Object.keys(files).forEach(function(key) {
-            let values : CSVPATH[]  = files[key];
-            values.forEach(function(value) {
-                fs.readFile(value.path , function(err: any,data: Buffer) {
+       Object.keys(files).forEach((key) => {
+            const values: CSVPATH[]  = files[key];
+            values.forEach((value) => {
+                fs.readFile(value.path, (err2: any, data: Buffer) => {
                     ProjectService.serializeProjects(data.toString());
                 });
             });
