@@ -14,8 +14,7 @@ const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
                         <th>Project ID</th>
                         <th>DevPost ID</th>
                         <th>Name</th>
-                        <th>Expo Number</th>
-                        <th>Table Number</th>
+                        <th>Expo-Table</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,8 +24,7 @@ const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
                                 <td>{project.project_id}</td>
                                 <td>{project.devpost_id}</td>
                                 <td>{project.name}</td>
-                                <td>{project.expo_number}</td>
-                                <td>{project.table_number}</td>
+                                <td>{project.expo_number}-{project.table_number}</td>
                             </tr>
                         )
                     })}

@@ -2,7 +2,7 @@ const schema = `
 scalar Date
 
 type Query {
-    nextBallotSet(user_id: Int!): [Ballot!]!
+    nextBallotSet(user_id: Int!, current_project_id: Int): [Ballot!]!
     getRanking: [CriteriaRanking!]!
 }
 

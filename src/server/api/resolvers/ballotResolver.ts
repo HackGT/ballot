@@ -6,14 +6,14 @@ import { ProjectScores } from '../types/ballot';
 const resolvers = {
     Query: {
         nextBallotSet: (obj: any,
-                        args: { user_id?: number },
+                        args: { user_id?: number, current_project_id?: number },
                         context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ViewBallot, args.user_id)) {
                 throw new Error('You do not have permission to view ballots');
             }
 
-            return BallotService.getNextProject(args.user_id!);
+            return BallotService.getNextProject(args.user_id!, args.current_project_id!);
         },
         getRanking: async (obj: any, args: any, context: any) => {
             if (!context.user ||

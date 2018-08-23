@@ -3,6 +3,7 @@ import { printAndThrowError } from '../util/common';
 import { BallotModel, BallotStatus, Ballots, BallotInstance } from '../models/BallotModel';
 import { sequelize } from '../db';
 import * as BPromise from 'bluebird';
+import { Projects, ProjectModelWithoutCategories, ProjectInstance } from '../models/ProjectModel';
 
 const logger = Logger('controllers/BallotService');
 
@@ -31,6 +32,8 @@ export interface Ranking {
 }
 
 export class BallotService {
+    public static projects: { [project_id: number]: ProjectModelWithoutCategories } = {};
+    public static projectBallotCounts: { [project_id: number]: number } = {};
 
     public static async getRanking(): Promise<Ranking[]> {
         const avgScores = await sequelize.query(
@@ -135,34 +138,68 @@ export class BallotService {
             .catch(printAndThrowError('batchCreate', logger));
     }
 
-    // TODO
-    public static bulkAssignBallots(): Promise<void> {
-        const assignments: BatchProjectAssignments[] = [];
-
-        // Take all of the ballots marked as pending and assign them.
-
-        return this.batchCreate(assignments);
-    }
-
-    public static getNextProject(userId: number, asJson: boolean = true):
-        BPromise<Array<(BallotModel | BallotInstance)>> {
+    public static async getNextProject(userId: number, currentProjectId: number = 0):
+        Promise<Array<(BallotModel | BallotInstance)>> {
         // TODO: Make this a Project that includes ballots
+
+        // Get all projects and store in a dictionary.
+        if (Object.keys(this.projects).length === 0) {
+            const projectResponse = await Projects.findAll();
+            for (const project of projectResponse) {
+                const projectID = project.toJSON().project_id;
+                this.projects[projectID] = project.toJSON();
+                this.projectBallotCounts[projectID] = 0;
+            }
+
+            const ballotResponse = await Ballots.findAll()
+        }
+
+        console.log(this.projects);
+        console.log(this.projectBallotCounts);
+
+        const projects = Object.values(this.projects);
+        projects.sort((a: ProjectModelWithoutCategories, b: ProjectModelWithoutCategories) => {
+            return this.projectBallotCounts[a.project_id] - this.projectBallotCounts[b.project_id];
+        });
+
+        let smallestDifference = Number.MAX_SAFE_INTEGER;
+        let closestProjectID = 0;
+        for (const projectID of projects) {
+            if (Math.abs(+projectID - currentProjectId) < smallestDifference) {
+                smallestDifference = Math.abs(+projectID - currentProjectId);
+                closestProjectID = +projectID;
+            }
+        }
+
         return Ballots.findAll({
             where: {
                 user_id: userId,
                 ballot_status: BallotStatus.Assigned,
             },
         })
-            .then((ballots) => ballots.map((ballot) => asJson ?
-                ballot.toJSON() : ballot))
+            .then((ballots) => ballots.map((ballot) =>
+                ballot.toJSON()))
             .catch(printAndThrowError('getNextProject', logger));
     }
+
+    public static async getCurrentAssignedBallots(userId: number, asJson: boolean = true):
+        Promise<Array<(BallotModel | BallotInstance)>> {
+            return Ballots.findAll({
+                where: {
+                    user_id: userId,
+                    ballot_status: BallotStatus.Assigned,
+                },
+            })
+                .then((ballots) => ballots.map((ballot) => asJson ?
+                    ballot.toJSON() : ballot))
+                .catch(printAndThrowError('getNextProject', logger));
+        }
 
     public static async skipProject(userId: number):
         Promise<BallotModel[] | undefined> {
         // Fetch the ballots currently assigned to the judge
         const curBallots = await
-            this.getNextProject(userId, false) as BallotInstance[];
+            this.getCurrentAssignedBallots(userId, false) as BallotInstance[];
 
         // Write the scores for each ballot
         let projectId: number | undefined;
@@ -215,7 +252,7 @@ export class BallotService {
 
         // Fetch the ballots currently assigned to the judge
         const curBallots = await
-            this.getNextProject(userId, false) as BallotInstance[];
+            this.getCurrentAssignedBallots(userId, false) as BallotInstance[];
 
         if (ballots.length !== curBallots.length) {
             throw new Error('The number of scores entered does not match'
@@ -242,6 +279,8 @@ export class BallotService {
             ballot.set('ballot_status', BallotStatus.Submitted);
             ballot.save();
         }
+        // Increment ballot count for projectID
+        this.projectBallotCounts[projectId!]++;
 
         // Assign the next round of ballots
         // TODO: Return a Project that includes ballots

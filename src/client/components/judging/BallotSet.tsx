@@ -11,14 +11,14 @@ interface BallotSetProps extends BallotSetState {
 
 const BallotSet: React.SFC<BallotSetProps> = (props) => {
     // Check if there is any ballot set loaded. If not, fetch new ballot set
-    function loadNext(mode: string): void {
+    function loadNext(mode: string, currentProjectID?: number): void {
         fetch('/auth/user_data/', { credentials: 'same-origin' })
         .then((result) => result.json())
         .then((userData) => {
             const user_id = userData.user_id;
             const query = `
                 {
-                    nextBallotSet(user_id: ${user_id}) {
+                    nextBallotSet(user_id: ${user_id} ${currentProjectID ? ', current_project_id: ' + currentProjectID : ''}) {
                         ballot_id,
                         project_id,
                         criteria_id,
@@ -73,7 +73,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
     }
 
     if (props.ballots.length === 0) {
-        loadNext('NO_LOAD_ON_EMPTY_RESPONSE');
+        loadNext('NO_LOAD_ON_EMPTY_RESPONSE', 10);
         return (
             <div>
                 <p>There's currently no assigned project to view.</p>
@@ -116,6 +116,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                     fetch('/auth/user_data/', { credentials: 'same-origin' })
                     .then((result) => result.json())
                     .then((userData) => {
+                        let project_id = 0;
                         const user_id = userData.user_id;
                         const scores = props.ballots.map((ballot) => {
                             if (!ballot.score || ballot.score === 0) {
@@ -123,6 +124,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                                 // Shall we notify user?
                                 ballot.score = 0;
                             }
+                            project_id = ballot.project_id;
                             return {
                                 ballot_id: ballot.ballot_id,
                                 score: ballot.score,
@@ -153,7 +155,7 @@ const BallotSet: React.SFC<BallotSetProps> = (props) => {
                         .then((json) => {
                             // When successful, load the next
                             console.log(json);
-                            loadNext('LOAD_ON_EMPTY_RESPONSE');
+                            loadNext('LOAD_ON_EMPTY_RESPONSE', project_id);
                         });
                     });
                 }}
