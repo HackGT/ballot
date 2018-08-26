@@ -1,0 +1,13 @@
+div.admin-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; }
+
+div.admin-left {
+  width: 150px;
+  border-right: 1px solid #444444;
+  margin-right: 30px; }
+
+div.admin-right {
+  flex-grow: 1;
+  min-width: 400px; }

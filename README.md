@@ -7,6 +7,7 @@ Stack ranking solution for judge assignment, management, and scoring.
 First, clone the repository and run `npm install`. This will create a `.env` file where you should fill in any environment variables that should be loaded in.
 
 ### Environment Variables
+OUT OF DATE. PLEASE UPDATE
 
 | Envar                           | Description                                                                                         |
 |---------------------------------|-----------------------------------------------------------------------------------------------------|
@@ -29,7 +30,7 @@ First, clone the repository and run `npm install`. This will create a `.env` fil
 | AUTH_AUTH_GOOGLE_ID             |  The OAuth Client ID for google                                                                     |
 | AUTH_AUTH_GOOGLE_SECRET         |  The OAuth Client secret for google                                                                 |
 | AUTH_ALLOW_LOCAL                |  If enabled, will render local login on the front end                                               |
- 
+
 ### Authentication
 
 *You must have at least one authentication strategy set up in order for the server to run properly.*

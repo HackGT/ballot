@@ -1,0 +1,12 @@
+.LoginButton {
+  margin: 5px;
+  display: inline-block;
+  border: 2px solid #E6E8E6; }
+  .LoginButton a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    background: none; }
+
+.LoginButton:hover {
+  background: #4e4e4e; }

@@ -1,0 +1,12 @@
+nav.nav {
+  display: block;
+  text-align: center;
+  margin: 0 0 30px 0; }
+  nav.nav ul li {
+    display: inline-block;
+    margin: 0 10px; }
+    nav.nav ul li a {
+      text-decoration: none;
+      padding: 2px 0; }
+    nav.nav ul li a:hover, nav.nav ul li a.active {
+      border-bottom: 3px solid #DB3636; }
