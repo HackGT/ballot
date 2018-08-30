@@ -49,7 +49,7 @@ CREATE TABLE criteria (
 );
 
 DROP TYPE IF EXISTS ballotstatus CASCADE;
-CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Skipped');
+CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Skipped', 'Started');
 
 DROP TABLE IF EXISTS ballots;
 CREATE TABLE ballots (
@@ -75,7 +75,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER update_ballot_score_submit_time
-    BEFORE UPDATE 
+    BEFORE UPDATE
     ON public.ballots
     FOR EACH ROW
     WHEN (OLD.score IS DISTINCT FROM NEW.score)

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import './UserTable.css';
 import UserTableRow from './UserTableRow';
 import { UserTableRowType } from './UserTableRow';
 

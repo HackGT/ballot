@@ -5,8 +5,12 @@ interface RegisterProps {}
 
 const Register: React.SFC<RegisterProps> = (props) => {
     return (
-        <div className='login'>
-        <h2>Register</h2>
+        <div style={{
+            maxWidth: 480,
+            width: '100%',
+            margin: '0 auto',
+         }}>
+            <h1>Register</h1>
             <form method='POST' action='/auth/signup'>
                 <input name='name' type='text' placeholder='Name' />
                 <input name='email' type='text' placeholder='Email' />

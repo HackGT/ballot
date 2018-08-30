@@ -2,7 +2,6 @@ import * as React from 'react';
 // import './Judging.css';
 import Criterion from './Criterion';
 import { BallotState, BallotSetState } from '../../types/State';
-import './SubmitButton.css';
 
 interface BallotSetProps extends BallotSetState {
     updateBallot: (ballot: BallotState) => void;

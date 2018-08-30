@@ -72,8 +72,19 @@ if (Environment.getGoogleAuth()) {
 if (Environment.allowLocalAuth()) {
     router.post('/login',
         postParser,
-        passport.authenticate('local',
-            { failureRedirect: '/login', successRedirect: '/' }));
+        (req, res, next) => {
+            passport.authenticate('local', (err, user, info) => {
+                console.log(user);
+                if (!user) {
+                    return res.json({ a: null });
+                } else {
+                    req.logIn(user, (err) => {
+                        return res.json({ a: user.user_class });
+                    });
+                }
+            })(req, res, next);
+        }
+    );
 
     router.post('/signup',
         postParser,

@@ -6,18 +6,21 @@ import { createStore, applyMiddleware } from 'redux';
 import AppContainer from './containers/AppContainer';
 import FetcherContainer from './containers/FetcherContainer';
 import LoginPage from './components/LoginPage';
-import RegisterPage from './components/RegisterPage';
-import './global.css';
 import store from './store';
+
+import './index.css';
+import Logout from './components/login/Logout';
+import { LogoutContainer } from './containers/LoginContainer';
 
 ReactDOM.render(
     <Router>
         <Provider store={store}>
-            <div>
+            <div style={{ width: '100%', minWidth: 320 }} >
                 <FetcherContainer />
                 <Switch>
+                    <Route path='/logout' component={LogoutContainer} />
                     <Route path='/login' component={LoginPage} />
-                    <Route path='/register' component={RegisterPage} />
+                    <Route path='/register' component={LoginPage} />
                     <Route path='/' component={AppContainer} />
                 </Switch>
             </div>

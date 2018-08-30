@@ -13,6 +13,7 @@ export enum BallotStatus {
     Assigned = 'Assigned',
     Submitted = 'Submitted',
     Skipped = 'Skipped',
+    Started = 'Started',
 }
 
 export interface BallotModel {

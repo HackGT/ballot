@@ -7,25 +7,29 @@ import AdminNavigation from './SidebarNavigation';
 import Status from '../Status';
 import Judging from '../judging/Judging';
 import ExpoPage from '../expo/ExpoPage';
-// import './AdminPage.css';
 
-interface AdminPageProps {
-    match: string;
-}
+interface AdminPageProps {}
 
 const AdminPage: React.SFC<AdminPageProps> = (props) => {
     return (
-        <div>
-            <Header />
+        <div style={{
+            width: '100%',
+            maxWidth: 960,
+            margin: '0 auto',
+        }}>
             <Navigation
                 linkNames={['Home', 'Judging', 'Expo', 'Admin']}
                 linkDests={['/', '/judging', '/expo', '/admin']} />
-            <Switch>
-                <Route exact path='/judging' component={Judging} />
-                <Route exact path='/expo' component={ExpoPage} />
-                <Route path='/admin' component={AdminContainer} />
-                <Route exact path='/' component={Status} />
-            </Switch>
+            <div style={{
+                padding: 15,
+            }}>
+                <Switch>
+                    <Route exact path='/judging' component={Judging} />
+                    <Route exact path='/expo' component={ExpoPage} />
+                    <Route path='/admin' component={AdminContainer} />
+                    <Route exact path='/' component={Status} />
+                </Switch>
+            </div>
         </div>
     );
 };

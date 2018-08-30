@@ -125,8 +125,7 @@ function addStrategy(serviceName: 'github' | 'google' | 'facebook',
         logger.warn(`No ${serviceName} Authentication envars found. Skipping.`);
         return;
     }
-    logger.info(`${serviceName} envars found, enabling ${serviceName}
-    Authentication`);
+    logger.info(`${serviceName} envars found, enabling ${serviceName} Authentication`);
 
     const newStrategy = new strategy(config,
         async (accessToken: string, refreshToken: string, profile: Profile,

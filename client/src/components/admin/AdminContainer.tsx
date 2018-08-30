@@ -4,10 +4,8 @@ import Admin from './Admin';
 import Ranking from './Ranking';
 import Events from './Events';
 import Users from './Users';
-import Header from '../Header';
 import Navigation from '../Navigation';
 import SidebarNavigation from './SidebarNavigation';
-import './AdminContainer.css';
 import { ProjectsContainer } from '../../containers/expo/ExpoContainer';
 
 interface AdminContainerProps {

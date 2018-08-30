@@ -5,11 +5,14 @@ import * as Sequelize from 'sequelize';
 // Sequelize.Model
 const { INTEGER, STRING, ENUM } = Sequelize;
 
-export interface UserModel {
+export interface SafeUserModel {
     user_id?: number;
     email: string;
     name: string;
     user_class: UserClass;
+}
+
+export interface UserModel extends SafeUserModel {
     github?: string;
     google?: string;
     facebook?: string;

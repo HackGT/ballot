@@ -48,6 +48,7 @@ enum BallotStatus {
     Assigned
     Submitted
     Reviewed
+    Started
 }`;
 
 export interface ProjectScores {

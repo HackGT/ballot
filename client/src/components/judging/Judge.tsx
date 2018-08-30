@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Header from '../Header';
 import Navigation from '../Navigation';
-import { Switch, Route } from 'react-router';
+import { Switch, Route, match } from 'react-router';
 import Judging from './Judging';
 import ExpoPage from '../expo/ExpoPage';
 import Status from '../Status';

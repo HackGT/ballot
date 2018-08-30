@@ -1,9 +1,8 @@
 import { Logger } from '../util/Logger';
 import { printAndThrowError } from '../util/common';
-import { ProjectModel, Projects, ProjectInstance, ProjectModelWithoutCategories } from '../models/ProjectModel';
+import { ProjectModel, Projects, ProjectInstance } from '../models/ProjectModel';
 import { sequelize } from '../db';
-import { Categories } from '../models/CategoryModel';
-import { Criteria } from '../models/CriteriaModel';
+import { dataStore } from '../store/DataStore';
 
 const logger = Logger('controllers/ProjectService');
 const csv = require('csv');
@@ -22,18 +21,8 @@ interface CategoryQueryResult {
 }
 
 export class ProjectService {
-    public static find(): Promise<ProjectModel[]> {
-        return Projects.findAll({
-            include: [{ model: Categories }],
-        })
-        .then((project) =>
-            project.map((project) => {
-                return {
-                    ...project.toJSON(),
-                    categories: project.categories!.map((category) => category.toJSON())
-                };
-            })
-        ).catch(printAndThrowError('find', logger));
+    public static find(): ProjectModel[] {
+        return Object.values(dataStore.projects);
     }
 
     public static async serializeProjects(projects: string):

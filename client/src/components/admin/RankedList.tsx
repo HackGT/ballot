@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { CategoryRanking, CriteriaRanking, ViewType, rankCriteriaToCategory } from '../../util/ranking';
 import RankedScore from './RankedScore';
-import './RankedList.css';
 
 interface RankedListProps {
     ranking: CriteriaRanking[];

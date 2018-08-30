@@ -142,35 +142,6 @@ export class BallotService {
         Promise<Array<(BallotModel | BallotInstance)>> {
         // TODO: Make this a Project that includes ballots
 
-        // Get all projects and store in a dictionary.
-        if (Object.keys(this.projects).length === 0) {
-            const projectResponse = await Projects.findAll();
-            for (const project of projectResponse) {
-                const projectID = project.toJSON().project_id;
-                this.projects[projectID] = project.toJSON();
-                this.projectBallotCounts[projectID] = 0;
-            }
-
-            const ballotResponse = await Ballots.findAll()
-        }
-
-        console.log(this.projects);
-        console.log(this.projectBallotCounts);
-
-        const projects = Object.values(this.projects);
-        projects.sort((a: ProjectModelWithoutCategories, b: ProjectModelWithoutCategories) => {
-            return this.projectBallotCounts[a.project_id] - this.projectBallotCounts[b.project_id];
-        });
-
-        let smallestDifference = Number.MAX_SAFE_INTEGER;
-        let closestProjectID = 0;
-        for (const projectID of projects) {
-            if (Math.abs(+projectID - currentProjectId) < smallestDifference) {
-                smallestDifference = Math.abs(+projectID - currentProjectId);
-                closestProjectID = +projectID;
-            }
-        }
-
         return Ballots.findAll({
             where: {
                 user_id: userId,
