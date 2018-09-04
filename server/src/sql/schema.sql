@@ -21,8 +21,9 @@ CREATE TABLE projects (
     project_id serial PRIMARY KEY,
     devpost_id text NOT NULL UNIQUE,
     name character varying(64) NOT NULL,
-    table_number smallint,
+    table_number character varying(32),
     expo_number smallint,
+    sponsor_prizes text,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
 );

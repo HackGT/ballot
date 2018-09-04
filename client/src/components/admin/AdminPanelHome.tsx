@@ -1,9 +1,9 @@
 import * as React from 'react';
 // import './Admin.css';
 
-interface AdminProps {}
+interface AdminPanelHomeProps {}
 
-const Admin: React.SFC<AdminProps> = (props) => {
+const AdminPanelHome: React.SFC<AdminPanelHomeProps> = (props) => {
     return (
         <div>
             <h1>Administration Home</h1>
@@ -12,4 +12,4 @@ const Admin: React.SFC<AdminProps> = (props) => {
     );
 };
 
-export default Admin;
+export default AdminPanelHome;

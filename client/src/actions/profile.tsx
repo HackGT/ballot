@@ -11,16 +11,21 @@ export const updateClass =
         console.log(json);
         return {
             type: UPDATE_CLASS,
-            role: json.a ? json.a : 'None',
+            email: json.email ? json.email : '',
+            name: json.name ? json.name : '',
+            role: json.class ? json.class : 'None',
         };
     };
 
 export const fetchProfileClass = () => {
     console.log('fetch');
-    return (dispatch: Dispatch<any>) => {
-        fetch('/auth/user_data/class', { credentials: 'same-origin' })
-            .then((result) => result.json())
-            .then((profile) => dispatch(updateClass(profile)))
-            .catch((err) => console.log(err));
+    return async (dispatch: Dispatch<any>) => {
+        const authResult = await fetch('/auth/user_data', { credentials: 'same-origin' });
+        const authJSON = await authResult.json();
+        dispatch(updateClass({
+            name: authJSON.name,
+            email: authJSON.email,
+            class: authJSON.user_class,
+        }));
     };
 };

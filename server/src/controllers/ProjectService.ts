@@ -98,6 +98,7 @@ export class ProjectService {
 
     private static ProjectsToModel: {[index: string]: string} = {
         devpost_link: 'devpost_id',
+        sponsor_prizes: 'sponsor_prizes',
         project_name: 'name',
         location: 'table_number',
         categories: 'categories',

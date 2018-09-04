@@ -29,13 +29,17 @@ class Logout extends React.Component<LogoutProps, LogoutState> {
                 success: true,
             }
         }, () => {
-            this.props.updateClass({ a: null });
+            this.props.updateClass({
+                name: null,
+                email: null,
+                class: null,
+            });
         });
     }
 
     public render() {
         return (
-            this.state.success ? <Redirect to='/login' /> : <div>Logging out...</div>
+            this.state.success ? <Redirect to='/' /> : <div>Logging out...</div>
         )
     }
 }

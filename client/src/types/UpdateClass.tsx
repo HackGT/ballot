@@ -1,9 +1,13 @@
 import Action from './Action';
 
 export interface UpdateClassRequestType {
-    a: string | null;
+    email: string | null;
+    name: string | null;
+    class: string | null;
 }
 
 export interface UpdateClassActionType extends Action {
+    email: string | null;
+    name: string | null;
     role: string | null;
 }

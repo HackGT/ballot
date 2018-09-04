@@ -79,7 +79,11 @@ if (Environment.allowLocalAuth()) {
                     return res.json({ a: null });
                 } else {
                     req.logIn(user, (err) => {
-                        return res.json({ a: user.user_class });
+                        return res.json({
+                            name: user.name,
+                            email: user.email,
+                            class: user.user_class
+                        });
                     });
                 }
             })(req, res, next);

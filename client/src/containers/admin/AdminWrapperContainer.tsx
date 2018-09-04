@@ -5,7 +5,7 @@ import {
     mapStateToAllProps,
 } from '../../util/authorization';
 
-import AdminPage from '../../components/admin/AdminPage';
+import AdminWrapper from '../../components/admin/AdminWrapper';
 
 import { State } from '../../types/State';
 
@@ -19,11 +19,11 @@ const mapStateToAuth = (state: State): boolean => {
     return ['Admin', 'Owner'].includes(state.auth.role!);
 };
 
-const AdminPageContainer = connect<StateToProps>(
+const AdminWrapperContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(AdminPage));
+)(ConditionalRender(AdminWrapper));
 
-export default AdminPageContainer;
+export default AdminWrapperContainer;

@@ -6,6 +6,7 @@ import { Popover, Button, Position, Menu, MenuItem, Navbar, Alignment, H1, Navba
 interface NavigationProps {
     linkNames: string[];
     linkDests: string[];
+    hasSession: boolean;
     match: any;
     history: any;
     location: any;
@@ -40,27 +41,30 @@ const Navigation: React.SFC<NavigationProps> = (props) => {
             linkDest={props.linkDests[i]}/>);
     }
 
-    navLinks.push(
-        <NavigationElement
-            key={props.linkNames.length}
-            location={props.location}
-            history={props.history}
-            mobile={false}
-            linkName={'Logout'}
-            linkDest={'/logout'}
-        />
-    );
+    if (props.hasSession) {
+        navLinks.push(
+            <NavigationElement
+                key={props.linkNames.length}
+                location={props.location}
+                history={props.history}
+                mobile={false}
+                linkName={'Logout'}
+                linkDest={'/logout'}
+            />
+        );
 
-    navLinksMobile.push(
-        <NavigationElement
-            key={props.linkNames.length}
-            location={props.location}
-            history={props.history}
-            mobile={true}
-            linkName={'Logout'}
-            linkDest={'/logout'}
-        />
-    );
+        navLinksMobile.push(
+            <NavigationElement
+                key={props.linkNames.length}
+                location={props.location}
+                history={props.history}
+                mobile={true}
+                linkName={'Logout'}
+                linkDest={'/logout'}
+            />
+        );
+    }
+
 
     return (
         <div>

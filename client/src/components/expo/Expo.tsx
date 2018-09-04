@@ -24,6 +24,7 @@ class Expo extends React.Component<ExpoProps, {}> {
                         name
                         table_number
                         expo_number
+                        sponsor_prizes
                         categories {
                             name
                         }

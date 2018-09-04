@@ -15,6 +15,7 @@ interface LoginProps {
 interface LoginState {
     email: string;
     password: string;
+    loggingIn: boolean;
 }
 
 const spacedInput = {
@@ -28,7 +29,8 @@ class Login extends React.Component<LoginProps, LoginState> {
         this.state = {
             email: '',
             password: '',
-        }
+            loggingIn: false,
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
@@ -41,10 +43,10 @@ class Login extends React.Component<LoginProps, LoginState> {
                 width: '100%',
                 margin: '0 auto',
              }}>
-                <Route path='/login' component={YesSessionContainer} />
+
                 <LoginButtons />
                 {process.env.REACT_APP_AUTH_ALLOW_LOCAL ?
-                    <FormGroup>
+                    <form>
                         <InputGroup
                             name='email'
                             type='text'
@@ -59,9 +61,15 @@ class Login extends React.Component<LoginProps, LoginState> {
                             large={true}
                             onChange={this.handleChange}
                             style={spacedInput} />
-                        <Button type='submit' value='Login' large={true} intent='primary' fill={true} onClick={this.handleLogin}>Login</Button>
-                    </FormGroup> :
-                    ''
+                        <Button
+                            type='submit'
+                            text='Login'
+                            loading={this.state.loggingIn}
+                            large={true}
+                            intent='primary'
+                            fill={true}
+                            onClick={this.handleLogin} />
+                    </form> : ''
                 }
 
                 <Link to='/register'>Register</Link>
@@ -69,17 +77,38 @@ class Login extends React.Component<LoginProps, LoginState> {
         );
     }
 
-    private async handleLogin() {
-        const loginResult = await axios.post('/auth/login',
-            qs.stringify({
-                'email': this.state.email,
-                'password': this.state.password,
-            }),
-            {
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'
-            },
+    private handleLogin() {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                loggingIn: true,
+            };
+        }, async () => {
+            const loginResult = await axios.post('/auth/login',
+                qs.stringify({
+                    'email': this.state.email,
+                    'password': this.state.password,
+                }),
+                {
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'
+                },
+            });
+
+            if (loginResult.data.class !== 'None') {
+                this.setState((prevState) => {
+                    return {
+                        ...prevState,
+                        loggingIn: false,
+                    };
+                });
+            }
+
+            this.props.updateClass({
+                name: loginResult.data.name,
+                email: loginResult.data.email,
+                class: loginResult.data.class,
+            });
         });
-        this.props.updateClass(loginResult.data);
     }
 
     private handleChange(event: any) {

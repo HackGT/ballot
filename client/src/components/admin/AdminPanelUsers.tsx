@@ -1,9 +1,14 @@
 import * as React from 'react';
-import UserTable from './UserTable';
-import { UserTableRowType } from './UserTableRow';
+import AdminPanelUserList from './AdminPanelUserList';
+import { AuthState } from '../../types/State';
+import { AdminPanelUserCardProps } from './AdminPanelUserCard';
 
-class UserContainer extends React.Component< {}, {
-    userData: UserTableRowType[]}> {
+interface AdminPanelUsersProps {
+    auth: AuthState;
+}
+
+class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {
+    userData: AdminPanelUserCardProps[]}> {
     constructor(props: any) {
         super(props);
 
@@ -25,13 +30,14 @@ class UserContainer extends React.Component< {}, {
         });
         const data = await result.json();
         const users = data.data.users;
-        const newUserData: UserTableRowType[] = [];
+        const newUserData: AdminPanelUserCardProps[] = [];
         for (const user of users) {
             newUserData.push({
                 user_id: user.user_id,
                 name: user.name,
                 email: user.email,
                 user_class: user.user_class,
+                isCurrentUser: this.props.auth.email === user.email,
             });
         }
 
@@ -40,9 +46,9 @@ class UserContainer extends React.Component< {}, {
 
     public render(): React.ReactElement<HTMLDivElement> {
         return (
-            <UserTable userData={this.state.userData} />
+            <AdminPanelUserList userData={this.state.userData} />
         );
     }
 }
 
-export default UserContainer;
+export default AdminPanelUsers;

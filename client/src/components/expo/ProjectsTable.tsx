@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ProjectState } from '../../types/State';
+import { Card } from '@blueprintjs/core';
 
 interface ProjectsTableProps {
     projects: ProjectState[];
@@ -7,29 +8,32 @@ interface ProjectsTableProps {
 
 const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
     return (
-        <div className='project-table'>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Project ID</th>
-                        <th>DevPost ID</th>
-                        <th>Name</th>
-                        <th>Expo-Table</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {props.projects.map((project: ProjectState) => {
-                        return (
-                            <tr key={project.project_id}>
-                                <td>{project.project_id}</td>
-                                <td>{project.devpost_id}</td>
-                                <td>{project.name}</td>
-                                <td>{project.expo_number}-{project.table_number}</td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+        <div style={{
+            width: '100%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+        }}>
+            {props.projects.map((project: ProjectState) => {
+                return (
+                    // <a href={'https://devpost.com/software/' + project.devpost_id} target='_blank' key={project.project_id} >
+                        <Card
+                            interactive={true}
+                            key={project.project_id}
+                            onClick={() => {
+                                window.open('https://devpost.com/software/' + project.devpost_id);
+                            }}
+                            style={{
+                                width: '100%',
+                                maxWidth: 300,
+                                margin: 5,
+                            }}>
+                            <h3>{project.project_id}: {project.name}</h3>
+                            <p>Expo: {project.expo_number} Table: {project.table_number}</p>
+                        </Card>
+                    // </a>
+                )
+            })}
         </div>
     )
 }

@@ -6,7 +6,7 @@ interface LoginButtonsProps { }
 
 const LoginButtons: React.SFC<LoginButtonsProps> = (props) => {
     return (
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', margin: '0 0 20px' }}>
             {process.env.REACT_APP_AUTH_ALLOW_GITHUB ?
                 <LoginButton name='Github'
                     link='/auth/github/login' /> : ''}

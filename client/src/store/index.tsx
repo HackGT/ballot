@@ -3,11 +3,13 @@ import thunk from 'redux-thunk';
 
 import auth from '../reducers/auth';
 import ballotset from '../reducers/ballotset';
+import categories from '../reducers/categories';
 import projects from '../reducers/projects';
 
 const reducer = combineReducers({
     auth,
     ballotset,
+    categories,
     projects,
 });
 

@@ -15,6 +15,8 @@ export enum Action {
     DeleteCategory = 'DeleteCategory',
     UpdateCategory = 'UpdateCategory',
 
+    DeleteCriterion = 'DeleteCriterion',
+
     ViewBallot = 'ViewBallot',
     ScoreBallot = 'ScoreBallot',
     ViewRanking = 'ViewRanking',
@@ -26,6 +28,7 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
     switch (action) {
         case Action.PromoteUser:
         case Action.DeleteUser:
+        case Action.DeleteCriterion:
         case Action.CreateCategory:
         case Action.ViewUsers:
         case Action.CreateCategory:

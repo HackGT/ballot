@@ -19,8 +19,6 @@ ReactDOM.render(
                 <FetcherContainer />
                 <Switch>
                     <Route path='/logout' component={LogoutContainer} />
-                    <Route path='/login' component={LoginPage} />
-                    <Route path='/register' component={LoginPage} />
                     <Route path='/' component={AppContainer} />
                 </Switch>
             </div>

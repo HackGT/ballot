@@ -2,15 +2,15 @@ import * as React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Header from '../Header';
 import Navigation from '../Navigation';
-import AdminContainer from './AdminContainer';
+import AdminPanelWrapper from './AdminPanelWrapper';
 import AdminNavigation from './SidebarNavigation';
-import Status from '../Status';
 import Judging from '../judging/Judging';
-import ExpoPage from '../expo/ExpoPage';
+import StatusContainer from '../../containers/StatusContainer';
+import { ExpoContainer } from '../../containers/expo/ExpoContainer';
 
-interface AdminPageProps {}
+interface AdminWrapperProps {}
 
-const AdminPage: React.SFC<AdminPageProps> = (props) => {
+const AdminWrapper: React.SFC<AdminWrapperProps> = (props) => {
     return (
         <div style={{
             width: '100%',
@@ -18,6 +18,7 @@ const AdminPage: React.SFC<AdminPageProps> = (props) => {
             margin: '0 auto',
         }}>
             <Navigation
+                hasSession={true}
                 linkNames={['Home', 'Judging', 'Expo', 'Admin']}
                 linkDests={['/', '/judging', '/expo', '/admin']} />
             <div style={{
@@ -25,13 +26,13 @@ const AdminPage: React.SFC<AdminPageProps> = (props) => {
             }}>
                 <Switch>
                     <Route exact path='/judging' component={Judging} />
-                    <Route exact path='/expo' component={ExpoPage} />
-                    <Route path='/admin' component={AdminContainer} />
-                    <Route exact path='/' component={Status} />
+                    <Route exact path='/expo' component={ExpoContainer} />
+                    <Route path='/admin' component={AdminPanelWrapper} />
+                    <Route exact path='/' component={StatusContainer} />
                 </Switch>
             </div>
         </div>
     );
 };
 
-export default AdminPage;
+export default AdminWrapper;

@@ -6,6 +6,7 @@ import YesSessionContainer from '../util/RedirectYesSession';
 import Register from './login/Register';
 import Login from './login/Login';
 import LoginContainer from '../containers/LoginContainer';
+import Footer from './Footer';
 
 interface LoginProps {}
 
@@ -33,9 +34,7 @@ const LoginPage: React.SFC<LoginProps> = (props) => {
                     </Switch>
                 </div>
             </div>
-            <footer style={{ textAlign: 'center' }}>
-                Made with &lt;3 by the HackGTeam
-            </footer>
+            <Footer />
         </div>
     );
 };

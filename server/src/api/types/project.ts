@@ -7,8 +7,9 @@ type Project {
     project_id: Int,
     devpost_id: String,
     name: String,
-    table_number: Int,
+    table_number: String,
     expo_number: Int,
+    sponsor_prizes: String,
     categories: [Category!]!
 }
 

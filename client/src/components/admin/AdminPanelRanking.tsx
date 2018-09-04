@@ -3,17 +3,14 @@ import { CriteriaRanking, ViewType } from '../../util/ranking';
 import RankedList from './RankedList';
 // import './Ranking.css';
 
-interface RankingProps {
-    match: any;
-}
+interface AdminPanelRankingProps {}
 
-interface RankingState {
+interface AdminPanelRankingState {
     ranking: CriteriaRanking[];
     viewType: ViewType;
 }
 
-class Ranking extends React.Component<RankingProps, RankingState> {
-
+class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPanelRankingState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -31,19 +28,19 @@ class Ranking extends React.Component<RankingProps, RankingState> {
             },
             body: JSON.stringify({
                 query: `{
-                            getRanking {
-                                criteria_name,
-                                category_id,
-                                category_name,
-                                ranking {
-                                    name,
-                                    project_id,
-                                    score,
-                                    judge_count,
-                                    devpost_id
-                                }
-                            }
+                    getRanking {
+                        criteria_name,
+                        category_id,
+                        category_name,
+                        ranking {
+                            name,
+                            project_id,
+                            score,
+                            judge_count,
+                            devpost_id
                         }
+                    }
+                }
             `}),
         });
 
@@ -72,6 +69,6 @@ class Ranking extends React.Component<RankingProps, RankingState> {
     }
 }
 
-export default Ranking;
+export default AdminPanelRanking;
 
 
