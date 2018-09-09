@@ -4,7 +4,10 @@ import '../css/ProjectIcon.css';
 class ProjectIcon extends Component {
   render() {
     return (
-      <div className={'ProjectIcon ' + this._className()} ref="icon">
+      <div
+        className={'ProjectIcon ' + this._className()}
+        ref="icon"
+        onClick={this._setActiveProject}>
         <div className="projectIconContents">
           <div title={this.props.project.name}>{this._renderTableNumber()}</div>
         </div>
@@ -33,9 +36,20 @@ class ProjectIcon extends Component {
       'RED': 'red',
       'GREEN': 'green',
       'BLUE': 'blue',
-    }[section];
+    }[section] + (
+      (this.props.inList && this.props.selected)
+        ? ' pendingMove'
+        : ''
+    );
   }
-  
+
+  _setActiveProject = () => {
+    if (!this.props.inList) {
+      return;
+    }
+    this.props.setActiveProject();
+  };
+
 }
 
 export default ProjectIcon;

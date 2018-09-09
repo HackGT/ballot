@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import '../css/MaybeProjectIcon.css';
-import ProjectIcon from './ProjectIcon.react';
+import ProjectIconContainer from './containers/ProjectIconContainer.react';
 
 class MaybeProjectIcon extends Component {
   render() {
     if (this.props.project) {
-      return <ProjectIcon project={this.props.project} />;
+      return <ProjectIconContainer projectID={this.props.project.project_id} inList={false} />;
     } else {
       return <div className="emptyProjectIcon"></div>;
     }

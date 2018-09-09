@@ -6,8 +6,10 @@ import './css/index.css';
 import AppContainer from './components/containers/AppContainer.react';
 
 import { createStore } from 'redux';
-import ProjectListingContainer from './components/containers/ProjectListingContainer.react';
 import MaybeProjectIcon from './components/MaybeProjectIcon.react';
+
+import io from 'socket.io-client';
+import uuid from 'uuid/v4';
 
 const store = createStore(rootReducer);
 
@@ -246,3 +248,24 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root'),
 );
+
+const socket = io();
+socket.on('connect', () => {
+  store.dispatch({
+    type: 'SET_SOCKET',
+    socket,
+  });
+
+  socket.emit('start', {
+    eventID: uuid(),
+    password: '',
+  });
+  
+  socket.on('queue_project', ({ userID, projectID }) => {
+    onQueueProject({ userID, projectID });
+  });
+
+  socket.on('next_project', ({ userID, projectID }) => {
+    onNextProject({ userID, projectID });
+  });
+});

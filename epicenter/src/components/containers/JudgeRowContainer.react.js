@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import uuid from 'uuid/v4';
 import JudgeRow from '../JudgeRow.react';
 
 const mapStateToProps = (state, ownProps) => {
@@ -20,6 +21,15 @@ const mapStateToProps = (state, ownProps) => {
           state.canonical.judgeQueues.get(judge.user_id).get('queuedProjectID')
         )
       : null,
+    enqueueSelectedProject: () => {
+      if (state.program.socket) {
+        state.program.socket.emit('queue_project', {
+          eventID: uuid(),
+          userID: judge.user_id,
+          projectID: state.program.selectedProjectID,
+        });
+      }
+    },
   };
 };
 

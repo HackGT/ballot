@@ -75,6 +75,8 @@ const DerivedState = Immutable.Record({
 
 const ProgramState = Immutable.Record({
   expo_number: 1,
+  selectedProjectID: null,
+  socket: null,
   activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
@@ -318,7 +320,21 @@ const rootReducer = (state = new State(), action) => {
         'projectIconRefs',
         action.projectID,
       ], action.ref);
-    }
+    },
+
+    'SET_SELECTED_PROJECT': (state, action) => {
+      return state.setIn([
+        'program',
+        'selectedProjectID',
+      ], action.projectID);
+    },
+
+    'SET_SOCKET': (state, action) => {
+      return state.setIn([
+        'program',
+        'socket',
+      ], action.socket);
+    },
   };
 
   if (action.type in handlers) {

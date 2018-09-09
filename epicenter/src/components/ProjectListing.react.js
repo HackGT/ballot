@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../css/ProjectListing.css';
-import ProjectIcon from './ProjectIcon.react';
+import ProjectIconContainer from './containers/ProjectIconContainer.react';
 
 class ProjectListing extends Component {
   render() {
@@ -8,10 +8,10 @@ class ProjectListing extends Component {
       <div className="ProjectListing">
         <div className="projectIcons">
           {this.props.projects.map((project, i) => (
-            <ProjectIcon
-              project={project}
-              key={i}
-              onMount={ref => this.props.setProjectIconRef(ref, project.project_id)} />
+            <ProjectIconContainer
+              projectID={project.project_id}
+              inList={true}
+              key={i} />
           ))}
         </div>
       </div>

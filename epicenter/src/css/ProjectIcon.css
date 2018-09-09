@@ -10,6 +10,10 @@
   border: 1px solid white;
 }
 
+.ProjectIcon.pendingMove {
+  opacity: 0.4;
+}
+
 .projectIconContents {
   display: flex;
   justify-content: center;

@@ -7,21 +7,8 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    setProjectIconRef: (ref, projectID) => {
-      dispatch({
-        type: 'SET_PROJECT_ICON_REF',
-        ref,
-        projectID,
-      });
-    },
-  };
-};
-
 const ProjectListingContainer = connect(
   mapStateToProps,
-  mapDispatchToProps,
 )(ProjectListing);
 
 export default ProjectListingContainer;
