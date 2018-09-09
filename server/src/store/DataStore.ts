@@ -244,8 +244,7 @@ export class DataStore {
             };
         }
 
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON()
-        , null, 0), 'utf-8', () => {
+        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
             console.log('Saved');
         });
     }
@@ -264,13 +263,59 @@ export class DataStore {
     }
 
     private asJSON(): any {
+        const jsonProjects: { [projectID: number]: {
+            project_id: number;
+            devpost_id: string;
+            name: string;
+            table_number: string;
+            expo_number: number;
+            sponsor_prizes: string;
+            categories: number[];
+        }} = {};
+
+        for (const project of Object.values(dataStore.projects)) {
+            const categoryArray = Object.values(project.categories).map((category) => {
+                return category.category_id!;
+            });
+
+            jsonProjects[project.project_id!] = {
+                ...project,
+                project_id: project.project_id!,
+                categories: categoryArray,
+            };
+        }
+
+        console.log(jsonProjects);
+
+        const jsonCategories: { [categoryID: number]: {
+            category_id: number;
+            name: string;
+            is_primary: boolean;
+            criteria: number[];
+        }} = {};
+
+        console.log(dataStore.categories);
+
+        for (const category of Object.values(dataStore.categories)) {
+            const criteriaArray = Object.values(category.criteria).map((criteria) => {
+                return criteria.criteria_id!;
+            });
+
+            jsonCategories[category.category_id!] = {
+                ...category,
+                category_id: category.category_id!,
+                criteria: criteriaArray,
+            };
+        }
+
         return {
             ballots: dataStore.ballots,
-            categories: dataStore.categories,
+            categories: jsonCategories,
             criteria: dataStore.criteria,
-            projects: dataStore.projects,
+            projects: jsonProjects,
             users: dataStore.users,
             judgeQueues: dataStore.judgeQueues,
+            judgedProjects: dataStore.judgedProjects,
         };
     }
 }

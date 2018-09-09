@@ -228,10 +228,10 @@ export class BallotService {
     /*
      * Applies the ballot scores and moves onto the next projects
      */
-    public static async scoreProject(userId: number, projectID: number, scores: ProjectScores[]):
+    public static async scoreProject(userID: number, projectID: number, scores: ProjectScores[]):
         Promise<Boolean> {
 
-        if (projectID === dataStore.judgeQueues[userId].activeProjectID) {
+        if (projectID === dataStore.judgeQueues[userID].activeProjectID) {
             const ballotIDs = dataStore.projectsToBallots[projectID];
             const databaseBallots = await Ballots.findAll({
                 where: {
@@ -262,16 +262,16 @@ export class BallotService {
                 socketReturn.push(dataStore.ballots[ballotID]);
             }
 
-            if (!dataStore.judgedProjects[userId]) {
-                dataStore.judgedProjects[userId] = [];
+            if (!dataStore.judgedProjects[userID]) {
+                dataStore.judgedProjects[userID] = [];
             }
 
-            dataStore.judgedProjects[userId].push(projectID);
-            dataStore.judgeQueues[userId].activeProjectID = null;
+            dataStore.judgedProjects[userID].push(projectID);
+            dataStore.judgeQueues[userID].activeProjectID = null;
 
             // Broadcast socket
             io.to('authenticated').emit('score_project', {
-                userId,
+                userID,
                 projectID,
                 ballots: socketReturn,
             });

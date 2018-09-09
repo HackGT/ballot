@@ -71,7 +71,7 @@ const animateProjectToQueue = (projectID, judgeID) => {
 
   const newProject = state.canonical.projects.get(projectID);
 
-  animateProject(projectIconRef, queueIconRef, oldProject, newProject, 750);
+  animateProject(projectIconRef, queueIconRef, oldProject, newProject, 250);
 };
 
 const animatePullProject = judgeID => {
@@ -93,7 +93,7 @@ const animatePullProject = judgeID => {
       )
     : null;
 
-  animateProject(queueIconRef, activeIconRef, oldProject, newProject, 750);
+  animateProject(queueIconRef, activeIconRef, oldProject, newProject, 250);
 };
 
 // TODO: move this
@@ -192,12 +192,12 @@ const onNextProject = data => {
 //     userID: 14,
 //     projectID: 2039,
 //   }),
-  
+
   // () => onNextProject({
   //   userID: 12,
   //   projectID: 2037,
   // }),
-  
+
   // () => onQueueProject({
   //   userID: 12,
   //   projectID: 2087,
@@ -249,15 +249,22 @@ socket.on('connect', () => {
 
   socket.emit('start', {
     eventID: uuid(),
-    password: '',
+    password: 'fdsf',
   });
-  
+
   socket.on('queue_project', ({ userID, projectID }) => {
     onQueueProject({ userID, projectID });
   });
 
   socket.on('next_project', ({ userID, projectID }) => {
     onNextProject({ userID, projectID });
+  });
+
+  socket.on('score_project', data => {
+    store.dispatch({
+      type: 'PROJECT_SCORED',
+      ...data,
+    });
   });
 
   socket.on('all_data', data => {

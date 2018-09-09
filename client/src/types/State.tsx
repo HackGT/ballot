@@ -42,6 +42,13 @@ export interface ProjectState {
     categories?: CategoryState[];
 }
 
+export interface UserState {
+    user_id: number;
+    name: string;
+    email: string;
+    user_class: string;
+}
+
 export interface State {
     auth: AuthState;
     ballots: BallotState[];

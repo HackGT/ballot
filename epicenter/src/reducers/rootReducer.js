@@ -59,7 +59,7 @@ const CanonicalState = Immutable.Record({
   categories: Immutable.Map(),
   criteria: Immutable.Map(),
   judgeQueues: Immutable.Map(),
-  judgedProjects: Immutable.Set(),
+  judgedProjects: Immutable.Map(),
 });
 
 const DerivedState = Immutable.Record({
@@ -75,6 +75,7 @@ const DerivedState = Immutable.Record({
 
 const ProgramState = Immutable.Record({
   expo_number: 1,
+  loadedState: false,
   selectedProjectID: null,
   socket: null,
   activeIconRefs: Immutable.Map(),
@@ -150,10 +151,10 @@ const deserializeCanonicalState = serializedState => {
     for (const judgeId in serializedState.judgedProjects) {
       map.set(
         parseInt(judgeId, 10),
-        Immutable.Set(serializedState.judgedProjects[judgeId]),
+        Immutable.OrderedSet(serializedState.judgedProjects[judgeId]),
       );
     }
-  })
+  });
 
   return new CanonicalState({
     projects,
@@ -213,7 +214,11 @@ const rootReducer = (state = new State(), action) => {
           .set(
             'derived',
             computeFullDerivedState(canonicalState),
-          );
+          )
+          .setIn([
+            'program',
+            'loadedState',
+          ], true);
       });
     },
     'ENQUEUE_PROJECT': (state, action) => {
@@ -257,7 +262,7 @@ const rootReducer = (state = new State(), action) => {
       ], null);
     },
     'PROJECT_SCORED': (state, action) => {
-      return state.withMutations(state => {
+      const s = state.withMutations(state => {
         for (const ballot of action.ballots) {
           state.setIn([
             'canonical',
@@ -268,7 +273,7 @@ const rootReducer = (state = new State(), action) => {
 
         if (
           !state.derived.judge_ballot_history.has(action.userID)
-          || !state.derived.judge_ballot_history.get(action.userID).has(action.projectDD)
+          || !state.derived.judge_ballot_history.get(action.userID).has(action.projectID)
         ) {
           state.setIn([
             'derived',
@@ -284,12 +289,19 @@ const rootReducer = (state = new State(), action) => {
           action.projectID,
         ], list => list.concat(action.ballots.map(deserializeBallot)));
 
-        state.setIn([
-          'derived',
-          'judge_completed_projects',
+        if (!state.canonical.judgedProjects.has(action.userID)) {
+          state.setIn([
+            'canonical',
+            'judgedProjects',
+            action.userID,
+          ], Immutable.OrderedSet());
+        }
+
+        state.updateIn([
+          'canonical',
+          'judgedProjects',
           action.userID,
-          action.projectID,
-        ], true);
+        ], set => set.add(action.projectID));
 
         state.setIn([
           'canonical',
@@ -298,6 +310,8 @@ const rootReducer = (state = new State(), action) => {
           'activeProjectID',
         ], null);
       });
+      console.log(action.userID, s.canonical.judgeQueues.get(action.userID).get('activeProjectID'));
+      return s;
     },
 
     'SET_ACTIVE_ICON_REF': (state, action) => {

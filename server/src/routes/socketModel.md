@@ -22,7 +22,7 @@ socket.on('all_data', data: {
         table_number: string,
         expo_number: number,
         sponsor_prizes: string,
-        category_ids: number[],
+        categories: number[],
     }},
     ballots: { [ballotID: number]: {
         ballot_id: number,
@@ -44,7 +44,7 @@ socket.on('all_data', data: {
         category_id: number,
         name: string,
         is_primary: boolean,
-        criteria_ids: number[],
+        criteria: number[],
     }},
     criteria: { [criteriaID: number]: {
         criteria_id: number,
