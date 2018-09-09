@@ -6,6 +6,10 @@ import '../css/App.css';
 
 class App extends Component {
   render() {
+    if (!this.props.loadedState) {
+      return null;
+    }
+
     return (
       <div className="App">
         <JudgeListingContainer />

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import uuid from 'uuid/v4';
 import JudgeRow from '../JudgeRow.react';
+import Immutable from 'immutable';
 
 const mapStateToProps = (state, ownProps) => {
   const judge = state.canonical.users.get(ownProps.judgeID);
@@ -8,9 +9,9 @@ const mapStateToProps = (state, ownProps) => {
     name: judge.name,
     // TODO: necessary ternary?
     scored: state.canonical.judgedProjects.has(judge.user_id)
-      ? state.canoical.judgedProjects.get(judge.user_id)
+      ? state.canonical.judgedProjects.get(judge.user_id)
           .map(project_id => state.canonical.projects.get(project_id))
-      : [],
+      : Immutable.Set(),
     activeProject: state.canonical.judgeQueues.has(judge.user_id)
       ? state.canonical.projects.get(
           state.canonical.judgeQueues.get(judge.user_id).get('activeProjectID')
@@ -22,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
         )
       : null,
     enqueueSelectedProject: () => {
-      if (state.program.socket) {
+      if (state.program.socket && state.program.selectedProjectID) {
         state.program.socket.emit('queue_project', {
           eventID: uuid(),
           userID: judge.user_id,

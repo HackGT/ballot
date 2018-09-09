@@ -2,7 +2,9 @@ import { connect } from 'react-redux';
 import App from '../App.react';
 
 const mapStateToProps = state => {
-  return {};
+  return {
+    loadedState: state.program.loadedState,
+  };
 };
 
 const AppContainer = connect(

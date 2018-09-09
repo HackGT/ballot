@@ -31,7 +31,7 @@ const Ballot: React.SFC<BallotProps> = (props) => {
                     min={props.criteria.min_score}
                     max={props.criteria.max_score}
                     onChange={updateBallot}
-                    value={props.ballot.score ? props.ballot.score : props.criteria.min_score} />
+                    value={props.ballot.score} />
             </div>
         </div>
     );
