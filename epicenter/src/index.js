@@ -20,21 +20,7 @@ store.dispatch({
 //   type: 
 // });
 
-const animateProjectToQueue = (projectID, judgeID) => {
-  const ANIMATION_DURATION = 750;
-
-  const state = store.getState();
-
-  const queueIconRef = state.program.queueIconRefs.get(judgeID);
-  const projectIconRef = state.program.projectIconRefs.get(projectID);
-
-  // TODO: kill useless ternary
-  const oldProject = state.canonical.judgeQueues.has(judgeID)
-    ? state.canonical.projects.get(
-        state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
-      )
-    : null;
-
+const animateProject = (fromRef, toRef, oldProject, newProject, duration) => {
   const phonyElement = document.createElement('div');
   ReactDOM.render(
     <Provider store={store}>
@@ -43,15 +29,11 @@ const animateProjectToQueue = (projectID, judgeID) => {
     phonyElement,
   );
   phonyElement.style.position = 'absolute';
-  phonyElement.style.top = queueIconRef.offsetTop + 'px';
-  phonyElement.style.left = queueIconRef.offsetLeft + 'px';
+  phonyElement.style.top = toRef.offsetTop + 'px';
+  phonyElement.style.left = toRef.offsetLeft + 'px';
   phonyElement.style.zIndex = '1';
 
-  document.body.appendChild(phonyElement);
-
-  queueIconRef.style.visibility = 'hidden';
-
-  const newProject = state.canonical.projects.get(projectID);
+  toRef.style.visibility = 'hidden';
 
   const animatedElement = document.createElement('div');
   ReactDOM.render(
@@ -61,23 +43,64 @@ const animateProjectToQueue = (projectID, judgeID) => {
     animatedElement,
   );
   animatedElement.style.position = 'absolute';
-  animatedElement.style.top = projectIconRef.offsetTop + 'px';
-  animatedElement.style.left = projectIconRef.offsetLeft + 'px';
+  animatedElement.style.top = fromRef.offsetTop + 'px';
+  animatedElement.style.left = fromRef.offsetLeft + 'px';
   animatedElement.style.zIndex = '2';
-  animatedElement.style.transition = `all ${ANIMATION_DURATION}ms`;
+  animatedElement.style.transition = `all ${duration}ms`;
 
   window.setTimeout(() => {
-    animatedElement.style.top = queueIconRef.offsetTop + 'px';
-    animatedElement.style.left = queueIconRef.offsetLeft + 'px';
+    animatedElement.style.top = toRef.offsetTop + 'px';
+    animatedElement.style.left = toRef.offsetLeft + 'px';
   }, 0);
 
   window.setTimeout(() => {
     phonyElement.remove();
     animatedElement.remove();
-    queueIconRef.style.visibility = 'visible';
-  }, ANIMATION_DURATION);
+    toRef.style.visibility = 'visible';
+  }, duration);
 
+  document.body.appendChild(phonyElement);
   document.body.appendChild(animatedElement);
+};
+
+const animateProjectToQueue = (projectID, judgeID) => {
+  const state = store.getState();
+
+  const projectIconRef = state.program.projectIconRefs.get(projectID);
+  const queueIconRef = state.program.queueIconRefs.get(judgeID);
+
+  // TODO: kill useless ternary
+  const oldProject = state.canonical.judgeQueues.has(judgeID)
+  ? state.canonical.projects.get(
+      state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
+    )
+  : null;
+
+  const newProject = state.canonical.projects.get(projectID);
+
+  animateProject(projectIconRef, queueIconRef, oldProject, newProject, 750);
+};
+
+const animatePullProject = judgeID => {
+  const state = store.getState();
+
+  const queueIconRef = state.program.queueIconRefs.get(judgeID);
+  const activeIconRef = state.program.activeIconRefs.get(judgeID);
+
+  // TODO: kill useless ternaries
+  const oldProject = state.canonical.judgeQueues.has(judgeID)
+    ? state.canonical.projects.get(
+        state.canonical.judgeQueues.get(judgeID).get('activeProjectID'),
+      )
+    : null;
+
+  const newProject = state.canonical.judgeQueues.has(judgeID)
+    ? state.canonical.projects.get(
+        state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
+      )
+    : null;
+
+  animateProject(queueIconRef, activeIconRef, oldProject, newProject, 750);
 };
 
 // TODO: move this
@@ -92,6 +115,8 @@ const onQueueProject = data => {
 };
 
 const onNextProject = data => {
+  animatePullProject(data.userID);
+
   store.dispatch({
     type: 'PULL_PROJECT_FROM_QUEUE',
     userID: data.userID,
@@ -115,14 +140,64 @@ const steps = [
     projectID: 2096,
   }),
 
+  () => onNextProject({
+    userID: 10,
+    projectID: 2040,
+  }),
+
   () => onQueueProject({
     userID: 13,
     projectID: 2037,
   }),
 
+  () => onNextProject({
+    userID: 12,
+    projectID: 2096,
+  }),
+
   () => onQueueProject({
     userID: 14,
     projectID: 2112,
+  }),
+
+  () => onNextProject({
+    userID: 11,
+    projectID: 2102,
+  }),
+
+  () => onQueueProject({
+    userID: 10,
+    projectID: 2110,
+  }),
+
+  () => onNextProject({
+    userID: 13,
+    projectID: 2037,
+  }),
+
+  () => onQueueProject({
+    userID: 11,
+    projectID: 2088,
+  }),
+
+  () => onQueueProject({
+    userID: 12,
+    projectID: 2066,
+  }),
+
+  () => onNextProject({
+    userID: 14,
+    projectID: 2112,
+  }),
+
+  () => onQueueProject({
+    userID: 13,
+    projectID: 2069,
+  }),
+
+  () => onQueueProject({
+    userID: 14,
+    projectID: 2039,
   }),
   
   // () => onNextProject({
@@ -162,7 +237,7 @@ const steps = [
 ];
 
 for (let i = 0; i < steps.length; i++) {
-  window.setTimeout(steps[i], 200 * (i + 1));
+  window.setTimeout(steps[i], 300 * (i + 1));
 }
 
 ReactDOM.render(

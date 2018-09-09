@@ -75,6 +75,7 @@ const DerivedState = Immutable.Record({
 
 const ProgramState = Immutable.Record({
   expo_number: 1,
+  activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
 });
@@ -297,6 +298,13 @@ const rootReducer = (state = new State(), action) => {
       });
     },
 
+    'SET_ACTIVE_ICON_REF': (state, action) => {
+      return state.setIn([
+        'program',
+        'activeIconRefs',
+        action.judgeID,
+      ], action.ref);
+    },
     'SET_QUEUE_ICON_REF': (state, action) => {
       return state.setIn([
         'program',

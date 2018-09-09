@@ -25,6 +25,13 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    setActiveIconRef: ref => {
+      dispatch({
+        type: 'SET_ACTIVE_ICON_REF',
+        judgeID: ownProps.judgeID,
+        ref,
+      });
+    },
     setQueueIconRef: ref => {
       dispatch({
         type: 'SET_QUEUE_ICON_REF',
