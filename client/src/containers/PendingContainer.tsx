@@ -5,7 +5,7 @@ import {
     mapStateToAllProps,
 } from '../util/authorization';
 
-import Pending from '../components/Pending';
+import PendingWrapper from '../components/PendingWrapper';
 
 import { State } from '../types/State';
 
@@ -24,6 +24,6 @@ const PendingContainer = connect<StateToProps>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(Pending));
+)(ConditionalRender(PendingWrapper));
 
 export default PendingContainer;

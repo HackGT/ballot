@@ -22,7 +22,7 @@ interface NoSessionProps {}
 
 const NoSession: React.SFC<NoSessionProps> = (props) => {
     return (
-        <Redirect to='/login' />
+        <Redirect to='/' />
     );
 };
 

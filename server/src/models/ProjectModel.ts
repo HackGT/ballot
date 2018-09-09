@@ -7,11 +7,12 @@ import { CategoryModel, CategoryInstance } from './CategoryModel';
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
 export interface ProjectModelWithoutCategories {
-    project_id: number;
+    project_id?: number;
     devpost_id: string;
     name: string;
-    table_number: number;
+    table_number: string;
     expo_number: number;
+    sponsor_prizes: string;
 }
 
 export interface ProjectModel extends ProjectModelWithoutCategories {
@@ -29,6 +30,7 @@ export const Projects: Sequelize.Model<ProjectInstance,
         project_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         devpost_id: { type: STRING(64), allowNull: false, unique: true },
         name: { type: STRING(64), allowNull: false },
-        table_number: { type: SMALLINT },
+        sponsor_prizes: { type: STRING(512) },
+        table_number: { type: STRING(32) },
         expo_number: { type: SMALLINT },
     });

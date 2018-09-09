@@ -7,17 +7,17 @@ import {
 } from '../../util/authorization';
 
 import Expo from '../../components/expo/Expo';
-import { refreshProjects } from '../../actions/projects'
+import { refreshProjects } from '../../actions/projects';
 
 import { State, ProjectState } from '../../types/State';
-import Projects from '../../components/admin/Projects';
+import AdminPanelProjects from '../../components/admin/AdminPanelProjects';
 
 interface StateToProps {
     projects: ProjectState[];
 }
 
 interface DispatchToProps {
-    refreshProjects: (proejcts: ProjectState[]) => void;
+    refreshProjects: (projects: ProjectState[]) => void;
 }
 
 const mapStateToProps = (state: State): StateToProps => {
@@ -42,5 +42,5 @@ export const ExpoContainer = connect<StateToProps, DispatchToProps>(
 export const ProjectsContainer = connect<StateToProps, DispatchToProps>(
     mapStateToProps,
     mapDispatchToProps
-)(Projects);
+)(AdminPanelProjects);
 

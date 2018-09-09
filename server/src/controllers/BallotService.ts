@@ -2,8 +2,9 @@ import { Logger } from '../util/Logger';
 import { printAndThrowError } from '../util/common';
 import { BallotModel, BallotStatus, Ballots, BallotInstance } from '../models/BallotModel';
 import { sequelize } from '../db';
-import * as BPromise from 'bluebird';
-import { Projects, ProjectModelWithoutCategories, ProjectInstance } from '../models/ProjectModel';
+import { ProjectModelWithoutCategories, ProjectModel } from '../models/ProjectModel';
+import { dataStore } from '../store/DataStore';
+import { io } from '../app';
 
 const logger = Logger('controllers/BallotService');
 
@@ -32,8 +33,8 @@ export interface Ranking {
 }
 
 export class BallotService {
-    public static projects: { [project_id: number]: ProjectModelWithoutCategories } = {};
-    public static projectBallotCounts: { [project_id: number]: number } = {};
+    public static projects: { [projectID: number]: ProjectModelWithoutCategories } = {};
+    public static projectBallotCounts: { [projectID: number]: number } = {};
 
     public static async getRanking(): Promise<Ranking[]> {
         const avgScores = await sequelize.query(
@@ -81,222 +82,224 @@ export class BallotService {
         return Object.values(criteria);
     }
 
-    public static async batchCreate(assignments: BatchProjectAssignments[]):
-        Promise<void> {
+    public static async getNextProject(userID: number):
+        Promise<{
+            project: ProjectModel,
+            ballots: Array<(BallotModel | BallotInstance)>
+        } | undefined> {
+        if (dataStore.judgeQueues[userID].activeProjectID) {
+            // If there is still an active ASSIGNED project, give this project.
+            const activeProjectID = dataStore.judgeQueues[userID].activeProjectID!;
 
-        /* Retrieve a list of project IDs to look up */
-        const projectIDs = new Set();
-        for (const assignment of assignments) {
-            for (const project of assignment.projects) {
-                projectIDs.add(project.project_id);
+            // Get ballots for the current project.
+            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID];
+
+            // Retrieve BallotModels for this project.
+            const resultBallots: BallotModel[] = [];
+            for (const ballotID of ballotIDs) {
+                resultBallots.push(dataStore.ballots[ballotID]);
             }
+
+            // Return project and associated ballots.
+            return {
+                project: dataStore.projects[activeProjectID],
+                ballots: resultBallots,
+            };
+
+        } else if (dataStore.judgeQueues[userID].queuedProjectID) {
+            // If there is a queued project, push this project into active ASSIGNED.
+            const activeProjectID = dataStore.judgeQueues[userID].queuedProjectID!;
+
+            // Move project from queued to assigned.
+            dataStore.judgeQueues[userID].activeProjectID = activeProjectID;
+            dataStore.judgeQueues[userID].queuedProjectID = null;
+
+            // Get ballotIDs for this project.
+            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID!];
+
+            // Retrieve BallotModels for this project and set status to assigned.
+            const resultBallots: BallotModel[] = [];
+            for (const ballotID of ballotIDs) {
+                dataStore.ballots[ballotID].ballot_status = BallotStatus.Assigned;
+                resultBallots.push(dataStore.ballots[ballotID]);
+            }
+
+            // Update ballots table in database with new status.
+            await Ballots.update({
+                ballot_status: BallotStatus.Assigned,
+            }, {
+                where: {
+                    user_id: userID,
+                    project_id: activeProjectID,
+                },
+            });
+
+            // Broadcast that project has moved from queued to assigned.
+            io.to('authenticated').emit('next_project', {
+                userID,
+                projectID: activeProjectID,
+            });
+
+            // Return ProjectModel and ballots to resolver.
+            return {
+                project: dataStore.projects[activeProjectID],
+                ballots: resultBallots,
+            };
         }
 
-        /* Build a dictionary from projectID to list of criteriaIDs */
-        const projectCriteriaPairs:
-            Array<{ criteria_id: number, project_id: number }> =
-            await sequelize.query(
-                `SELECT b.project_id, c.criteria_id FROM
-            categories AS a
-            INNER JOIN project_categories AS b ON
-                a.category_id = b.category_id AND b.project_id IN(:projects)
-            INNER JOIN criteria AS c ON a.category_id = c.category_id`,
-                {
-                    replacements: { projects: Array.from(projectIDs) },
-                    type: sequelize.QueryTypes.SELECT,
+        // If the judge has no projects in his queue, return nothing.
+        return undefined;
+    }
+
+    public static async startProject(userID: number, projectID: number): Promise<boolean> {
+        // Make sure the judge is currently assigned a project. If not, return false.
+        if (dataStore.judgeQueues[userID].activeProjectID) {
+            // Make sure ballots exist for this project.
+            if (dataStore.projectsToBallots[projectID]) {
+                for (const ballotID of dataStore.projectsToBallots[projectID]) {
+                    dataStore.ballots[ballotID].ballot_status = BallotStatus.Started;
+                }
+
+                await Ballots.update({
+                    ballot_status: BallotStatus.Started,
+                }, {
+                    where: {
+                        user_id: userID,
+                        project_id: projectID,
+                    },
                 });
 
-        const criteriaGroups: { [projectId: number]: number[] } = {};
-        for (const pair of projectCriteriaPairs) {
-            if (pair.project_id in criteriaGroups) {
-                criteriaGroups[pair.project_id].push(pair.criteria_id);
-            } else {
-                criteriaGroups[pair.project_id] = [pair.criteria_id];
+                io.to('authenticated').emit('start_project', {
+                    message: `Judge ${userID} started judging project ${dataStore.judgeQueues[userID].activeProjectID}`,
+                    userID,
+                    projectID,
+                });
+
+                return true;
             }
+
         }
 
-        /* Build body for batchCreate */
-        const ballotObjs: BallotModel[] = [];
-
-        for (const assignment of assignments) {
-            for (let i = 0; i < assignment.projects.length; i++) {
-                const project = assignment.projects[i];
-                for (const criteriaId of criteriaGroups[project.project_id]) {
-                    ballotObjs.push({
-                        project_id: project.project_id,
-                        user_id: assignment.judge_id,
-                        criteria_id: criteriaId,
-                        judge_priority: i,
-                        ballot_status: i === 0 ? BallotStatus.Assigned :
-                            BallotStatus.Pending,
-                    });
-                }
-            }
-        }
-
-        await Ballots.bulkCreate(ballotObjs)
-            .catch(printAndThrowError('batchCreate', logger));
+        return false;
     }
 
-    public static async getNextProject(userId: number, currentProjectId: number = 0):
-        Promise<Array<(BallotModel | BallotInstance)>> {
-        // TODO: Make this a Project that includes ballots
+    public static async skipProject(userID: number, projectID: number): Promise<boolean> {
+        const activeProjectID = dataStore.judgeQueues[userID].activeProjectID;
+        // If there is not an assigned project, return nothing.
+        if (activeProjectID === projectID) {
+            // Get ballotIDs for this project.
+            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID!];
 
-        // Get all projects and store in a dictionary.
-        if (Object.keys(this.projects).length === 0) {
-            const projectResponse = await Projects.findAll();
-            for (const project of projectResponse) {
-                const projectID = project.toJSON().project_id;
-                this.projects[projectID] = project.toJSON();
-                this.projectBallotCounts[projectID] = 0;
+            // Retrieve BallotModels for this project and set status to skipped.
+            const resultBallots: BallotModel[] = [];
+            for (const ballotID of ballotIDs) {
+                dataStore.ballots[ballotID].ballot_status = BallotStatus.Skipped;
+                resultBallots.push(dataStore.ballots[ballotID]);
             }
 
-            const ballotResponse = await Ballots.findAll()
-        }
-
-        console.log(this.projects);
-        console.log(this.projectBallotCounts);
-
-        const projects = Object.values(this.projects);
-        projects.sort((a: ProjectModelWithoutCategories, b: ProjectModelWithoutCategories) => {
-            return this.projectBallotCounts[a.project_id] - this.projectBallotCounts[b.project_id];
-        });
-
-        let smallestDifference = Number.MAX_SAFE_INTEGER;
-        let closestProjectID = 0;
-        for (const projectID of projects) {
-            if (Math.abs(+projectID - currentProjectId) < smallestDifference) {
-                smallestDifference = Math.abs(+projectID - currentProjectId);
-                closestProjectID = +projectID;
-            }
-        }
-
-        return Ballots.findAll({
-            where: {
-                user_id: userId,
-                ballot_status: BallotStatus.Assigned,
-            },
-        })
-            .then((ballots) => ballots.map((ballot) =>
-                ballot.toJSON()))
-            .catch(printAndThrowError('getNextProject', logger));
-    }
-
-    public static async getCurrentAssignedBallots(userId: number, asJson: boolean = true):
-        Promise<Array<(BallotModel | BallotInstance)>> {
-            return Ballots.findAll({
+            // Update ballots table in database with new status.
+            Ballots.update({
+                ballot_status: BallotStatus.Skipped,
+            }, {
                 where: {
-                    user_id: userId,
-                    ballot_status: BallotStatus.Assigned,
+                    user_id: userID,
+                    project_id: projectID,
                 },
-            })
-                .then((ballots) => ballots.map((ballot) => asJson ?
-                    ballot.toJSON() : ballot))
-                .catch(printAndThrowError('getNextProject', logger));
+            });
+
+            // Remove the project from the queue.
+            dataStore.judgeQueues[userID].activeProjectID = null;
+
+            // Add the project to the judge's judged projects.
+            dataStore.judgedProjects[userID].push(activeProjectID);
+
+            // Broadcast socket
+            io.to('authenticated').emit('skip_project', {
+                userID,
+                projectID,
+            });
+
+            return true;
         }
 
-    public static async skipProject(userId: number):
-        Promise<BallotModel[] | undefined> {
-        // Fetch the ballots currently assigned to the judge
-        const curBallots = await
-            this.getCurrentAssignedBallots(userId, false) as BallotInstance[];
-
-        // Write the scores for each ballot
-        let projectId: number | undefined;
-        let priority: number;
-        for (const ballot of curBallots) {
-
-            const id: number = ballot.get('ballot_id');
-
-            if (projectId && projectId !== ballot.get('project_id')) {
-                logger.error(`Ballot ${id} does not match the others
-                (project ${projectId} !== ${ballot.get('project_id')})`);
-            }
-            projectId = ballot.get('project_id');
-            priority = ballot.get('judge_priority');
-
-            ballot.set('ballot_status', BallotStatus.Skipped);
-            ballot.save();
-        }
-
-        // Assign the next round of ballots
-        // TODO: Return a Project that includes ballots
-        return await Ballots.update(
-            { ballot_status: BallotStatus.Assigned } as any, {
-                where: { judge_priority: 1 + priority!, user_id: userId },
-                returning: true,
-            })
-            .then((val) => {
-                const [num, newBallots] = val;
-                if (num === 0) {
-                    logger.info('No more ballots to assign.');
-                    return undefined;
-                }
-                return newBallots.map((ballot) => ballot.toJSON());
-            })
-            .catch(printAndThrowError('scoreProject', logger));
+        return false;
     }
 
     /*
      * Applies the ballot scores and moves onto the next projects
      */
-    public static async scoreProject(userId: number,
-                                     ballots: ProjectScores[]):
-        Promise<BallotModel[] | undefined> {
+    public static async scoreProject(userId: number, projectID: number, scores: ProjectScores[]):
+        Promise<Boolean> {
 
-        // Build a dictionary to make things easier
-        const scoreDict: { [ballotId: number]: number; } = {};
-        for (const ballot of ballots) {
-            scoreDict[ballot.ballotId] = ballot.score;
+        if (projectID === dataStore.judgeQueues[userId].activeProjectID) {
+            const ballotIDs = dataStore.projectsToBallots[projectID];
+            const databaseBallots = await Ballots.findAll({
+                where: {
+                    ballot_id: {
+                        [sequelize.Op.or]: ballotIDs,
+                    },
+                },
+            });
+
+            const ballotIDToScores: { [ballotID: number]: number } = {};
+
+            for (const score of scores) {
+                ballotIDToScores[score.ballotId] = score.score;
+            }
+
+            const socketReturn: BallotModel[] = [];
+
+            for (const databaseBallot of databaseBallots) {
+                const ballotID: number = databaseBallot.get('ballot_id');
+                databaseBallot.set('score', ballotIDToScores[ballotID]);
+                databaseBallot.set('ballot_status', BallotStatus.Submitted);
+
+                databaseBallot.save();
+
+                dataStore.ballots[ballotID].score = ballotIDToScores[ballotID];
+                dataStore.ballots[ballotID].ballot_status = BallotStatus.Submitted;
+
+                socketReturn.push(dataStore.ballots[ballotID]);
+            }
+
+            if (!dataStore.judgedProjects[userId]) {
+                dataStore.judgedProjects[userId] = [];
+            }
+
+            dataStore.judgedProjects[userId].push(projectID);
+            dataStore.judgeQueues[userId].activeProjectID = null;
+
+            // Broadcast socket
+            io.to('authenticated').emit('score_project', {
+                userId,
+                projectID,
+                ballots: socketReturn,
+            });
+
+            return true;
         }
 
-        // Fetch the ballots currently assigned to the judge
-        const curBallots = await
-            this.getCurrentAssignedBallots(userId, false) as BallotInstance[];
-
-        if (ballots.length !== curBallots.length) {
-            throw new Error('The number of scores entered does not match'
-                + ' the number of assigned ballots');
-        } else if (curBallots.length === 0) {
-            return undefined;
-        }
+        return false;
 
         // Write the scores for each ballot
-        let projectId: number | undefined;
-        let priority: number;
-        for (const ballot of curBallots) {
+        // let projectId: number | undefined;
+        // let priority: number;
+        // for (const ballot of curBallots) {
 
-            const id: number = ballot.get('ballot_id');
+        //     const id: number = ballot.get('ballot_id');
 
-            if (projectId && projectId !== ballot.get('project_id')) {
-                logger.error(`Ballot ${id} does not match the others
-                (project ${projectId} !== ${ballot.get('project_id')})`);
-            }
-            projectId = ballot.get('project_id');
-            priority = ballot.get('judge_priority');
+        //     if (projectId && projectId !== ballot.get('project_id')) {
+        //         logger.error(`Ballot ${id} does not match the others
+        //         (project ${projectId} !== ${ballot.get('project_id')})`);
+        //     }
+        //     projectId = ballot.get('project_id');
+        //     priority = ballot.get('judge_priority');
 
-            ballot.set('score', scoreDict[id]);
-            ballot.set('ballot_status', BallotStatus.Submitted);
-            ballot.save();
-        }
-        // Increment ballot count for projectID
-        this.projectBallotCounts[projectId!]++;
-
-        // Assign the next round of ballots
-        // TODO: Return a Project that includes ballots
-        return await Ballots.update(
-            { ballot_status: BallotStatus.Assigned } as any, {
-                where: { judge_priority: 1 + priority!, user_id: userId },
-                returning: true,
-            })
-            .then((val) => {
-                const [num, newBallots] = val;
-                if (num === 0) {
-                    logger.info('No more ballots to assign.');
-                    return undefined;
-                }
-                return newBallots.map((ballot) => ballot.toJSON());
-            })
-            .catch(printAndThrowError('scoreProject', logger));
+        //     ballot.set('score', scoreDict[id]);
+        //     ballot.set('ballot_status', BallotStatus.Submitted);
+        //     ballot.save();
+        // }
+        // // Increment ballot count for projectID
+        // this.projectBallotCounts[projectId!]++;
     }
 }

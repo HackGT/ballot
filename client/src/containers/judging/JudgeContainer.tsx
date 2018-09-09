@@ -5,7 +5,7 @@ import {
     mapStateToAllProps,
 } from '../../util/authorization';
 
-import Judge from '../../components/judging/Judge';
+import JudgeWrapper from '../../components/judging/JudgeWrapper';
 
 import { State } from '../../types/State';
 
@@ -24,6 +24,6 @@ const JudgeContainer = connect<StateToProps>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(Judge));
+)(ConditionalRender(JudgeWrapper));
 
 export default JudgeContainer;

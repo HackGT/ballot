@@ -1,11 +1,14 @@
 import * as React from 'react';
+import { Button, ButtonGroup } from '@blueprintjs/core';
 
 interface UserClassSelectorProps {
+    user_id: number;
     user_class: string;
+    disabled: boolean;
 }
 
 class UserClassSelector extends React.Component<
-    { user_id: number, user_class: string },
+    UserClassSelectorProps,
     { user_id: number, user_class: string }> {
     constructor(props: any) {
         super(props);
@@ -18,22 +21,26 @@ class UserClassSelector extends React.Component<
         this.changeClass = this.changeClass.bind(this);
     }
 
-    public render(): React.ReactElement<HTMLDivElement> {
+    public render() {
         return (
-            <div className='class-selector'>
-                <button onClick={() => this.changeClass('Pending')}
-                    className={this.state.user_class === 'Pending' ?
-                    'selected' : undefined}>Pending</button>
-                <button onClick={() => this.changeClass('Judge')}
-                    className={this.state.user_class === 'Judge' ?
-                    'selected' : undefined}>Judge</button>
-                <button onClick={() => this.changeClass('Admin')}
-                    className={this.state.user_class === 'Admin' ?
-                    'selected' : undefined}>Admin</button>
-                <button onClick={() => this.changeClass('Owner')}
-                    className={this.state.user_class === 'Owner' ?
-                    'selected' : undefined}>Owner</button>
-            </div>
+            <ButtonGroup>
+                <Button onClick={() => this.changeClass('Pending')}
+                    disabled={this.props.disabled}
+                    small={true}
+                    active={this.state.user_class === 'Pending'}>Pending</Button>
+                <Button onClick={() => this.changeClass('Judge')}
+                    disabled={this.props.disabled}
+                    small={true}
+                    active={this.state.user_class === 'Judge'}>Judge</Button>
+                <Button onClick={() => this.changeClass('Admin')}
+                    disabled={this.props.disabled}
+                    small={true}
+                    active={this.state.user_class === 'Admin'}>Admin</Button>
+                <Button onClick={() => this.changeClass('Owner')}
+                    disabled={this.props.disabled}
+                    small={true}
+                    active={this.state.user_class === 'Owner'}>Owner</Button>
+            </ButtonGroup>
         );
     }
 

@@ -21,8 +21,9 @@ CREATE TABLE projects (
     project_id serial PRIMARY KEY,
     devpost_id text NOT NULL UNIQUE,
     name character varying(64) NOT NULL,
-    table_number smallint,
+    table_number character varying(32),
     expo_number smallint,
+    sponsor_prizes text,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
 );
@@ -49,7 +50,7 @@ CREATE TABLE criteria (
 );
 
 DROP TYPE IF EXISTS ballotstatus CASCADE;
-CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Skipped');
+CREATE TYPE ballotstatus AS ENUM('Pending', 'Assigned', 'Submitted', 'Skipped', 'Started');
 
 DROP TABLE IF EXISTS ballots;
 CREATE TABLE ballots (
@@ -75,7 +76,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER update_ballot_score_submit_time
-    BEFORE UPDATE 
+    BEFORE UPDATE
     ON public.ballots
     FOR EACH ROW
     WHEN (OLD.score IS DISTINCT FROM NEW.score)

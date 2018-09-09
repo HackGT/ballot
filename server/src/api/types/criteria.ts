@@ -8,6 +8,7 @@ type Mutation {
     rubric: String!, min_score: Int!, max_score: Int!, category_id: Int!)
         : Criterion!
     updateCriterion(criteria_id: Int!, update: PartialCriterion!): Criterion!
+    deleteCriterion(criteria_id: Int!): Boolean
 }
 
 input PartialCriterion {

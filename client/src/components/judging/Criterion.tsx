@@ -2,7 +2,6 @@ import * as React from 'react';
 // import Rater from 'react-rater'; // No type def yet
 const Rater = require('react-rater').default;
 import 'react-rater/lib/react-rater.css';
-import './Criterion.css';
 
 interface CriterionProps {
     ballot_id: number;

@@ -33,4 +33,15 @@ export class CriteriaService {
                 return updatedCriteria[0]!.toJSON();
             }).catch(printAndThrowError('update', logger));
     }
+
+    public static delete(criteriaID: number): Promise<void> {
+        return Criteria.destroy({ where: { criteria_id: criteriaID } })
+            .then((num) => {
+                if (num === 0) {
+                    throw new Error('No rows deleted');
+                } else if (num > 1) {
+                    throw new Error('More than one row deleted');
+                }
+            }).catch(printAndThrowError('delete', logger));
+    }
 }

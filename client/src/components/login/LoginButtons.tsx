@@ -1,11 +1,12 @@
 import * as React from 'react';
-import './LoginButtons.css';
+import axios from 'axios';
+import { ButtonGroup, Button } from '@blueprintjs/core';
 
 interface LoginButtonsProps { }
 
 const LoginButtons: React.SFC<LoginButtonsProps> = (props) => {
     return (
-        <div>
+        <div style={{ textAlign: 'center', margin: '0 0 20px' }}>
             {process.env.REACT_APP_AUTH_ALLOW_GITHUB ?
                 <LoginButton name='Github'
                     link='/auth/github/login' /> : ''}
@@ -24,12 +25,20 @@ interface LoginButtonProps {
     link: string;
 }
 
-const LoginButton: React.SFC<LoginButtonProps> = (props) => {
-    return (
-        <div className='LoginButton'>
-            <a href={props.link}>Log in with {props.name}</a>
-        </div>
-    );
+class LoginButton extends React.Component<LoginButtonProps, {}> {
+    constructor(props: LoginButtonProps) {
+        super(props);
+    }
+
+    public render() {
+        return (
+            <Button text={`Log in with ${this.props.name}`} onClick={() => {
+                if (window) {
+                    window.location.href = this.props.link;
+                }
+            }} />
+        );
+    }
 };
 
 export default LoginButtons;
