@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { H1, H2 } from '@blueprintjs/core';
+import { H1, H2, H4 } from '@blueprintjs/core';
 import { AuthState } from '../types/State';
 
 interface StatusProps {
@@ -12,9 +12,15 @@ const Status: React.SFC<StatusProps> = (props) => {
             maxWidth: 640,
             margin: '0 auto',
         }}>
-            <H1>Hello {props.auth.name}! Welcome to Ballot!</H1>
+            <div style={{
+                textAlign: 'center',
+                marginBottom: '20px',
+            }}>
+                <h3>Hello {props.auth.name}!</h3>
+                <H1>Welcome to Ballot!</H1>
+                <p><strong>Your Status: {props.auth.role}</strong></p>
+            </div>
 
-            <p><strong>Your Status: {props.auth.role}</strong></p>
 
             <p>If you go to the <strong>Expo</strong> page, you can see all the projects that were made during the event along with their locations during the Expo and links to their DevPost pages.</p>
             {props.auth.role === 'Judge' || props.auth.role === 'Owner' || props.auth.role === 'Admin' ?

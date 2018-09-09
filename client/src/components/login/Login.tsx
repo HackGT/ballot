@@ -41,9 +41,10 @@ class Login extends React.Component<LoginProps, LoginState> {
             <div style={{
                 maxWidth: 480,
                 width: '100%',
+                textAlign: 'center',
                 margin: '0 auto',
              }}>
-
+                <H1>Login</H1>
                 <LoginButtons />
                 {process.env.REACT_APP_AUTH_ALLOW_LOCAL ?
                     <form>
@@ -88,11 +89,12 @@ class Login extends React.Component<LoginProps, LoginState> {
                 qs.stringify({
                     'email': this.state.email,
                     'password': this.state.password,
-                }),
-                {
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'
-                },
-            });
+                }), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                }
+            );
 
             if (loginResult.data.class !== 'None') {
                 this.setState((prevState) => {
@@ -107,6 +109,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                 name: loginResult.data.name,
                 email: loginResult.data.email,
                 class: loginResult.data.class,
+                user_id: loginResult.data.user_id,
             });
         });
     }

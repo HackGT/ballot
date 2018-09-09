@@ -20,7 +20,7 @@ const AdminPanelProjectsTable: React.SFC<AdminPanelProjectsTableProps> = (props)
                         interactive={true}
                         key={project.project_id}
                         onClick={() => {
-                            window.open('https://devpost.com/software/' + project.devpost_id);
+                            window.open(project.devpost_id);
                         }}
                         style={{
                             width: '100%',

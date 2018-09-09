@@ -2,13 +2,14 @@ const schema = `
 scalar Date
 
 type Query {
-    nextBallotSet(user_id: Int!, current_project_id: Int): [Ballot!]!
+    nextBallotSet(user_id: Int!): NextBallot
     getRanking: [CriteriaRanking!]!
 }
 
 type Mutation {
-    scoreProject(user_id: Int!, scores: [ProjectScores!]!): [Ballot!]!
-    skipProject(user_id: Int!): [Ballot!]!
+    startProject(user_id: Int!, project_id: Int!): Boolean!
+    scoreProject(user_id: Int!, project_id: Int!, scores: [ProjectScores!]!): Boolean!
+    skipProject(user_id: Int!, project_id: Int!): Boolean!
 }
 
 type CriteriaRanking {
@@ -25,6 +26,23 @@ type ScoreSummary {
     score: Float!
     judge_count: Int!
     devpost_id: String!
+}
+
+type Project {
+    project_id: Int,
+    devpost_id: String,
+    name: String,
+    table_number: String,
+    expo_number: Int,
+    sponsor_prizes: String,
+    categories: [Category!]!
+}
+
+type Category
+
+type NextBallot {
+    project: Project!,
+    ballots: [Ballot!]!,
 }
 
 type Ballot {

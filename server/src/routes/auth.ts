@@ -73,7 +73,7 @@ if (Environment.allowLocalAuth()) {
     router.post('/login',
         postParser,
         (req, res, next) => {
-            passport.authenticate('local', (err, user, info) => {
+            passport.authenticate('local', (error, user, info) => {
                 console.log(user);
                 if (!user) {
                     return res.json({ a: null });
@@ -82,7 +82,8 @@ if (Environment.allowLocalAuth()) {
                         return res.json({
                             name: user.name,
                             email: user.email,
-                            class: user.user_class
+                            class: user.user_class,
+                            user_id: user.user_id,
                         });
                     });
                 }
@@ -92,11 +93,22 @@ if (Environment.allowLocalAuth()) {
 
     router.post('/signup',
         postParser,
-        passport.authenticate('local',
-            { failureRedirect: '/login' }), (req, res) => {
-                req.logout();
-                res.redirect('/login');
-            });
+        (req, res, next) => {
+            passport.authenticate('local', (error, user, info) => {
+                if (!user) {
+                    return res.json({
+                        status: true,
+                        message: 'Success'
+                    });
+                } else {
+                    return res.json({
+                        status: false,
+                        message: 'User already exists'
+                    });
+                }
+            })(req, res, next);
+        }
+    );
 }
 
 export default router;

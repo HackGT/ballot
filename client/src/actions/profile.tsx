@@ -14,6 +14,7 @@ export const updateClass =
             email: json.email ? json.email : '',
             name: json.name ? json.name : '',
             role: json.class ? json.class : 'None',
+            user_id: json.user_id ? json.user_id : -1,
         };
     };
 
@@ -26,6 +27,7 @@ export const fetchProfileClass = () => {
             name: authJSON.name,
             email: authJSON.email,
             class: authJSON.user_class,
+            user_id: authJSON.user_id,
         }));
     };
 };

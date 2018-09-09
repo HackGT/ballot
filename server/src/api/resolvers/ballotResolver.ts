@@ -6,14 +6,14 @@ import { ProjectScores } from '../types/ballot';
 const resolvers = {
     Query: {
         nextBallotSet: (obj: any,
-                        args: { user_id?: number, current_project_id?: number },
+                        args: { user_id?: number },
                         context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ViewBallot, args.user_id)) {
                 throw new Error('You do not have permission to view ballots');
             }
 
-            return BallotService.getNextProject(args.user_id!, args.current_project_id!);
+            return BallotService.getNextProject(args.user_id!);
         },
         getRanking: async (obj: any, args: any, context: any) => {
             if (!context.user ||
@@ -27,18 +27,26 @@ const resolvers = {
     },
 
     Mutation: {
-        skipProject: (obj: any, args: { user_id?: number }, context: any) => {
+        startProject: (obj: any, args: { user_id?: number, project_id?: number }, context: any) => {
+            if (!context.user || !context.user.can(Action.StartProject, args.user_id)) {
+                throw new Error('You do not have permission to skip ballots');
+            }
+
+            return BallotService.startProject(args.user_id!, args.project_id!);
+        },
+
+        skipProject: (obj: any, args: { user_id?: number, project_id?: number }, context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ScoreBallot, args.user_id)) {
                 throw new Error('You do not have permission to score ballots');
             }
 
-            const ret = BallotService.skipProject(args.user_id!);
+            const ret = BallotService.skipProject(args.user_id!, args.project_id!);
             return ret || [];
         },
 
         scoreProject: (obj: any,
-                       args: { user_id?: number, scores?: ProjectScores[] },
+                       args: { user_id?: number, project_id?: number, scores?: ProjectScores[] },
                        context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ScoreBallot, args.user_id)) {
@@ -46,6 +54,7 @@ const resolvers = {
             }
 
             const ret = BallotService.scoreProject(args.user_id!,
+                args.project_id!,
                 args.scores!.map((score) => {
                     return {
                         ballotId: score.ballot_id,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { H1, EditableText, Button } from '@blueprintjs/core';
+import { H1, EditableText, Button, Switch } from '@blueprintjs/core';
 import { CategoryState, CriteriaState } from '../../types/State';
 import AdminPanelNewCategoryCriteria from './AdminPanelNewCategoryCriteria';
 
@@ -13,6 +13,7 @@ interface AdminPanelNewCategoryProps {
 interface AdminPanelNewCategoryState {
     categoryName: string;
     criteria: CriteriaState[];
+    isPrimary: boolean;
 }
 
 let nextCriteriaID = 1;
@@ -33,6 +34,7 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
         this.state = {
             categoryName: '',
             criteria: [criteriaInit],
+            isPrimary: false,
         };
 
         this.addMoreCriteria = this.addMoreCriteria.bind(this);
@@ -40,6 +42,7 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
         this.handleRemoveCriteriaRow = this.handleRemoveCriteriaRow.bind(this);
         this.createCategory = this.createCategory.bind(this);
         this.handleCriteriaUpdate = this.handleCriteriaUpdate.bind(this);
+        this.handlePrimaryChange = this.handlePrimaryChange.bind(this);
     }
 
     public render() {
@@ -50,6 +53,11 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
                         placeholder='Category Name'
                         onChange={this.handleNameChange} />
                 </H1>
+
+                <Switch
+                    checked={this.state.isPrimary}
+                    label='Primary Category'
+                    onChange={this.handlePrimaryChange} />
 
                 {this.state.criteria.map((criteria: CriteriaState, index: number) => {
                     return (
@@ -74,6 +82,15 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
         )
     }
 
+    private handlePrimaryChange(event: any) {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                isPrimary: !prevState.isPrimary,
+            };
+        });
+    }
+
     private handleCriteriaUpdate(criteria: CriteriaState, index: number) {
         this.setState((prevState) => {
             prevState.criteria[index] = criteria;
@@ -96,7 +113,7 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
                     mutation {
                         createCategory(
                             name: "${this.state.categoryName}",
-                            is_primary: true,
+                            is_primary: ${this.state.isPrimary},
                         ) {
                             category_id
                             name
@@ -147,7 +164,7 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
         const newCategory: CategoryState = {
             category_id: categoryID,
             name: this.state.categoryName,
-            is_primary: true,
+            is_primary: this.state.isPrimary,
             criteria: this.state.criteria,
         }
 

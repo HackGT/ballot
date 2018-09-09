@@ -31,6 +31,7 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
         this.handleRefresh = this.handleRefresh.bind(this);
         this.openUploadDialog = this.openUploadDialog.bind(this);
         this.closeUploadDialog = this.closeUploadDialog.bind(this);
+        this.handleRefreshProjects = this.handleRefreshProjects.bind(this);
     }
 
     public async componentDidMount() {
@@ -52,11 +53,12 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
                     <H6 style={{
                         textAlign: 'center',
                     }}>
-                        Loading categories and criteria.
+                        Loading projects
                     </H6>
                 </div>
             )
         }
+
         return (
             <div>
                 <Dialog
@@ -67,7 +69,7 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
                     onClose={this.closeUploadDialog}>
 
                     <div className={Classes.DIALOG_BODY}>
-                        <AdminPanelUploadProjects />
+                        <AdminPanelUploadProjects refreshProjects={this.handleRefreshProjects} />
                     </div>
 
                 </Dialog>
@@ -89,6 +91,17 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
         );
     }
 
+    private handleRefreshProjects(projects: ProjectState[]) {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                uploadDialogOpen: false,
+            };
+        }, () => {
+            this.props.refreshProjects(projects);
+        });
+    }
+
     private async fetchProjects() {
         const result = await fetch('/graphql', {
             credentials: 'same-origin',
@@ -106,7 +119,7 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
                         expo_number
                         sponsor_prizes
                         categories {
-                            name
+                            category_id
                         }
                     }
                 }`

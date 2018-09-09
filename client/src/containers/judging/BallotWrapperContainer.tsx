@@ -6,27 +6,34 @@ import {
     mapStateToAllProps,
 } from '../../util/authorization';
 
-import BallotSet from '../../components/judging/BallotSet';
-import { loadNextBallotSets, updateBallot } from '../../actions/ballotset';
+import BallotsWrapper from '../../components/judging/BallotsWrapper';
+import { loadNextBallotSets, updateBallot } from '../../actions/ballots';
+import { refreshCategories } from '../../actions/categories';
+import { refreshProjects } from '../../actions/projects';
 
-import { State, BallotSetState, BallotState } from '../../types/State';
+import { State, AuthState, BallotState, ProjectState, CategoryState } from '../../types/State';
 import Action from '../../types/Action';
 
-interface StateToProps extends BallotSetState {}
+interface StateToProps {
+    auth: AuthState;
+    ballots: BallotState[];
+}
+
 interface DispatchToProps {
     updateBallot: (ballot: BallotState) => void;
-    loadNextBallotSets: (nextBallotSet: BallotSetState) => void;
+    loadNextBallotSets: (nextBallotSet: BallotState[]) => void;
 }
 
 const mapStateToProps = (state: State): StateToProps => {
     return {
-        ballots: state.ballotset.ballots,
+        auth: state.auth,
+        ballots: state.ballots,
     };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>) => {
     return {
-        loadNextBallotSets: (nextBallotSet: BallotSetState) => {
+        loadNextBallotSets: (nextBallotSet: BallotState[]) => {
             dispatch(loadNextBallotSets(nextBallotSet));
         },
         updateBallot: (ballot: BallotState) => {
@@ -39,9 +46,9 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>) => {
 //     return state.auth.role === 'Judge';
 // };
 
-const ConnectedBallotSet = connect<StateToProps, DispatchToProps>(
+const BallotWrapperContainer = connect<StateToProps, DispatchToProps>(
     mapStateToProps,
     mapDispatchToProps
-)(BallotSet);
+)(BallotsWrapper);
 
-export default ConnectedBallotSet;
+export default BallotWrapperContainer;

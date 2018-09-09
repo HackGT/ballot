@@ -7,10 +7,10 @@ import { CategoryModel, CategoryInstance } from './CategoryModel';
 const { INTEGER, STRING, SMALLINT } = Sequelize;
 
 export interface ProjectModelWithoutCategories {
-    project_id: number;
+    project_id?: number;
     devpost_id: string;
     name: string;
-    table_number: number;
+    table_number: string;
     expo_number: number;
     sponsor_prizes: string;
 }

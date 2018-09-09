@@ -7,6 +7,7 @@ const initState: AuthState = {
     email: null,
     name: null,
     role: null,
+    user_id: null,
 };
 
 const auth = (state: AuthState = initState, actionAny: Action): AuthState => {
@@ -16,7 +17,8 @@ const auth = (state: AuthState = initState, actionAny: Action): AuthState => {
             return {
                 email: action.email,
                 name: action.name,
-                role: action.role
+                role: action.role,
+                user_id: action.user_id,
             };
         default:
             return state;

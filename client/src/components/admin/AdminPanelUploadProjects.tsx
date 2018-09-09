@@ -10,7 +10,7 @@ interface ProjectGroup {
 }
 
 interface AdminPanelUploadProjectsProps {
-
+    refreshProjects: (projects: ProjectState[]) => void;
 }
 
 interface AdminPanelUploadProjectsState {
@@ -20,6 +20,8 @@ interface AdminPanelUploadProjectsState {
     expoCount: number;
     projectGroups: ProjectGroup[];
     projectsAccountedFor: number;
+    totalProjects: number;
+    errorMessage: string;
 }
 
 const initGroup = {
@@ -38,6 +40,8 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             expoCount: 1,
             projectGroups: [initGroup],
             projectsAccountedFor: initGroup.numberProjects,
+            totalProjects: 0,
+            errorMessage: '',
         }
 
         this.handleUpload = this.handleUpload.bind(this);
@@ -46,6 +50,8 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
         this.handleNewProjectGroup = this.handleNewProjectGroup.bind(this);
         this.handleUpdateNumberProjects = this.handleUpdateNumberProjects.bind(this);
         this.handleUpdateName = this.handleUpdateName.bind(this);
+        this.setErrorMessage = this.setErrorMessage.bind(this);
+        this.processUpload = this.processUpload.bind(this);
     }
 
     public render() {
@@ -64,7 +70,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                             onValueChange={this.handleExpoCountChange}
                             style={{ width: 50 }} />
 
-                        <H4>Group Name <span style={{}}></span></H4>
+                        <H4>Group Name <span style={{ float: 'right', }}># of Projects</span></H4>
 
                         {this.state.projectGroups.map((value, index) => {
                             return (
@@ -88,8 +94,9 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                         <p style={{
                             float: 'right',
                         }}>
-                            {this.state.projectsAccountedFor} / {this.state.projects.length}
+                            {this.state.projectsAccountedFor} / {this.state.totalProjects}
                         </p>
+                        <p>{this.state.errorMessage}</p>
 
                         <Button
                             onClick={this.processUpload}
@@ -169,12 +176,110 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             return {
                 ...prevState,
                 expoCount: value,
+                totalProjects: Math.ceil(prevState.projects.length / value),
             };
         });
     }
 
     private processUpload() {
         console.log("UPLOAD BUTTON");
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                errorMessage: ''
+            }
+        }, async () => {
+            if (this.state.totalProjects === this.state.projectsAccountedFor) {
+                let isValid = true;
+                const groupNames: string[] = [];
+                for (const projectGroup of this.state.projectGroups) {
+                    if (groupNames.includes(projectGroup.name)) {
+                        isValid = false;
+                    } else {
+                        groupNames.push(projectGroup.name);
+                    }
+
+                    if (projectGroup.numberProjects < 1) {
+                        isValid = false;
+                    }
+                }
+
+                if (isValid) {
+                    let projectNumber = 0;
+
+                    const projects = this.state.projects;
+
+                    for (let expo = 0; expo < this.state.expoCount; expo++) {
+                        for (const projectGroup of this.state.projectGroups) {
+                            for (let tableNumber = 0; tableNumber < projectGroup.numberProjects; tableNumber++) {
+                                if (projectNumber < this.state.projects.length) {
+                                    projects[projectNumber].expo_number = expo + 1;
+                                    projects[projectNumber].table_number = projectGroup.name + ' ' + (tableNumber + 1);
+                                    projectNumber++;
+                                }
+                            }
+                        }
+                    }
+
+                    const projectUploadResult = await fetch('/graphql', {
+                        credentials: 'same-origin',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query: `
+                                mutation {
+                                    batchUploadProjects(
+                                        projects: [${
+                                            this.state.projects.map((project) => {
+                                                return `{
+                                                    name: "${project.name}"
+                                                    devpost_id: "${project.devpost_id}"
+                                                    expo_number: ${project.expo_number}
+                                                    table_number: "${project.table_number}"
+                                                    sponsor_prizes: "${project.sponsor_prizes}"
+                                                }`
+                                            })
+                                        }]
+                                    ) {
+                                        project_id
+                                        devpost_id
+                                        expo_number
+                                        table_number
+                                        name
+                                        sponsor_prizes
+                                        categories {
+                                            category_id
+                                        }
+                                    }
+                                }
+                            `
+                        }),
+                    });
+
+                    const json = await projectUploadResult.json();
+                    const returnedProjects: ProjectState[] = json.data.batchUploadProjects;
+
+                    this.props.refreshProjects(returnedProjects);
+
+                } else {
+                    this.setErrorMessage('Each project group must have a unique name and at least 1 project.');
+                }
+            } else {
+                this.setErrorMessage('You have not accounted for the correct number of projects.');
+            }
+        });
+
+    }
+
+    private setErrorMessage(message: string) {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                errorMessage: message,
+            };
+        });
     }
 
     private parseCSV(results: papa.ParseResult) {
@@ -196,7 +301,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
         console.log(keys);
 
         if (keys.name === -1 || keys.url === -1 || keys.categories === -1) {
-            throw new Error('No first row');
+            throw new Error('First row is invalid');
         }
 
         const data = results.data.splice(1, results.data.length - 1);
@@ -210,8 +315,8 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     project_id: -1,
                     name: project[keys.name],
                     devpost_id: project[keys.url],
-                    table_number: 1,
-                    expo_number: 1,
+                    table_number: '-1',
+                    expo_number: -1,
                     sponsor_prizes: project[keys.categories],
                 });
             }
@@ -223,6 +328,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             return {
                 ...prevState,
                 projects,
+                totalProjects: projects.length,
             };
         });
     }

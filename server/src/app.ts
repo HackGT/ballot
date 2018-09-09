@@ -16,7 +16,6 @@ import { Environment } from './config/Environment';
 import healthcheck from './routes/healthcheck';
 import auth from './routes/auth';
 import index from './routes/index';
-import batchupload from './routes/batchupload';
 import { Logger } from './util/Logger';
 import { strategies, serialize, deserialize } from './config/auth';
 import schema from './api';
@@ -24,8 +23,8 @@ import { sync } from './models';
 import socketHandler from './routes/socket';
 
 const app = express();
-const server = http.createServer(app)
-const io = socketio(server);
+const server = http.createServer(app);
+export const io = socketio(server);
 
 // Throw any errors if missing configurations
 try {
@@ -68,8 +67,9 @@ try {
     app.use('/', express.static('./build/public'));
     app.use('/healthcheck', healthcheck);
     app.use('/auth', auth);
-    app.use('/batchupload', batchupload);
-    app.use('/graphql', bodyParser.json(),
+    app.use('/graphql', bodyParser.json({
+        limit: '10mb',
+    }),
         graphqlExpress((req?: express.Request, res?: express.Response) => {
             return {
                 schema,

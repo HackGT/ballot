@@ -1,12 +1,12 @@
 import * as React from 'react';
 // import './Judging.css';
-import ConnectedBallotSet from '../../containers/judging/ConnectedBallotSet';
+import BallotWrapperContainer from '../../containers/judging/BallotWrapperContainer';
 
 interface JudgingProps {}
 
 const Judging: React.SFC<JudgingProps> = (props) => {
     return (
-        <ConnectedBallotSet />
+        <BallotWrapperContainer />
     );
 };
 

@@ -33,6 +33,7 @@ class Logout extends React.Component<LogoutProps, LogoutState> {
                 name: null,
                 email: null,
                 class: null,
+                user_id: null,
             });
         });
     }

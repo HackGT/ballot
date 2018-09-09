@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { CategoryState, CriteriaState } from '../../types/State';
-import { Card, H3, Button, Alert, EditableText, Spinner, ProgressBar } from '@blueprintjs/core';
+import { Card, H3, Button, Alert, EditableText, Spinner, ProgressBar, Switch } from '@blueprintjs/core';
 import AdminPanelNewCategoryCriteria from './AdminPanelNewCategoryCriteria';
 
 interface AdminPanelCategoryCardProps {
@@ -45,6 +45,7 @@ class AdminPanelCategoryCard extends React.Component<AdminPanelCategoryCardProps
         this.handleNameChange = this.handleNameChange.bind(this);
 
         this.handleCriteriaUpdate = this.handleCriteriaUpdate.bind(this);
+        this.handlePrimaryChange = this.handlePrimaryChange.bind(this);
     }
 
     public render() {
@@ -92,6 +93,14 @@ class AdminPanelCategoryCard extends React.Component<AdminPanelCategoryCardProps
                     </span>
                 </H3>
 
+                {this.state.editMode ?
+                    <Switch
+                        checked={this.state.category.is_primary}
+                        label='Primary Category'
+                        onChange={this.handlePrimaryChange} /> : <p><strong>{this.state.category.is_primary ? 'Primary Category' : ''}</strong></p>
+
+                }
+
                 {this.props.category.criteria.map((criteria: CriteriaState, index: number) => {
                     return (
                         <AdminPanelNewCategoryCriteria
@@ -112,6 +121,18 @@ class AdminPanelCategoryCard extends React.Component<AdminPanelCategoryCardProps
 
             </Card>
         )
+    }
+
+    private handlePrimaryChange(event: any) {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                category: {
+                    ...prevState.category,
+                    is_primary: !prevState.category.is_primary,
+                },
+            };
+        });
     }
 
     private handleCriteriaUpdate(criteria: CriteriaState, index: number) {
@@ -282,6 +303,29 @@ class AdminPanelCategoryCard extends React.Component<AdminPanelCategoryCardProps
                 this.props.editCriteria(criteria);
             }
         }));
+
+        const categoryResult = await fetch('/graphql', {
+            credentials: 'same-origin',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `
+                    mutation {
+                        updateCategory(
+                            category_id: ${this.state.category.category_id}
+                            update: {
+                                name: "${this.state.category.name}"
+                                is_primary: ${this.state.category.is_primary}
+                            }
+                        ) {
+                            category_id
+                        }
+                    }
+                `
+            }),
+        });
 
         this.props.editCategory(this.state.category);
 

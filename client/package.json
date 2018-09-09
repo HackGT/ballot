@@ -13,7 +13,6 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-hot-loader": "^4.3.5",
-    "react-rater": "^5.0.3",
     "react-redux": "^5.0.7",
     "react-responsive": "^5.0.0",
     "react-router": "^4.3.1",

@@ -17,7 +17,10 @@ export enum Action {
 
     DeleteCriterion = 'DeleteCriterion',
 
+    BatchUploadProjects = 'BatchUploadProjects',
+
     ViewBallot = 'ViewBallot',
+    StartProject = 'StartProject',
     ScoreBallot = 'ScoreBallot',
     ViewRanking = 'ViewRanking',
 }
@@ -31,6 +34,7 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
         case Action.DeleteCriterion:
         case Action.CreateCategory:
         case Action.ViewUsers:
+        case Action.BatchUploadProjects:
         case Action.CreateCategory:
         case Action.DeleteCategory:
         case Action.UpdateCategory:
@@ -40,6 +44,7 @@ export function can(this: UserModel, action: Action, target?: Target): boolean {
 
         case Action.EditUser:
         case Action.ChangePassword:
+        case Action.StartProject:
         case Action.ScoreBallot:
         case Action.ViewBallot:
             return this.user_class === UserClass.Admin ||

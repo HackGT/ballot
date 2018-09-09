@@ -14,11 +14,6 @@ interface AdminPanelCategoryCriteriaState {
     criteria: CriteriaState;
 }
 
-function escapeString(value: string): string {
-    return value.replace(/\\n/g, "\\n");
- }
-
-
 class AdminPanelNewCategoryCriteria extends React.Component<AdminPanelCategoryCriteriaProps, AdminPanelCategoryCriteriaState> {
     constructor(props: AdminPanelCategoryCriteriaProps) {
         super(props);
@@ -72,7 +67,10 @@ class AdminPanelNewCategoryCriteria extends React.Component<AdminPanelCategoryCr
                         multiline={true}
                         onConfirm={this.handleRubricChange}
                     /> :
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.criteria.rubric}</p>
+                    <p style={{
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all'
+                    }}>{this.state.criteria.rubric}</p>
                 }
 
                 {this.props.editMode ?
