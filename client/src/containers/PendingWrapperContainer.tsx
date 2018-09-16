@@ -5,7 +5,7 @@ import {
     mapStateToAllProps,
 } from '../util/authorization';
 
-import GeneralWrapper from '../components/GeneralWrapper';
+import PendingWrapper from '../components/PendingWrapper';
 
 import { State } from '../types/State';
 
@@ -16,14 +16,14 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    return state.auth.role === 'None';
+    return state.auth.role === 'Pending';
 };
 
-const GeneralContainer = connect<StateToProps>(
+const PendingWrapperContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(GeneralWrapper));
+)(ConditionalRender(PendingWrapper));
 
-export default GeneralContainer;
+export default PendingWrapperContainer;

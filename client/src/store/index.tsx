@@ -5,12 +5,14 @@ import auth from '../reducers/auth';
 import ballots from '../reducers/ballotset';
 import categories from '../reducers/categories';
 import projects from '../reducers/projects';
+import users from '../reducers/users';
 
 const reducer = combineReducers({
     auth,
     ballots,
     categories,
     projects,
+    users,
 });
 
 export default createStore(

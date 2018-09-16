@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as papa from 'papaparse';
 import { ProjectState } from '../../types/State';
-import { FileInput, Button, NumericInput, H4 } from '@blueprintjs/core';
+import { FileInput, Button, NumericInput, H4, FormGroup } from '@blueprintjs/core';
 import AdminPanelUploadProjectsGroup from './AdminPanelUploadProjectsGroup';
 
 interface ProjectGroup {
@@ -63,12 +63,18 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     onInputChange={this.handleUpload} />
 
                 {this.state.csv ?
-                    <div>
-                        <NumericInput
-                            value={this.state.expoCount}
-                            min={1}
-                            onValueChange={this.handleExpoCountChange}
-                            style={{ width: 50 }} />
+                    <div style={{
+                        marginTop: 10
+                    }} >
+                        <hr />
+                        <FormGroup>
+                            <H4>Number of Expos</H4>
+                            <NumericInput
+                                value={this.state.expoCount}
+                                min={1}
+                                onValueChange={this.handleExpoCountChange}
+                                style={{ width: 50 }} />
+                        </FormGroup>
 
                         <H4>Group Name <span style={{ float: 'right', }}># of Projects</span></H4>
 

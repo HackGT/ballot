@@ -8,16 +8,16 @@ import LoginContainer from '../containers/LoginContainer';
 import Register from './login/Register';
 import NoSessionContainer from '../util/RedirectNoSession';
 
-interface PendingWrapperProps {}
+interface GeneralWrapperProps {}
 
-const PendingWrapper: React.SFC<PendingWrapperProps> = (props) => {
+const GeneralWrapper: React.SFC<GeneralWrapperProps> = (props) => {
     return (
         <div style={{
             width: '100%',
             maxWidth: 960,
             margin: '0 auto',
         }}>
-            <Navigation linkNames={['Expo', 'Login', 'Register']} linkDests={['/', '/login', '/register']} hasSession={false} />
+            <Navigation linkNames={['Expo', 'Login']} linkDests={['/', '/login']} hasSession={false} />
 
             <div style={{
                 padding: 15,
@@ -33,4 +33,4 @@ const PendingWrapper: React.SFC<PendingWrapperProps> = (props) => {
     );
 };
 
-export default PendingWrapper;
+export default GeneralWrapper;

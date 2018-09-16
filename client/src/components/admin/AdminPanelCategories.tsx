@@ -69,13 +69,11 @@ class AdminPanelCategories extends React.Component<AdminPanelCategoriesProps, Ad
                     title='New Category'
                     onClose={this.closeNewCategoryDialog}>
 
-                    <div className={Classes.DIALOG_BODY}>
-                        <AdminPanelNewCategory
-                            closeDialog={this.closeNewCategoryDialog}
-                            addCategory={this.props.addCategory}
-                            addCriteria={this.props.addCriteria}
-                        />
-                    </div>
+                    <AdminPanelNewCategory
+                        closeDialog={this.closeNewCategoryDialog}
+                        addCategory={this.props.addCategory}
+                        addCriteria={this.props.addCriteria}
+                    />
 
                 </Dialog>
                 <h1>Categories

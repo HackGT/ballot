@@ -51,6 +51,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                         <InputGroup
                             name='email'
                             type='text'
+                            autoComplete='off'
                             placeholder='Email'
                             large={true}
                             onChange={this.handleChange}
@@ -72,13 +73,12 @@ class Login extends React.Component<LoginProps, LoginState> {
                             onClick={this.handleLogin} />
                     </form> : ''
                 }
-
-                <Link to='/register'>Register</Link>
             </div>
         );
     }
 
-    private handleLogin() {
+    private handleLogin(event: any) {
+        event.preventDefault();
         this.setState((prevState) => {
             return {
                 ...prevState,

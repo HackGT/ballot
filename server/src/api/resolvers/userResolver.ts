@@ -49,7 +49,7 @@ const resolvers = {
             return user;
         },
         changePassword: async (obj: any,
-                               args: { id?: number, password?: string },
+                               args: { id?: number, newPassword?: string },
                                context: any) => {
             if (!context.user ||
                 !context.user.can(Action.ChangePassword, args.id)) {
@@ -57,7 +57,7 @@ const resolvers = {
                     ' users password');
             }
 
-            const { salt, hash } = await hashPassword(args.password!);
+            const { salt, hash } = await hashPassword(args.newPassword!);
 
             const user = await UserService.update(args.id!, { hash, salt });
 

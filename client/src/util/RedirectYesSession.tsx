@@ -6,21 +6,29 @@ import {
     mapStateToAllProps,
 } from '../util/authorization';
 
-import { State } from '../types/State';
+import { State, AuthState } from '../types/State';
 
 interface StateToProps {}
 
 const mapStateToProps = (state: State): StateToProps => {
-    return {};
+    return {
+        auth: state.auth,
+    };
 };
 
 const mapStateToAuth = (state: State): boolean => {
     return state.auth.role !== 'None';
 };
 
-interface YesSessionProps {}
+interface YesSessionProps {
+    auth: AuthState;
+}
 
 const YesSession: React.SFC<YesSessionProps> = (props) => {
+    if (props.auth.role === null || props.auth.role === 'None') {
+        return null;
+    }
+
     return (
         <Redirect to='/' />
     );

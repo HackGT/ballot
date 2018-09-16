@@ -3,11 +3,11 @@ import * as React from 'react';
 import {
     ConditionalRender,
     mapStateToAllProps,
-} from '../util/authorization';
+} from '../../util/authorization';
 
-import PendingWrapper from '../components/PendingWrapper';
+import JudgeWrapper from '../../components/judging/JudgeWrapper';
 
-import { State } from '../types/State';
+import { State } from '../../types/State';
 
 interface StateToProps {}
 
@@ -16,14 +16,14 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    return state.auth.role === 'Pending';
+    return state.auth.role === 'Judge';
 };
 
-const PendingContainer = connect<StateToProps>(
+const JudgeWrapperContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(PendingWrapper));
+)(ConditionalRender(JudgeWrapper));
 
-export default PendingContainer;
+export default JudgeWrapperContainer;

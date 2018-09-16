@@ -1,8 +1,12 @@
 import * as React from 'react';
+import { AuthState, UserState } from '../../types/State';
 import AdminPanelUserCard, { AdminPanelUserCardProps } from './AdminPanelUserCard';
 
 interface UserTableProps {
-    userData: AdminPanelUserCardProps[];
+    userData: UserState[];
+    currentUser: AuthState;
+    editUser: (user: UserState) => void;
+    removeUser: (user: UserState) => void;
 }
 
 const AdminPanelUserList: React.SFC<UserTableProps> = (props) => {
@@ -14,7 +18,9 @@ const AdminPanelUserList: React.SFC<UserTableProps> = (props) => {
             name={props.userData[i].name}
             email={props.userData[i].email}
             user_class={props.userData[i].user_class}
-            isCurrentUser={props.userData[i].isCurrentUser}
+            isCurrentUser={props.userData[i].user_id === props.currentUser.user_id}
+            editUser={props.editUser}
+            removeUser={props.removeUser}
         />);
     }
 

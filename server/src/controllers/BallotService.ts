@@ -92,7 +92,7 @@ export class BallotService {
             const activeProjectID = dataStore.judgeQueues[userID].activeProjectID!;
 
             // Get ballots for the current project.
-            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID];
+            const ballotIDs: number[] = dataStore.usersToProjects[userID][activeProjectID];
 
             // Retrieve BallotModels for this project.
             const resultBallots: BallotModel[] = [];
@@ -115,7 +115,7 @@ export class BallotService {
             dataStore.judgeQueues[userID].queuedProjectID = null;
 
             // Get ballotIDs for this project.
-            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID!];
+            const ballotIDs: number[] = dataStore.usersToProjects[userID][activeProjectID!];
 
             // Retrieve BallotModels for this project and set status to assigned.
             const resultBallots: BallotModel[] = [];
@@ -155,8 +155,8 @@ export class BallotService {
         // Make sure the judge is currently assigned a project. If not, return false.
         if (dataStore.judgeQueues[userID].activeProjectID) {
             // Make sure ballots exist for this project.
-            if (dataStore.projectsToBallots[projectID]) {
-                for (const ballotID of dataStore.projectsToBallots[projectID]) {
+            if (dataStore.usersToProjects[userID][projectID]) {
+                for (const ballotID of dataStore.usersToProjects[userID][projectID]) {
                     dataStore.ballots[ballotID].ballot_status = BallotStatus.Started;
                 }
 
@@ -188,7 +188,7 @@ export class BallotService {
         // If there is not an assigned project, return nothing.
         if (activeProjectID === projectID) {
             // Get ballotIDs for this project.
-            const ballotIDs: number[] = dataStore.projectsToBallots[activeProjectID!];
+            const ballotIDs: number[] = dataStore.usersToProjects[userID][activeProjectID!];
 
             // Retrieve BallotModels for this project and set status to skipped.
             const resultBallots: BallotModel[] = [];
@@ -229,10 +229,10 @@ export class BallotService {
      * Applies the ballot scores and moves onto the next projects
      */
     public static async scoreProject(userID: number, projectID: number, scores: ProjectScores[]):
-        Promise<Boolean> {
+        Promise<boolean> {
 
         if (projectID === dataStore.judgeQueues[userID].activeProjectID) {
-            const ballotIDs = dataStore.projectsToBallots[projectID];
+            const ballotIDs = dataStore.usersToProjects[userID][projectID];
             const databaseBallots = await Ballots.findAll({
                 where: {
                     ballot_id: {

@@ -3,11 +3,11 @@ import * as React from 'react';
 import {
     ConditionalRender,
     mapStateToAllProps,
-} from '../../util/authorization';
+} from '../util/authorization';
 
-import JudgeWrapper from '../../components/judging/JudgeWrapper';
+import GeneralWrapper from '../components/GeneralWrapper';
 
-import { State } from '../../types/State';
+import { State } from '../types/State';
 
 interface StateToProps {}
 
@@ -16,14 +16,14 @@ const mapStateToProps = (state: State): StateToProps => {
 };
 
 const mapStateToAuth = (state: State): boolean => {
-    return state.auth.role === 'Judge';
+    return state.auth.role === 'None';
 };
 
-const JudgeContainer = connect<StateToProps>(
+const GeneralWrapperContainer = connect<StateToProps>(
     mapStateToAllProps<StateToProps, {}>(
         mapStateToProps,
         mapStateToAuth
     )
-)(ConditionalRender(JudgeWrapper));
+)(ConditionalRender(GeneralWrapper));
 
-export default JudgeContainer;
+export default GeneralWrapperContainer;

@@ -76,8 +76,6 @@ const Ballots: React.SFC<BallotsProps> = (props) => {
                             {category.criteria.map((criteria) => {
                                 const ballot = props.criteriaToBallot[criteria.criteria_id];
 
-                                ballot.score = criteria.min_score;
-
                                 return (
                                     <Ballot
                                         key={criteria.criteria_id}

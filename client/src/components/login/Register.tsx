@@ -112,7 +112,8 @@ class Register extends React.Component<RegisterProps, RegisterState> {
 
     private handleRegister(event: any) {
         event.preventDefault();
-        if (this.state.passwordConfirm === this.state.password && this.state.email && this.state.name) {
+        const pattern = /^[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*@[a-z0-9]+(\-[a-z0-9]+)*(\.[a-z0-9]+(\-[a-z0-9]+)*)*\.[a-z]{2,4}$/;
+        if (this.state.passwordConfirm === this.state.password && pattern.test(this.state.email) && this.state.name) {
             this.setState((prevState) => {
                 return {
                     ...prevState,
@@ -152,7 +153,7 @@ class Register extends React.Component<RegisterProps, RegisterState> {
             this.setState((prevState) => {
                 return {
                     ...prevState,
-                    errorMessage: 'All fields must be filled in and passwords must match.'
+                    errorMessage: 'One or more of the inputs is not valid.'
                 };
             });
         }
