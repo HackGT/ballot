@@ -71,6 +71,32 @@ const DerivedState = Immutable.Record({
     }
   */
   judge_ballot_history: Immutable.Map(),
+  /*
+    project_ballots: {
+      [project_id]: {
+        [judge_id]: [ballot_id, ballot_id, ...] 
+      }
+    }
+  */
+  project_ballots: Immutable.Map(),
+  /*
+    project_queues: {
+      [project_id]: [judge_id, judge_id, ... ]
+    }
+  */
+  project_queues: Immutable.Map(),
+  /*
+      project_assignments: {
+        [project_id]: [judge_id, judge_id, ... ]
+      }
+    */
+  project_assignments: Immutable.Map(),
+  /*
+    project_health: {
+      [project_id]: number,
+    }
+  */
+  project_health: Immutable.Map(),
 });
 
 const ProgramState = Immutable.Record({
@@ -168,7 +194,7 @@ const deserializeCanonicalState = serializedState => {
 };
 
 const computeFullDerivedState = canonicalState => {
-  const { ballots } = canonicalState;
+  const { ballots, judgeQueues } = canonicalState;
 
   const judge_ballot_history =
     ballots
@@ -176,11 +202,32 @@ const computeFullDerivedState = canonicalState => {
       .groupBy(ballot_id => ballots.get(ballot_id).user_id)
       .map(judge_ballots => judge_ballots
         .groupBy(judge_ballot_id => ballots.get(judge_ballot_id).project_id));
+  
+  const project_ballots =
+    ballots
+      .keySeq()
+      .groupBy(ballot_id => ballots.get(ballot_id).project_id)
+      .map(project_ballots => project_ballots
+        .gropuBy(project_ballot_id => ballots.get(project_ballot_id).user_id));
+  
+  const project_queues = judgeQueues.groupBy(m => m.get('queuedProjectID')).map(m => m.keySeq().toSet());
+  const project_assignments = judgeQueues.groupBy(m => m.get('assignedProjectID')).map(m => m.keySeq().toSet());
 
   return new DerivedState({
     judge_ballot_history,
+    project_ballots,
+    project_queues,
+    project_assignments,
   });
-}
+};
+
+const computeProjectHealth = derivedState => project => {
+  return (
+    derivedState.project_ballots.get(project.id).size
+    + 0.75 * derivedState.project_assignments.get(project.id).size
+    + 0.50 * derivedState.project_queues.get(project.id).size
+  );
+};
 
 const deserializeBallot = ballot => {
   return new Ballot({
@@ -222,20 +269,43 @@ const rootReducer = (state = new State(), action) => {
       });
     },
     'ENQUEUE_PROJECT': (state, action) => {
-      return state.setIn([
-        'canonical',
-        'judgeQueues',
-        action.userID,
-        'queuedProjectID',
-      ], action.projectID);
+      return state.withMutations(state => {
+        const oldProjectID = state.canonical.judgeQueues.get(action.userID);
+
+        state.setIn([
+          'canonical',
+          'judgeQueues',
+          action.userID,
+          'queuedProjectID',
+        ], action.projectID);
+        state.updateIn([
+          'derived',
+          'project_queues',
+          action.projectID,
+        ], s => s.add(action.userID));
+
+        if (oldProjectID) {
+          state.updateIn([
+            'derived',
+            'project_queues',
+            oldProjectID,
+          ], s => s.delete(action.userID));
+        }
+      });
     },
     'REMOVE_PROJECT_FROM_QUEUE': (state, action) => {
-      return state.setIn([
-        'canonical',
-        'judgeQueues',
-        action.userID,
-        'queuedProjectID',
-      ], null);
+      return state
+        .setIn([
+          'canonical',
+          'judgeQueues',
+          action.userID,
+          'queuedProjectID',
+        ], null)
+        .updateIn([
+          'derived',
+          'project_queues',
+          action.projectID,
+        ], s => s.delete(action.userID));
     },
     'PULL_PROJECT_FROM_QUEUE': (state, action) => {
       return state.withMutations(state => {
@@ -251,15 +321,31 @@ const rootReducer = (state = new State(), action) => {
           action.userID,
           'queuedProjectID',
         ], null);
+        state.updateIn([
+          'derived',
+          'project_queues',
+          action.projectID,
+        ], s => s.delete(action.userID));
+        state.updateIn([
+          'derived',
+          'project_assignments',
+          action.projectID,
+        ], s => s.add(action.userID));
       });
     },
     'SKIP_PROJECT': (state, action) => {
-      return state.setIn([
-        'canonical',
-        'judgeQueues',
-        action.userID,
-        'activeProjectID',
-      ], null);
+      return state
+        .setIn([
+          'canonical',
+          'judgeQueues',
+          action.userID,
+          'activeProjectID',
+        ], null)
+        .updateIn([
+          'derived',
+          'project_assignments',
+          action.projectID,
+        ], s => s.delete(action.userID));
     },
     'PROJECT_SCORED': (state, action) => {
       const s = state.withMutations(state => {
@@ -289,6 +375,24 @@ const rootReducer = (state = new State(), action) => {
           action.projectID,
         ], list => list.concat(action.ballots.map(deserializeBallot)));
 
+        if (
+          !state.derived.project_ballots.has(action.projectID)
+          || !state.derived.project_ballots.get(action.projectID).has(action.userID)
+        ) {
+          state.setIn([
+            'derived',
+            'project_ballots',
+            action.projectID,
+            action.userID,
+          ], Immutable.List());
+        }
+        state.setIn([
+          'derived',
+          'project_ballots',
+          action.projectID,
+          action.userID,
+        ], list => list.concat(action.ballots.map(deserializeBallot)));
+
         if (!state.canonical.judgedProjects.has(action.userID)) {
           state.setIn([
             'canonical',
@@ -296,7 +400,6 @@ const rootReducer = (state = new State(), action) => {
             action.userID,
           ], Immutable.OrderedSet());
         }
-
         state.updateIn([
           'canonical',
           'judgedProjects',
@@ -309,8 +412,12 @@ const rootReducer = (state = new State(), action) => {
           action.userID,
           'activeProjectID',
         ], null);
+        state.updateIn([
+          'derived',
+          'project_assignments',
+          action.projectID,
+        ], s => s.delete(action.userID));
       });
-      console.log(action.userID, s.canonical.judgeQueues.get(action.userID).get('activeProjectID'));
       return s;
     },
 
@@ -352,7 +459,18 @@ const rootReducer = (state = new State(), action) => {
   };
 
   if (action.type in handlers) {
-    return handlers[action.type](state, action);
+    const newState = handlers[action.type](state, action);
+    // ALWAYS recompute every project's health.
+    // this should be based shallowly on derived state, so it's inexpensive.
+    // we do this every time to make it easy to tweak project health without
+    // worrying about which actions need to re-derive state.
+    return newState.setIn(
+      [
+        'derived',
+        'project_health',
+      ],
+      newState.projects.map(computeProjectHealth(newState.derived)),
+    );
   } else {
     return state;
   }
