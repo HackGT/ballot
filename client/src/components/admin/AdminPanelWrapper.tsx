@@ -12,7 +12,7 @@ import AdminPanelCategories from './AdminPanelCategories';
 import AdminPanelUsers from './AdminPanelUsers';
 import MediaQuery from 'react-responsive';
 import CategoriesContainer from '../../containers/admin/CategoriesContainer';
-import { AdminPanelUsersContainer } from '../../containers/StatusContainer';
+import { AdminPanelUsersContainer } from '../../containers/admin/AdminPanelUsersContainer';
 
 interface AdminPanelWrapperProps {
     match: any;

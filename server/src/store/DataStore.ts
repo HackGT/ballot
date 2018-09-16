@@ -21,7 +21,8 @@ export class DataStore {
     } }; // Tim wants with project IDs
 
     public judgedProjects: { [judgeID: number]: number[] };
-    public projectsToBallots: { [projectID: number]: number[] };
+    public usersToProjects: { [judgeID: number]: { [projectID: number]: number[] } };
+    // public projectsToBallots: { [projectID: number]: number[] };
 
     public autoassignEnabled: boolean;
 
@@ -34,12 +35,11 @@ export class DataStore {
 
         this.judgeQueues = {};
         this.judgedProjects = {};
-        this.projectsToBallots = {};
+        this.usersToProjects = {};
+        // this.projectsToBallots = {};
 
         this.autoassignEnabled = false;
 
-        this.fetchUsers();
-        this.fetchBallots();
         this.fetchCollective();
     }
 
@@ -102,7 +102,7 @@ export class DataStore {
                 ballotIDs.push(json.ballot_id!);
             }
 
-            dataStore.projectsToBallots[projectID] = ballotIDs;
+            dataStore.usersToProjects[userID][projectID] = ballotIDs;
 
             console.log(this.judgeQueues);
 
@@ -140,7 +140,7 @@ export class DataStore {
                     delete dataStore.ballots[ballotID];
                 }
 
-                delete dataStore.projectsToBallots[projectID];
+                delete dataStore.usersToProjects[userID][projectID];
 
                 return {
                     status: true,
@@ -198,11 +198,15 @@ export class DataStore {
                     break;
             }
 
-            if (!dataStore.projectsToBallots[actualBallot.project_id]) {
-                dataStore.projectsToBallots[actualBallot.project_id] = [];
+            if (!dataStore.usersToProjects[actualBallot.user_id]) {
+                dataStore.usersToProjects[actualBallot.user_id] = {};
             }
 
-            dataStore.projectsToBallots[actualBallot.project_id].push(actualBallot.ballot_id!);
+            if (!dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id]) {
+                dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id] = [];
+            }
+
+            dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id].push(actualBallot.ballot_id!);
         }
 
         fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
@@ -211,6 +215,8 @@ export class DataStore {
     }
 
     private async fetchCollective(): Promise<void> {
+        await this.fetchUsers();
+        await this.fetchBallots();
         await this.fetchCategories();
 
         const criteriaResult = await Criteria.findAll();
@@ -233,7 +239,7 @@ export class DataStore {
         }
     }
 
-    private async fetchProjects(): Promise<void> {
+    public async fetchProjects(): Promise<void> {
         const projectsResult = await Projects.findAll({
             include: [{ model: Categories }],
         });
@@ -259,6 +265,15 @@ export class DataStore {
                 name: userModel.name,
                 user_class: userModel.user_class,
             };
+
+            this.judgeQueues[userModel.user_id!] = {
+                activeProjectID: null,
+                queuedProjectID: null,
+            };
+
+            this.judgedProjects[userModel.user_id!] = [];
+
+            this.usersToProjects[userModel.user_id!] = [];
         }
     }
 
@@ -285,16 +300,12 @@ export class DataStore {
             };
         }
 
-        console.log(jsonProjects);
-
         const jsonCategories: { [categoryID: number]: {
             category_id: number;
             name: string;
             is_primary: boolean;
             criteria: number[];
         }} = {};
-
-        console.log(dataStore.categories);
 
         for (const category of Object.values(dataStore.categories)) {
             const criteriaArray = Object.values(category.criteria).map((criteria) => {

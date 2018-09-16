@@ -2,6 +2,7 @@ import { ProjectModel, Projects, ProjectModelWithoutCategories } from '../models
 import { dataStore } from '../store/DataStore';
 import { CategoryModel } from '../models/CategoryModel';
 import { ProjectCategories, ProjectCategory } from '../models/ProjectCategoriesModel';
+import { io } from '../app';
 
 interface ProjectsInput {
     name: string;
@@ -66,7 +67,19 @@ export class ProjectService {
 
         ProjectCategories.bulkCreate(projectCategoryIDs);
 
-        dataStore.projects = resultProjects;
+        await dataStore.fetchProjects();
+
+        io.in('authenticated').emit('all_data', {
+            message: 'Latest state sent',
+            autoassign: dataStore.autoassignEnabled,
+            projects: dataStore.projects, // Only category IDs
+            ballots: dataStore.ballots,
+            categories: dataStore.categories, // Only criteria IDs
+            criteria: dataStore.criteria,
+            users: dataStore.users,
+            judgeQueues: dataStore.judgeQueues,
+            judgedProjects: dataStore.judgedProjects,
+        });
 
         return resultProjects;
     }

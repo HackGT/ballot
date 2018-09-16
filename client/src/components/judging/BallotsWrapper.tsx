@@ -178,8 +178,16 @@ class BallotsWrapper extends React.Component<BallotsWrapperProps, BallotsWrapper
             const ballots = ballotsJSON.data.nextBallotSet.ballots;
             const project = ballotsJSON.data.nextBallotSet.project;
 
+            const criteriaToScore: { [criteriaID: number]: number } = {}; // criteriaID to min_score
+            for (const category of project.categories) {
+                for (const criteria of category.criteria) {
+                    criteriaToScore[criteria.criteria_id] = criteria.min_score;
+                }
+            }
+
             const criteriaToBallot: { [criteriaID: number]: BallotState } = {};
             for (const ballot of ballots) {
+                ballot.score = criteriaToScore[ballot.criteria_id];
                 criteriaToBallot[ballot.criteria_id] = ballot;
             }
 

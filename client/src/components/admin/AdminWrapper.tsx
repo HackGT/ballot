@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Header from '../Header';
 import Navigation from '../Navigation';
 import AdminPanelWrapper from './AdminPanelWrapper';
@@ -29,6 +29,7 @@ const AdminWrapper: React.SFC<AdminWrapperProps> = (props) => {
                     <Route exact path='/expo' component={ExpoContainer} />
                     <Route path='/admin' component={AdminPanelWrapper} />
                     <Route exact path='/' component={StatusContainer} />
+                    <Route path='*' render={() => <Redirect to='/' />} />
                 </Switch>
             </div>
         </div>

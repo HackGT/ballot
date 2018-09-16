@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { H1, EditableText, Button, Switch } from '@blueprintjs/core';
+import { H1, EditableText, Button, Switch, Classes } from '@blueprintjs/core';
 import { CategoryState, CriteriaState } from '../../types/State';
 import AdminPanelNewCategoryCriteria from './AdminPanelNewCategoryCriteria';
 
@@ -47,7 +47,7 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
 
     public render() {
         return (
-            <div>
+            <div className={Classes.DIALOG_BODY}>
                 <H1>
                     <EditableText
                         placeholder='Category Name'
@@ -74,7 +74,8 @@ class AdminPanelNewCategory extends React.Component<AdminPanelNewCategoryProps, 
                 <div style={{ margin: '0px 0' }}>
                     <Button intent='primary' text='Add More Criteria' minimal={true} onClick={this.addMoreCriteria} />
                 </div>
-                <div style={{ margin: '10px 0 0', float: 'right' }}>
+
+                <div className={Classes.DIALOG_FOOTER_ACTIONS}>
                     <Button text='Cancel' onClick={this.props.closeDialog} />
                     <Button intent='primary' text='Create Category' onClick={this.createCategory} />
                 </div>

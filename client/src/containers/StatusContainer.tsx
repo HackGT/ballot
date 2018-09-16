@@ -31,9 +31,4 @@ const StatusContainer = connect<StateToProps, DispatchToProps>(
     mapDispatchToProps
 )(Status);
 
-export const AdminPanelUsersContainer = connect<StateToProps, DispatchToProps>(
-    mapStateToProps,
-    mapDispatchToProps
-)(AdminPanelUsers);
-
 export default StatusContainer;

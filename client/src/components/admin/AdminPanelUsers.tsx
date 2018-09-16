@@ -1,20 +1,20 @@
 import * as React from 'react';
 import AdminPanelUserList from './AdminPanelUserList';
-import { AuthState } from '../../types/State';
+import { AuthState, UserState } from '../../types/State';
 import { AdminPanelUserCardProps } from './AdminPanelUserCard';
 
 interface AdminPanelUsersProps {
     auth: AuthState;
+    users: UserState[];
+    refreshUsers: (users: UserState[]) => void;
+    addUser: (user: UserState) => void;
+    editUser: (user: UserState) => void;
+    removeUser: (user: UserState) => void;
 }
 
-class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {
-    userData: AdminPanelUserCardProps[]}> {
+class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {}> {
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            userData: [],
-        };
     }
 
     public async componentWillMount(): Promise<void> {
@@ -30,23 +30,26 @@ class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {
         });
         const data = await result.json();
         const users = data.data.users;
-        const newUserData: AdminPanelUserCardProps[] = [];
+        const newUserData: UserState[] = [];
         for (const user of users) {
             newUserData.push({
                 user_id: user.user_id,
                 name: user.name,
                 email: user.email,
                 user_class: user.user_class,
-                isCurrentUser: this.props.auth.email === user.email,
             });
         }
 
-        this.setState({ userData: newUserData });
+        this.props.refreshUsers(newUserData);
     }
 
     public render(): React.ReactElement<HTMLDivElement> {
         return (
-            <AdminPanelUserList userData={this.state.userData} />
+            <AdminPanelUserList
+                userData={this.props.users}
+                currentUser={this.props.auth}
+                editUser={this.props.editUser}
+                removeUser={this.props.removeUser} />
         );
     }
 }

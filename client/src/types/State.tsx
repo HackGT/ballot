@@ -54,4 +54,5 @@ export interface State {
     ballots: BallotState[];
     categories: CategoryState[];
     projects: ProjectState[];
+    users: UserState[];
 }

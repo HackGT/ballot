@@ -1,8 +1,10 @@
 import { UserModel, Users } from '../models/UserModel';
 import { Logger } from '../util/Logger';
-import * as Promise from 'bluebird';
+import * as BPromise from 'bluebird';
 import { printAndThrowError } from '../util/common';
 import { can, Action, Target } from '../util/Permissions';
+import { io } from '../app';
+import { dataStore } from '../store/DataStore';
 
 const logger = Logger('controllers/UserService');
 
@@ -17,7 +19,7 @@ function applyPrototypeFunctions(user: UserModel | undefined):
 
 export class UserService {
 
-    public static find(): Promise<UserModel[]> {
+    public static find(): BPromise<UserModel[]> {
         return Users.findAll()
             .then((users) => users.map((user) => user.toJSON()))
             .then((users) => users.map((user) =>
@@ -25,30 +27,44 @@ export class UserService {
             .catch(printAndThrowError('find', logger));
     }
 
-    public static findById(id: number): Promise<User | undefined> {
+    public static findById(id: number): BPromise<User | undefined> {
         return Users.findById(id)
             .then((user) => user ? user.toJSON() : undefined)
             .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findById', logger));
     }
 
-    public static findByEmail(email: string): Promise<User | undefined> {
+    public static findByEmail(email: string): BPromise<User | undefined> {
         return Users.findOne({ where: { email } })
             .then((user) => user ? user.toJSON() : undefined)
             .then(applyPrototypeFunctions)
             .catch(printAndThrowError('findByEmail', logger));
     }
 
-    public static create(user: UserModel): Promise<User | undefined> {
-        return Users.create(user)
-            .then((newUser) => newUser.toJSON())
+    public static async create(user: UserModel): Promise<User | undefined> {
+        const newUser = await Users.create(user, {
+            returning: true,
+        }).then((newUser) => newUser.toJSON())
             .then(applyPrototypeFunctions)
             .catch(printAndThrowError('create', logger));
+
+        if (newUser) {
+            dataStore.users[newUser.user_id!] = newUser;
+
+            io.to('authenticated').emit('add_user', {
+                user_id: newUser.user_id!,
+                email: newUser.email,
+                name: newUser.name,
+                user_class: newUser.user_class,
+            });
+        }
+
+        return newUser;
     }
 
     public static update(id: number,
                          user: Partial<UserModel>):
-        Promise<UserModel | undefined> {
+        BPromise<UserModel | undefined> {
 
         return Users.update(user as UserModel,
             { where: { user_id: id }, returning: true })
@@ -66,7 +82,7 @@ export class UserService {
             .catch(printAndThrowError('update', logger));
     }
 
-    public static delete(id: number): Promise<void> {
+    public static delete(id: number): BPromise<void> {
         return Users.destroy({ where: { user_id: id } })
             .then((num) => {
                 if (num === 0) {
@@ -77,7 +93,7 @@ export class UserService {
             }).catch(printAndThrowError('delete', logger));
     }
 
-    public static isEmpty(): Promise<boolean> {
+    public static isEmpty(): BPromise<boolean> {
         return Users.count()
             .then((num) => num === 0)
             .catch(printAndThrowError('isEmpty', logger));

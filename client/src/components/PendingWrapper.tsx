@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, Switch, Route } from 'react-router-dom';
+import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import { Callout } from '@blueprintjs/core';
 import Navigation from './Navigation';
 import { ExpoContainer } from '../containers/expo/ExpoContainer';
@@ -22,6 +22,7 @@ const PendingWrapper: React.SFC<PendingWrapperProps> = (props) => {
                 <Switch>
                     <Route exact path='/expo' component={ExpoContainer} />
                     <Route exact path='/' component={PendingContent} />
+                    <Route path='*' render={() => <Redirect to='/' />} />
                 </Switch>
             </div>
         </div>
