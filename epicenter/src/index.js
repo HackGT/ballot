@@ -233,6 +233,24 @@ const onNextProject = data => {
 //   window.setTimeout(steps[i], 300 * (i + 1));
 // }
 
+const autoAssignToJudge = (judgeID, state) => {
+  const lowestHealth = state.derived.project_health.sort().get(0);
+  state.program.socket.emit('queue_project', {
+    eventID: uuid(),
+    userID: judgeID,
+    projectID: lowestHealth.project_id,
+  });
+};
+
+document.onkeydown = event => {
+  // space
+  if (event.keyCode === 0x20) {
+    const state = store.getState();
+    const emptyJudge = state.canonical.users.filter(judge => state.canonical.judgeQueues.get(judge.user_id).size === 0).first();
+    autoAssignToJudge(emptyJudge.user_id, state);
+  }
+};
+
 ReactDOM.render(
   <Provider store={store}>
     <AppContainer />
