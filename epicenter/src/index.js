@@ -234,20 +234,25 @@ const onNextProject = data => {
 // }
 
 const autoAssignToJudge = (judgeID, state) => {
-  const lowestHealth = state.derived.project_health.sort().get(0);
+  // todo: queued and active
+  const lowestHealth = state.derived.project_health.filter((v, k) => !state.canonical.judgedProjects.get(judgeID).has(k)).sort().keySeq().first();
+  console.log(judgeID, lowestHealth);
   state.program.socket.emit('queue_project', {
     eventID: uuid(),
     userID: judgeID,
-    projectID: lowestHealth.project_id,
+    projectID: lowestHealth,
   });
 };
 
 document.onkeydown = event => {
   // space
   if (event.keyCode === 0x20) {
+    event.preventDefault();
     const state = store.getState();
-    const emptyJudge = state.canonical.users.filter(judge => state.canonical.judgeQueues.get(judge.user_id).size === 0).first();
-    autoAssignToJudge(emptyJudge.user_id, state);
+    const emptyJudge = state.canonical.users.filter(judge => state.canonical.judgeQueues.get(judge.user_id).get('queuedProjectID') === null).first();
+    if (emptyJudge) {
+      autoAssignToJudge(emptyJudge.user_id, state);
+    }
   }
 };
 
