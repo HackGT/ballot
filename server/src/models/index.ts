@@ -4,45 +4,48 @@ import { Ballots } from './BallotModel';
 import { Projects } from './ProjectModel';
 import { Users } from './UserModel';
 import { Logger } from '../util/Logger';
+import { sequelize } from '../db/index';
 
 const logger = Logger('models:sync');
 
 export async function sync(): Promise<void> {
-    Criteria.hasOne(Categories, { foreignKey: 'category_id' });
-    Categories.hasMany(Criteria,
-        { foreignKey: 'category_id', sourceKey: 'category_id' });
-
+    const ProjectCategories = sequelize.define('project_categories', {});
+    Categories.hasMany(Criteria, {
+        foreignKey: 'category_id',
+        sourceKey: 'category_id',
+    });
     Ballots.belongsTo(Users, {
         foreignKey: 'user_id',
+        onDelete: 'CASCADE',
     });
     Ballots.belongsTo(Criteria, {
         foreignKey: 'criteria_id',
+        onDelete: 'CASCADE',
     });
     Ballots.belongsTo(Projects, {
         foreignKey: 'project_id',
+        onDelete: 'CASCADE',
     });
-
     Projects.belongsToMany(Categories, {
-        through: 'project_categories',
-        foreignKey: 'project_id',
+        through: ProjectCategories,
+        foreignKey: 'category_id',
         onDelete: 'CASCADE',
     });
     Categories.belongsToMany(Projects, {
-        through: 'project_categories',
+        through: ProjectCategories,
         foreignKey: 'category_id',
         onDelete: 'CASCADE',
     });
 
-    const promises = [
-        Categories.sync(),
-        Criteria.sync(),
-        Projects.sync(),
-        Users.sync(),
-        Ballots.sync(),
-    ];
+    const parameters = {
+        // logging: console.log,
+        // force: true,
+    }
 
-    Promise.all(promises as any)
-        .catch((err) => {
-            logger.error(err);
-        });
+    await Categories.sync(parameters);
+    await Criteria.sync(parameters);
+    await Users.sync(parameters);
+    await Projects.sync(parameters);
+    await ProjectCategories.sync(parameters);
+    await Ballots.sync(parameters);
 }

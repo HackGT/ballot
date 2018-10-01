@@ -331,4 +331,8 @@ export class DataStore {
     }
 }
 
-export const dataStore = new DataStore();
+export const createDataStore = () => {
+    dataStore = new DataStore();
+}
+
+export let dataStore: DataStore;

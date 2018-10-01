@@ -50,7 +50,7 @@ export const Ballots: Sequelize.Model<BallotInstance, BallotModel> =
         },
         judge_priority: { type: INTEGER, allowNull: false },
         ballot_status: {
-            type: ENUM('Pending', 'Assigned', 'Submitted', 'Skipped'),
+            type: ENUM('Pending', 'Assigned', 'Submitted', 'Skipped', 'Started'),
             allowNull: false,
         },
         score: { type: SMALLINT },

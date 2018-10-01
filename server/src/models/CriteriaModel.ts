@@ -4,7 +4,7 @@ import { Categories } from './CategoryModel';
 
 // Catch-all import because we want SequelizeStatic.Model and not
 // Sequelize.Model
-const { INTEGER, STRING, SMALLINT } = Sequelize;
+const { INTEGER, STRING, SMALLINT, TEXT } = Sequelize;
 
 export interface CriteriaModel {
     criteria_id?: number;
@@ -22,7 +22,7 @@ export const Criteria: Sequelize.Model<CriteriaInstance, CriteriaModel> =
     sequelize.define<CriteriaInstance, CriteriaModel>('criteria', {
         criteria_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
-        rubric: { type: STRING(512) },
+        rubric: { type: TEXT('long') },
         min_score: { type: SMALLINT, defaultValue: 1 },
         max_score: { type: SMALLINT, defaultValue: 5 },
         category_id: {
