@@ -7,11 +7,8 @@ const mapStateToProps = (state, ownProps) => {
   const judge = state.canonical.users.get(ownProps.judgeID);
   return {
     name: judge.name,
-    // TODO: necessary ternary?
-    scored: state.canonical.judgedProjects.has(judge.user_id)
-      ? state.canonical.judgedProjects.get(judge.user_id)
-          .map(project_id => state.canonical.projects.get(project_id))
-      : Immutable.Set(),
+    scored: state.canonical.judgedProjects.get(judge.user_id)
+              .map(project_id => state.canonical.projects.get(project_id)),
     activeProject: state.canonical.judgeQueues.has(judge.user_id)
       ? state.canonical.projects.get(
           state.canonical.judgeQueues.get(judge.user_id).get('activeProjectID')

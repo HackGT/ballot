@@ -165,6 +165,12 @@ const deserializeCanonicalState = serializedState => {
   });
 
   const judgeQueues = Immutable.Map().withMutations(map => {
+    for (const judgeId in serializedState.users) {
+      map.set(
+        parseInt(judgeId, 10),
+        Immutable.Map({ activeProjectID: null, queuedProjectID: null }),   // empty map first
+      );
+    }
     for (const judgeId in serializedState.judgeQueues) {
       map.set(
         parseInt(judgeId, 10),
@@ -174,6 +180,12 @@ const deserializeCanonicalState = serializedState => {
   });
 
   const judgedProjects = Immutable.Map().withMutations(map => {
+    for (const judgeId in serializedState.users) {
+      map.set(
+        parseInt(judgeId, 10),
+        Immutable.OrderedSet(),
+      );
+    }
     for (const judgeId in serializedState.judgedProjects) {
       map.set(
         parseInt(judgeId, 10),
@@ -213,7 +225,7 @@ const computeFullDerivedState = canonicalState => {
   const project_queues = projects.map(_ => Immutable.Set())
     .merge(judgeQueues.groupBy(m => m.get('queuedProjectID')).map(m => m.keySeq().toSet()));
   const project_assignments = projects.map(_ => Immutable.Set())
-    .merge(judgeQueues.groupBy(m => m.get('assignedProjectID')).map(m => m.keySeq().toSet()));
+    .merge(judgeQueues.groupBy(m => m.get('activeProjectID')).map(m => m.keySeq().toSet()));
 
   return new DerivedState({
     judge_ballot_history,
@@ -226,17 +238,17 @@ const computeFullDerivedState = canonicalState => {
 const computeProjectHealth = derivedState => project => {
   let health = 0;
 
-  if (derivedState.project_ballots.has(project.id)) {
-    health += derivedState.project_ballots.get(project.id).size;
+  const epsilon = 0.00000001 * ((project.project_id * 179426447) % 500);
+
+  // hacky pseudorandom based on id so they don't get auto-assigned in order
+  health += epsilon;
+
+  if (derivedState.project_ballots.has(project.project_id)) {
+    health += derivedState.project_ballots.get(project.project_id).size;
   }
 
-  if (derivedState.project_assignments.has(project.id)) {
-    health += 0.75 * derivedState.project_assignments.get(project.id).size;
-  }
-
-  if (derivedState.project_queues.has(project.id)) {
-    health += 0.50 * derivedState.project_queues.get(project.id).size;
-  }
+  health += 0.75 * derivedState.project_assignments.get(project.project_id).size;
+  health += 0.50 * derivedState.project_queues.get(project.project_id).size;
 
   return health;
 };

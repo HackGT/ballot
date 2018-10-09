@@ -6,6 +6,7 @@ const mapStateToProps = (state, ownProps) => {
     selected: state.program.selectedProjectID === ownProps.projectID,
     inList: ownProps.inList,
     project: state.canonical.projects.get(ownProps.projectID),
+    health: state.derived.project_health.get(ownProps.projectID),
   };
 };
 
