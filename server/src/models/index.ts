@@ -2,14 +2,13 @@ import { Criteria } from './CriteriaModel';
 import { Categories } from './CategoryModel';
 import { Ballots } from './BallotModel';
 import { Projects } from './ProjectModel';
+import { ProjectCategories } from './ProjectCategoriesModel';
 import { Users } from './UserModel';
 import { Logger } from '../util/Logger';
-import { sequelize } from '../db/index';
 
 const logger = Logger('models:sync');
 
 export async function sync(): Promise<void> {
-    const ProjectCategories = sequelize.define('project_categories', {});
     Categories.hasMany(Criteria, {
         foreignKey: 'category_id',
         sourceKey: 'category_id',
@@ -28,7 +27,7 @@ export async function sync(): Promise<void> {
     });
     Projects.belongsToMany(Categories, {
         through: ProjectCategories,
-        foreignKey: 'category_id',
+        foreignKey: 'project_id',
         onDelete: 'CASCADE',
     });
     Categories.belongsToMany(Projects, {
