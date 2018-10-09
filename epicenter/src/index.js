@@ -62,12 +62,9 @@ const animateProjectToQueue = (projectID, judgeID) => {
   const projectIconRef = state.program.projectIconRefs.get(projectID);
   const queueIconRef = state.program.queueIconRefs.get(judgeID);
 
-  // TODO: kill useless ternary
-  const oldProject = state.canonical.judgeQueues.has(judgeID)
-  ? state.canonical.projects.get(
-      state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
-    )
-  : null;
+  const oldProject = state.canonical.projects.get(
+    state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
+  );
 
   const newProject = state.canonical.projects.get(projectID);
 
@@ -80,18 +77,13 @@ const animatePullProject = judgeID => {
   const queueIconRef = state.program.queueIconRefs.get(judgeID);
   const activeIconRef = state.program.activeIconRefs.get(judgeID);
 
-  // TODO: kill useless ternaries
-  const oldProject = state.canonical.judgeQueues.has(judgeID)
-    ? state.canonical.projects.get(
-        state.canonical.judgeQueues.get(judgeID).get('activeProjectID'),
-      )
-    : null;
+  const oldProject = state.canonical.projects.get(
+      state.canonical.judgeQueues.get(judgeID).get('activeProjectID'),
+    );
 
-  const newProject = state.canonical.judgeQueues.has(judgeID)
-    ? state.canonical.projects.get(
-        state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
-      )
-    : null;
+  const newProject = state.canonical.projects.get(
+      state.canonical.judgeQueues.get(judgeID).get('queuedProjectID'),
+    );
 
   animateProject(queueIconRef, activeIconRef, oldProject, newProject, 250);
 };
@@ -233,9 +225,25 @@ const onNextProject = data => {
 //   window.setTimeout(steps[i], 300 * (i + 1));
 // }
 
+const projectJudgePenalty = (judgeID, projectID) => {
+  let penalty = 1;
+
+  return penalty;
+};
+
 const autoAssignToJudge = (judgeID, state) => {
   // todo: queued and active
-  const lowestHealth = state.derived.project_health.filter((v, k) => !state.canonical.judgedProjects.get(judgeID).has(k)).sort().keySeq().first();
+  const judgedProjects = state.canonical.judgedProjects.get(judgeID);
+  const judgeQueues = state.canonical.judgeQueues.get(judgeID);
+  const lowestHealth = state.derived.project_health
+    .filter(
+      (v, k) => !judgedProjects.has(k)
+                  && judgeQueues.get('activeProjectID') !== k
+                  && judgeQueues.get('queuedProjectID') !== k
+                  && state.canonical.projects.get(k).expo_number === state.program.expo_number,
+    )
+    .map((health, projectID) => health * projectJudgePenalty(judgeID, projectID))
+    .sort().keySeq().first();
   console.log(judgeID, lowestHealth);
   state.program.socket.emit('queue_project', {
     eventID: uuid(),
@@ -249,7 +257,11 @@ document.onkeydown = event => {
   if (event.keyCode === 0x20) {
     event.preventDefault();
     const state = store.getState();
-    const emptyJudge = state.canonical.users.filter(judge => state.canonical.judgeQueues.get(judge.user_id).get('queuedProjectID') === null).first();
+    const emptyJudge = state.canonical.users.filter(
+      judge =>
+        state.canonical.judgeQueues.get(judge.user_id).get('queuedProjectID') === null
+        && judge.user_class !== 'Pending',
+    ).first();
     if (emptyJudge) {
       autoAssignToJudge(emptyJudge.user_id, state);
     }
