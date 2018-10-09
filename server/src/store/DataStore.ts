@@ -39,8 +39,6 @@ export class DataStore {
         // this.projectsToBallots = {};
 
         this.autoassignEnabled = false;
-
-        this.fetchCollective();
     }
 
     public async queueProject(userID: number, projectID: number): Promise<{ status: boolean, message: string }> {
@@ -212,13 +210,9 @@ export class DataStore {
 
             dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id].push(actualBallot.ballot_id!);
         }
-
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
     }
 
-    private async fetchCollective(): Promise<void> {
+    public async fetchCollective(): Promise<void> {
         await this.fetchUsers();
         await this.fetchBallots();
         await this.fetchCategories();
@@ -257,6 +251,8 @@ export class DataStore {
         fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
             console.log('Saved');
         });
+
+        console.log(this.usersToProjects);
     }
 
     private async fetchUsers(): Promise<void> {
@@ -277,7 +273,7 @@ export class DataStore {
 
             this.judgedProjects[userModel.user_id!] = [];
 
-            this.usersToProjects[userModel.user_id!] = [];
+            this.usersToProjects[userModel.user_id!] = {};
         }
     }
 
@@ -335,8 +331,9 @@ export class DataStore {
     }
 }
 
-export const createDataStore = () => {
+export const createDataStore = async () => {
     dataStore = new DataStore();
+    await dataStore.fetchCollective();
 }
 
 export let dataStore: DataStore;

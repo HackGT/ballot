@@ -18,6 +18,20 @@ export class ProjectService {
     }
 
     public static async serializeProjects(projects: ProjectsInput[]): Promise<ProjectModel[]> {
+        await ProjectCategories.destroy({
+            truncate: true,
+            cascade: true,
+        });
+        await Projects.destroy({
+            truncate: true,
+            cascade: true,
+        });
+
+        dataStore.judgedProjects = {};
+        dataStore.judgeQueues = {};
+        dataStore.usersToProjects = {};
+        dataStore.projects = {};
+
         const projectModels: ProjectModelWithoutCategories[] = [];
 
         for (const project of projects) {

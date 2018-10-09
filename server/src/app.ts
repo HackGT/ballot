@@ -35,7 +35,7 @@ async function start(): Promise<void> {
         // Sync database
         await sync();
 
-        createDataStore();
+        await createDataStore();
 
         // Integrate Helmet
         app.use(helmet());
