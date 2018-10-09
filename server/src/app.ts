@@ -21,78 +21,87 @@ import { strategies, serialize, deserialize } from './config/auth';
 import schema from './api';
 import { sync } from './models';
 import socketHandler from './routes/socket';
+import { createDataStore } from './store/DataStore';
 
 const app = express();
 const server = http.createServer(app);
 export const io = socketio(server);
 
-// Throw any errors if missing configurations
-try {
-    verifyEnvironment();
+async function start(): Promise<void> {
+    // Throw any errors if missing configurations
+    try {
+        await verifyEnvironment();
 
-    // Sync database
-    sync();
+        // Sync database
+        await sync();
 
-    // Integrate Helmet
-    app.use(helmet());
-    app.use(helmet.noCache());
-    app.use(helmet.hsts({
-        maxAge: 31536000,
-        includeSubdomains: true,
-    }));
+        createDataStore();
 
-    // Integrate Cors
-    app.use(cors());
+        // Integrate Helmet
+        app.use(helmet());
+        app.use(helmet.noCache());
+        app.use(helmet.hsts({
+            maxAge: 31536000,
+            includeSubdomains: true,
+        }));
 
-    // Integrate Logging
-    app.use(morgan('dev'));
+        // Integrate Cors
+        app.use(cors());
 
-    // Integrate Authentication
-    app.use(session({
-        secret: Environment.getSession(),
-        resave: true,
-        saveUninitialized: true,
-    }));
+        // Integrate Logging
+        app.use(morgan('dev'));
 
-    for (const strategy of strategies) {
-        passport.use(strategy);
+        // Integrate Authentication
+        app.use(session({
+            secret: Environment.getSession(),
+            resave: true,
+            saveUninitialized: true,
+        }));
+
+        for (const strategy of strategies) {
+            passport.use(strategy);
+        }
+        passport.serializeUser(serialize);
+        passport.deserializeUser(deserialize);
+
+        app.use(passport.initialize());
+        app.use(passport.session());
+
+        // Activate Routes
+        app.use('/', express.static('./build/public'));
+        app.use('/healthcheck', healthcheck);
+        app.use('/auth', auth);
+        app.use('/graphql', bodyParser.json({
+            limit: '10mb',
+        }),
+            graphqlExpress((req?: express.Request, res?: express.Response) => {
+                return {
+                    schema,
+                    context: {
+                        user: req!.user,
+                    },
+                };
+            })
+        );
+        app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+        app.use('*', index);
+
+        // Activate sockets
+        io.on('connection', socketHandler);
+
+        // Start Server
+        const port = Environment.getPort();
+        server.listen(normalizePort(port));
+
+        console.log('Hello')
+
+        // app.listen(normalizePort(port), () => {
+        //     Logger('app').info(`Listening on port ${port}`);
+        // });
+    } catch (error) {
+        Logger('app').error('Server startup canceled due to missing dependencies');
+        Logger('app').error(error);
     }
-    passport.serializeUser(serialize);
-    passport.deserializeUser(deserialize);
-
-    app.use(passport.initialize());
-    app.use(passport.session());
-
-    // Activate Routes
-    app.use('/', express.static('./build/public'));
-    app.use('/healthcheck', healthcheck);
-    app.use('/auth', auth);
-    app.use('/graphql', bodyParser.json({
-        limit: '10mb',
-    }),
-        graphqlExpress((req?: express.Request, res?: express.Response) => {
-            return {
-                schema,
-                context: {
-                    user: req!.user,
-                },
-            };
-        })
-    );
-    app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-    app.use('*', index);
-
-    // Activate sockets
-    io.on('connection', socketHandler);
-
-    // Start Server
-    const port = Environment.getPort();
-    server.listen(normalizePort(port));
-
-    // app.listen(normalizePort(port), () => {
-    //     Logger('app').info(`Listening on port ${port}`);
-    // });
-} catch (error) {
-    Logger('app').error('Server startup canceled due to missing dependencies');
-    Logger('app').error(error);
 }
+
+start()

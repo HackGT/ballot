@@ -47,6 +47,12 @@ export class Environment {
 
     public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI
         | undefined {
+        if (process.env.POSTGRES_URL) {
+            return {
+                uri: process.env.POSTGRES_URL,
+            };
+        }
+
         if (process.env.PGURL &&
             process.env.PGUSERNAME &&
             process.env.PGDATABASE &&
@@ -58,12 +64,6 @@ export class Environment {
                 database: process.env.PGDATABASE,
                 username: process.env.PGUSERNAME,
                 password: process.env.PGPASSWORD,
-            };
-        }
-
-        if (process.env.POSTGRES_URL) {
-            return {
-                uri: process.env.POSTGRES_URL,
             };
         }
 

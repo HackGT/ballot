@@ -4,7 +4,7 @@ import { CategoryModel, CategoryInstance } from './CategoryModel';
 
 // Catch-all import because we want SequelizeStatic.Model and not
 // Sequelize.Model
-const { INTEGER, STRING, SMALLINT } = Sequelize;
+const { INTEGER, STRING, SMALLINT, TEXT } = Sequelize;
 
 export interface ProjectModelWithoutCategories {
     project_id?: number;
@@ -28,9 +28,9 @@ export const Projects: Sequelize.Model<ProjectInstance,
     ProjectModelWithoutCategories> =
     sequelize.define<ProjectInstance, ProjectModelWithoutCategories>('projects', {
         project_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-        devpost_id: { type: STRING(64), allowNull: false, unique: true },
-        name: { type: STRING(64), allowNull: false },
-        sponsor_prizes: { type: STRING(512) },
-        table_number: { type: STRING(32) },
+        devpost_id: { type: STRING(512), allowNull: false, unique: true },
+        name: { type: STRING(512), allowNull: false },
+        sponsor_prizes: { type: TEXT('long') },
+        table_number: { type: STRING(128) },
         expo_number: { type: SMALLINT },
     });

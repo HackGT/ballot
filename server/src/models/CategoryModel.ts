@@ -26,6 +26,6 @@ export const Categories: Sequelize.Model<
     CategoryModelWithoutCriteria> =
     sequelize.define<CategoryInstance, CategoryModel>('categories', {
         category_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-        name: { type: STRING(64), allowNull: false },
+        name: { type: STRING(512), allowNull: false },
         is_primary: { type: BOOLEAN, allowNull: false },
     });

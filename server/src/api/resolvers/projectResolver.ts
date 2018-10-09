@@ -18,11 +18,14 @@ const resolvers = {
             }
 
             if (args.projects) {
-                await Projects.destroy({
-                    truncate: true,
-                });
+
                 await ProjectCategories.destroy({
                     truncate: true,
+                    cascade: true,
+                });
+                await Projects.destroy({
+                    truncate: true,
+                    cascade: true,
                 });
                 return await ProjectService.serializeProjects(args.projects);
             } else {
