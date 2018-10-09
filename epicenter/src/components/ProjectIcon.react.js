@@ -7,6 +7,7 @@ class ProjectIcon extends Component {
       <div
         className={'ProjectIcon ' + this._className()}
         ref="icon"
+        title={this.props.health}
         onClick={this._setActiveProject}>
         <div className="projectIconContents">
           <div title={this.props.project.name}>{this._renderTableNumber()}</div>
@@ -16,7 +17,7 @@ class ProjectIcon extends Component {
   }
 
   componentDidMount() {
-    if (this.props.onMount) {
+    if (this.props.onMount && this.props.inList) {
       this.props.onMount(this.refs.icon);
     }
   }
