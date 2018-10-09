@@ -57,6 +57,10 @@ export class DataStore {
             this.judgedProjects[userID] = [];
         }
 
+        if (!this.usersToProjects[userID]) {
+            this.usersToProjects[userID] = {};
+        }
+
         // Check if the judge already judged this project.
         if (this.judgedProjects[userID].includes(projectID)) {
             return {
@@ -98,11 +102,11 @@ export class DataStore {
 
             for (const ballot of createdBallots) {
                 const json = ballot.toJSON();
-                dataStore.ballots[json.ballot_id!] = json;
+                this.ballots[json.ballot_id!] = json;
                 ballotIDs.push(json.ballot_id!);
             }
 
-            dataStore.usersToProjects[userID][projectID] = ballotIDs;
+            this.usersToProjects[userID][projectID] = ballotIDs;
 
             console.log(this.judgeQueues);
 
