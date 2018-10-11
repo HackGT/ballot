@@ -84,9 +84,9 @@ if (Environment.allowLocalAuth()) {
                             user_id: user.user_id,
                         });
                     });
+                } else {
+                    return res.json({ a: null });
                 }
-
-                return res.json({ a: null });
             })(req, res, next);
         }
     );

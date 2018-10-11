@@ -83,10 +83,11 @@ async function start(): Promise<void> {
 
         app.use('/auth', auth);
 
-        app.use('/', express.static('./build/public/client'));
-        app.use('/', express.static('./build/public/dashboard'));
-        app.use('/dashboard/*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './public/dashboard/index.html'));
+        app.use('/', express.static(path.resolve(__dirname, '../build/public/client')));
+        app.use('/', express.static(path.resolve(__dirname, '../build/public/epicenter')));
+
+        app.use('/epicenter/*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, './public/epicenter/index.html'));
         });
 
         app.use('/*', (req, res) => {
@@ -113,4 +114,4 @@ async function start(): Promise<void> {
     }
 }
 
-start()
+start();

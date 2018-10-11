@@ -1,11 +1,12 @@
 git:
     remote: https://github.com/HackGT/ballot.git
     branch: master
-    
+
 secrets:
     - SESSION_SECRET
-    - AUTH_GITHUB_ID
-    - AUTH_GITHUB_SECRET
+    - SOCKET_PASSWORD
+    # - AUTH_GITHUB_ID
+    # - AUTH_GITHUB_SECRET
     # - AUTH_FACEBOOK_ID
     # - AUTH_FACEBOOK_SECRET
     # - AUTH_GOOGLE_ID

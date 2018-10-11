@@ -30,19 +30,6 @@ gulp.task('build:server', () => {
 
 gulp.task('build', gulp.series('lint', 'build:server'));
 
-gulp.task('build:client', () => {
-
-});
-
-// gulp.task('build:client', () => {
-//     webpack(webpackConfig, function (err, stats) {
-//         if (err) throw new gutil.PluginError("webpack", err);
-//         gutil.log("[webpack]", stats.toString({
-//             colors: true
-//         }))
-//     });
-// });
-
 gulp.task('serve', gulp.series('lint', 'build:server', () => {
     nodemon({
         script: path.join(__dirname, 'build/app.js'),

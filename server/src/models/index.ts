@@ -36,7 +36,7 @@ export async function sync(): Promise<void> {
     const parameters = {
         // logging: console.log,
         // force: true,
-    }
+    };
 
     await Categories.sync(parameters);
     await Criteria.sync(parameters);
