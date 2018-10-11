@@ -1,7 +1,6 @@
-import { ProjectModel, Projects } from '../../models/ProjectModel';
+import { ProjectModel } from '../../models/ProjectModel';
 import { ProjectService } from '../../controllers/ProjectService';
 import { Action } from '../../util/Permissions';
-import { ProjectCategories } from '../../models/ProjectCategoriesModel';
 
 const resolvers = {
     Query: {

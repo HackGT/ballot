@@ -104,12 +104,12 @@ if (Environment.allowLocalAuth()) {
                 const hash = await pbkdf2Async(password,
                     Buffer.from(user.salt as string, 'hex'), 3000);
                 if (hash.toString('hex') === user.hash) {
-                    done(undefined, user);
+                    return done(undefined, user);
                 } else {
                     // TODO: display this issue using express.flash middleware
                     logger.error(`Attempted local acccount sign in -
                     Wrong password`);
-                    done(undefined, false);
+                    return done(undefined, false);
                 }
             }
         }));

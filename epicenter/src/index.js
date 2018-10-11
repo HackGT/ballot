@@ -284,7 +284,7 @@ socket.on('connect', () => {
 
   socket.emit('start', {
     eventID: uuid(),
-    password: 'fdsf',
+    password: window.prompt('What is password?'),
   });
 
   socket.on('queue_project', ({ userID, projectID }) => {

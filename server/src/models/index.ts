@@ -4,9 +4,6 @@ import { Ballots } from './BallotModel';
 import { Projects } from './ProjectModel';
 import { ProjectCategories } from './ProjectCategoriesModel';
 import { Users } from './UserModel';
-import { Logger } from '../util/Logger';
-
-const logger = Logger('models:sync');
 
 export async function sync(): Promise<void> {
     Categories.hasMany(Criteria, {

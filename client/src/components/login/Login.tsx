@@ -50,9 +50,10 @@ class Login extends React.Component<LoginProps, LoginState> {
                     <form>
                         <InputGroup
                             name='email'
-                            type='text'
+                            type='email'
                             autoComplete='off'
                             placeholder='Email'
+                            autoCapitalize='off'
                             large={true}
                             onChange={this.handleChange}
                             style={spacedInput} />
@@ -87,7 +88,7 @@ class Login extends React.Component<LoginProps, LoginState> {
         }, async () => {
             const loginResult = await axios.post('/auth/login',
                 qs.stringify({
-                    'email': this.state.email,
+                    'email': this.state.email.toLowerCase(),
                     'password': this.state.password,
                 }), {
                     headers: {
