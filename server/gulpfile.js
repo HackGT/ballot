@@ -9,13 +9,8 @@ const path = require('path');
 const tsProject = ts.createProject('./src/tsconfig.json');
 
 gulp.task('watch', (done) => {
-    gulp.watch('src/**/*', ['lint', 'build:server']);
+    gulp.watch('src/**/*', gulp.series('lint', 'build:server'));
 });
-
-gulp.task('build', [
-    'lint',
-    'build:server',
-]);
 
 gulp.task('lint', () => {
     return gulp.src(['src/**/*.ts', 'src/**/*.tsx'])
@@ -33,6 +28,12 @@ gulp.task('build:server', () => {
         .pipe(gulp.dest('build/'));
 });
 
+gulp.task('build', gulp.series('lint', 'build:server'));
+
+gulp.task('build:client', () => {
+
+});
+
 // gulp.task('build:client', () => {
 //     webpack(webpackConfig, function (err, stats) {
 //         if (err) throw new gutil.PluginError("webpack", err);
@@ -42,11 +43,7 @@ gulp.task('build:server', () => {
 //     });
 // });
 
-gulp.task('serve',
-    [
-        'lint',
-        'build:server'
-    ], () => {
+gulp.task('serve', gulp.series('lint', 'build:server', () => {
     nodemon({
         script: path.join(__dirname, 'build/app.js'),
         watch: ['build/'],
@@ -57,6 +54,6 @@ gulp.task('serve',
     }).on('start', function () {
         gutil.log(gutil.colors.blue('Server started!'));
     });
-});
+}));
 
-gulp.task('default', ['serve', 'watch']);
+gulp.task('default', gulp.parallel('serve', 'watch'));

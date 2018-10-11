@@ -57,7 +57,7 @@
     "fs": "0.0.1-security",
     "graphql": "^0.13.0",
     "graphql-tools": "^2.20.2",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-tslint": "^8.1.2",
     "gulp-typescript": "^3.2.4",
     "gulp-util": "^3.0.8",
