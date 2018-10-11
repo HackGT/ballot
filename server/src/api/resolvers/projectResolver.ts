@@ -1,7 +1,6 @@
-import { ProjectModel, Projects } from '../../models/ProjectModel';
+import { ProjectModel } from '../../models/ProjectModel';
 import { ProjectService } from '../../controllers/ProjectService';
 import { Action } from '../../util/Permissions';
-import { ProjectCategories } from '../../models/ProjectCategoriesModel';
 
 const resolvers = {
     Query: {
@@ -18,15 +17,6 @@ const resolvers = {
             }
 
             if (args.projects) {
-
-                await ProjectCategories.destroy({
-                    truncate: true,
-                    cascade: true,
-                });
-                await Projects.destroy({
-                    truncate: true,
-                    cascade: true,
-                });
                 return await ProjectService.serializeProjects(args.projects);
             } else {
                 throw new Error('Must specify projects');

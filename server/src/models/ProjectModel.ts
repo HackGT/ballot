@@ -30,7 +30,7 @@ export const Projects: Sequelize.Model<ProjectInstance,
         project_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         devpost_id: { type: STRING(512), allowNull: false, unique: true },
         name: { type: STRING(512), allowNull: false },
-        sponsor_prizes: { type: TEXT('long') },
+        sponsor_prizes: { type: TEXT },
         table_number: { type: STRING(128) },
         expo_number: { type: SMALLINT },
     });

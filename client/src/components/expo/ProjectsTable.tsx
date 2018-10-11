@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ProjectState } from '../../types/State';
-import { Card } from '@blueprintjs/core';
+import { Card, Tag } from '@blueprintjs/core';
 
 interface ProjectsTableProps {
     projects: ProjectState[];
@@ -14,9 +14,8 @@ const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
             flexWrap: 'wrap',
             justifyContent: 'center',
         }}>
-            {props.projects.map((project: ProjectState) => {
+            {props.projects.length > 0 ? props.projects.map((project: ProjectState) => {
                 return (
-                    // <a href={'https://devpost.com/software/' + project.devpost_id} target='_blank' key={project.project_id} >
                     <Card
                         interactive={true}
                         key={project.project_id}
@@ -30,11 +29,14 @@ const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
                         }}>
                         <h3>{project.project_id}: {project.name}</h3>
                         <p>Expo: {project.expo_number} Table: {project.table_number}</p>
-                        <p>{project.sponsor_prizes}</p>
+                        <div>{project.sponsor_prizes.map((prize: string, index: number) => {
+                            return (
+                                <Tag style={{ margin: 2 }} key={index} minimal={true}>{prize}</Tag>
+                            )
+                        })}</div>
                     </Card>
-                    // </a>
                 )
-            })}
+            }) : <div>No projects match this criteria.</div>}
         </div>
     )
 }

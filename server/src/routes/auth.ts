@@ -75,9 +75,7 @@ if (Environment.allowLocalAuth()) {
         (req, res, next) => {
             passport.authenticate('local', (error, user, info) => {
                 console.log(user);
-                if (!user) {
-                    return res.json({ a: null });
-                } else {
+                if (user) {
                     req.logIn(user, (err) => {
                         return res.json({
                             name: user.name,
@@ -86,6 +84,8 @@ if (Environment.allowLocalAuth()) {
                             user_id: user.user_id,
                         });
                     });
+                } else {
+                    return res.json({ a: null });
                 }
             })(req, res, next);
         }
@@ -98,12 +98,12 @@ if (Environment.allowLocalAuth()) {
                 if (!user) {
                     return res.json({
                         status: true,
-                        message: 'Success'
+                        message: 'Success',
                     });
                 } else {
                     return res.json({
                         status: false,
-                        message: 'User already exists'
+                        message: 'User already exists',
                     });
                 }
             })(req, res, next);

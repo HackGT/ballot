@@ -22,7 +22,7 @@ export const Criteria: Sequelize.Model<CriteriaInstance, CriteriaModel> =
     sequelize.define<CriteriaInstance, CriteriaModel>('criteria', {
         criteria_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(64), allowNull: false },
-        rubric: { type: TEXT('long') },
+        rubric: { type: TEXT },
         min_score: { type: SMALLINT, defaultValue: 1 },
         max_score: { type: SMALLINT, defaultValue: 5 },
         category_id: {

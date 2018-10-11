@@ -10,12 +10,12 @@ import * as http from 'http';
 import * as passport from 'passport';
 import * as bodyParser from 'body-parser';
 import * as socketio from 'socket.io';
+import * as path from 'path';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { normalizePort, verifyEnvironment } from './util/server';
 import { Environment } from './config/Environment';
 import healthcheck from './routes/healthcheck';
 import auth from './routes/auth';
-import index from './routes/index';
 import { Logger } from './util/Logger';
 import { strategies, serialize, deserialize } from './config/auth';
 import schema from './api';
@@ -35,7 +35,7 @@ async function start(): Promise<void> {
         // Sync database
         await sync();
 
-        createDataStore();
+        await createDataStore();
 
         // Integrate Helmet
         app.use(helmet());
@@ -68,9 +68,6 @@ async function start(): Promise<void> {
         app.use(passport.session());
 
         // Activate Routes
-        app.use('/', express.static('./build/public'));
-        app.use('/healthcheck', healthcheck);
-        app.use('/auth', auth);
         app.use('/graphql', bodyParser.json({
             limit: '10mb',
         }),
@@ -83,8 +80,23 @@ async function start(): Promise<void> {
                 };
             })
         );
+
+        app.use('/auth', auth);
+
+        app.use('/', express.static(path.resolve(__dirname, '../build/public/client')));
+        app.use('/', express.static(path.resolve(__dirname, '../build/public/epicenter')));
+
+        app.use('/epicenter/*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, './public/epicenter/index.html'));
+        });
+
+        app.use('/*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, './public/client/index.html'));
+        });
+
+        app.use('/healthcheck', healthcheck);
         app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-        app.use('*', index);
+        // app.use('*', index);
 
         // Activate sockets
         io.on('connection', socketHandler);
@@ -92,8 +104,6 @@ async function start(): Promise<void> {
         // Start Server
         const port = Environment.getPort();
         server.listen(normalizePort(port));
-
-        console.log('Hello')
 
         // app.listen(normalizePort(port), () => {
         //     Logger('app').info(`Listening on port ${port}`);
@@ -104,4 +114,4 @@ async function start(): Promise<void> {
     }
 }
 
-start()
+start();

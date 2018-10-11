@@ -1,0 +1,15 @@
+git:
+    branch: master
+
+wants:
+    postgres: true
+
+health:
+  path: /version
+
+secrets:
+  - SESSION_SECRET
+  - SOCKET_PASSWORD
+env:
+  SOCKET_AUTH_ENABLED: true
+  AUTH_ALLOW_LOCAL: true

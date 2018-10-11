@@ -64,6 +64,7 @@ class Register extends React.Component<RegisterProps, RegisterState> {
                         <InputGroup
                             name='email'
                             type='text'
+                            autoCapitalize='off'
                             placeholder='Email'
                             large={true}
                             onChange={this.handleChange}
@@ -123,7 +124,7 @@ class Register extends React.Component<RegisterProps, RegisterState> {
             }, async () => {
                 const registerResult = await axios.post('/auth/signup', qs.stringify({
                     'name': this.state.name,
-                    'email': this.state.email,
+                    'email': this.state.email.toLowerCase(),
                     'password': this.state.password,
                 }), {
                     headers: {

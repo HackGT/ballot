@@ -84,7 +84,7 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
                 </h1>
                 {
                     this.props.projects ?
-                    <AdminPanelProjectsTable projects={this.props.projects} />
+                    <ProjectsTable projects={this.props.projects} />
                     : undefined
                 }
             </div>
@@ -127,7 +127,30 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
         });
 
         const json = await result.json();
-        this.props.refreshProjects(json.data.project);
+
+        const categories = {};
+        const newProjects = json.data.project.map((project: any) => {
+            const newProject = project;
+            const sponsorPrizes = project.sponsor_prizes.split(',').map((sponsorPrize: string) => {
+                const finalPrizeName = sponsorPrize.trim();
+
+                if (finalPrizeName) {
+                    categories[finalPrizeName] = true;
+                }
+
+                return finalPrizeName;
+            });
+
+            if (sponsorPrizes[0]) {
+                newProject.sponsor_prizes = sponsorPrizes;
+            } else {
+                newProject.sponsor_prizes = [];
+            }
+
+            return newProject;
+        });
+
+        this.props.refreshProjects(newProjects);
 
         this.setState((prevState) => {
             return {

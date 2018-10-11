@@ -38,7 +38,7 @@ export interface ProjectState {
     name: string;
     table_number: string;
     expo_number: number;
-    sponsor_prizes: string;
+    sponsor_prizes: string[];
     categories?: CategoryState[];
 }
 

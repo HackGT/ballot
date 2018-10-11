@@ -44,22 +44,22 @@ export class UserService {
     public static async create(user: UserModel): Promise<User | undefined> {
         const newUser = await Users.create(user, {
             returning: true,
-        }).then((newUser) => newUser.toJSON())
-            .then(applyPrototypeFunctions)
-            .catch(printAndThrowError('create', logger));
+        });
 
-        if (newUser) {
-            dataStore.users[newUser.user_id!] = newUser;
+        const newUserJSON = newUser.toJSON();
+
+        if (newUserJSON) {
+            dataStore.users[newUserJSON.user_id!] = newUserJSON;
 
             io.to('authenticated').emit('add_user', {
-                user_id: newUser.user_id!,
-                email: newUser.email,
-                name: newUser.name,
-                user_class: newUser.user_class,
+                user_id: newUserJSON.user_id!,
+                email: newUserJSON.email,
+                name: newUserJSON.name,
+                user_class: newUserJSON.user_class,
             });
         }
 
-        return newUser;
+        return applyPrototypeFunctions(newUserJSON);
     }
 
     public static update(id: number,

@@ -1,12 +1,8 @@
-import { Logger } from '../util/Logger';
-import { printAndThrowError } from '../util/common';
 import { BallotModel, BallotStatus, Ballots, BallotInstance } from '../models/BallotModel';
 import { sequelize } from '../db';
 import { ProjectModelWithoutCategories, ProjectModel } from '../models/ProjectModel';
 import { dataStore } from '../store/DataStore';
 import { io } from '../app';
-
-const logger = Logger('controllers/BallotService');
 
 export interface BatchProjectAssignments {
     judge_id: number;

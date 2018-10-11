@@ -39,9 +39,9 @@ export class DataStore {
         // this.projectsToBallots = {};
 
         this.autoassignEnabled = false;
-
-        this.fetchCollective();
     }
+
+
 
     public async queueProject(userID: number, projectID: number): Promise<{ status: boolean, message: string }> {
         // Check if this user has a queue, if not, create it.
@@ -55,6 +55,10 @@ export class DataStore {
         // Check if this judge has any logged judged projects, otherwise, create the log.
         if (!this.judgedProjects[userID]) {
             this.judgedProjects[userID] = [];
+        }
+
+        if (!this.usersToProjects[userID]) {
+            this.usersToProjects[userID] = {};
         }
 
         // Check if the judge already judged this project.
@@ -98,11 +102,11 @@ export class DataStore {
 
             for (const ballot of createdBallots) {
                 const json = ballot.toJSON();
-                dataStore.ballots[json.ballot_id!] = json;
+                this.ballots[json.ballot_id!] = json;
                 ballotIDs.push(json.ballot_id!);
             }
 
-            dataStore.usersToProjects[userID][projectID] = ballotIDs;
+            this.usersToProjects[userID][projectID] = ballotIDs;
 
             console.log(this.judgeQueues);
 
@@ -161,6 +165,73 @@ export class DataStore {
 
     }
 
+    public async fetchProjects(): Promise<void> {
+        const projectsResult = await Projects.findAll({
+            include: [{ model: Categories }],
+        });
+        for (const project of projectsResult) {
+            this.projects[project.toJSON().project_id!] = {
+                ...project.toJSON(),
+                categories: project.categories!.map((category) => this.categories[category.toJSON().category_id!]),
+            };
+        }
+
+        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
+            console.log('Saved');
+        });
+
+        console.log(this.usersToProjects);
+    }
+
+
+    public async fetchCollective(): Promise<void> {
+        await this.fetchUsers();
+        await this.fetchBallots();
+        await this.fetchCategories();
+
+        const criteriaResult = await Criteria.findAll();
+        for (const criteria of criteriaResult) {
+            const criteriaModel = criteria.toJSON();
+            this.criteria[criteriaModel.criteria_id!] = criteriaModel;
+            this.categories[criteriaModel.category_id].criteria.push(criteriaModel);
+        }
+
+        await this.fetchProjects();
+    }
+
+    private async fetchCategories(): Promise<void> {
+        const categoryResult = await Categories.findAll();
+        for (const category of categoryResult) {
+            this.categories[category.toJSON().category_id!] = {
+                ...category.toJSON(),
+                criteria: [],
+            };
+        }
+    }
+
+
+    private async fetchUsers(): Promise<void> {
+        const usersResult = await Users.findAll();
+        for (const user of usersResult) {
+            const userModel = user.toJSON();
+            this.users[userModel.user_id!] = {
+                user_id: userModel.user_id,
+                email: userModel.email,
+                name: userModel.name,
+                user_class: userModel.user_class,
+            };
+
+            this.judgeQueues[userModel.user_id!] = {
+                activeProjectID: null,
+                queuedProjectID: null,
+            };
+
+            this.judgedProjects[userModel.user_id!] = [];
+
+            this.usersToProjects[userModel.user_id!] = {};
+        }
+    }
+
     private async fetchBallots(): Promise<void> {
         const ballotsResult = await Ballots.findAll();
         for (const ballot of ballotsResult) {
@@ -207,73 +278,6 @@ export class DataStore {
             }
 
             dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id].push(actualBallot.ballot_id!);
-        }
-
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
-    }
-
-    private async fetchCollective(): Promise<void> {
-        await this.fetchUsers();
-        await this.fetchBallots();
-        await this.fetchCategories();
-
-        const criteriaResult = await Criteria.findAll();
-        for (const criteria of criteriaResult) {
-            const criteriaModel = criteria.toJSON();
-            this.criteria[criteriaModel.criteria_id!] = criteriaModel;
-            this.categories[criteriaModel.category_id].criteria.push(criteriaModel);
-        }
-
-        await this.fetchProjects();
-    }
-
-    private async fetchCategories(): Promise<void> {
-        const categoryResult = await Categories.findAll();
-        for (const category of categoryResult) {
-            this.categories[category.toJSON().category_id!] = {
-                ...category.toJSON(),
-                criteria: [],
-            };
-        }
-    }
-
-    public async fetchProjects(): Promise<void> {
-        const projectsResult = await Projects.findAll({
-            include: [{ model: Categories }],
-        });
-        for (const project of projectsResult) {
-            this.projects[project.toJSON().project_id!] = {
-                ...project.toJSON(),
-                categories: project.categories!.map((category) => this.categories[category.toJSON().category_id!]),
-            };
-        }
-
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
-    }
-
-    private async fetchUsers(): Promise<void> {
-        const usersResult = await Users.findAll();
-        for (const user of usersResult) {
-            const userModel = user.toJSON();
-            this.users[userModel.user_id!] = {
-                user_id: userModel.user_id,
-                email: userModel.email,
-                name: userModel.name,
-                user_class: userModel.user_class,
-            };
-
-            this.judgeQueues[userModel.user_id!] = {
-                activeProjectID: null,
-                queuedProjectID: null,
-            };
-
-            this.judgedProjects[userModel.user_id!] = [];
-
-            this.usersToProjects[userModel.user_id!] = [];
         }
     }
 
@@ -329,10 +333,13 @@ export class DataStore {
             judgedProjects: dataStore.judgedProjects,
         };
     }
+
+
 }
 
-export const createDataStore = () => {
+export const createDataStore = async () => {
     dataStore = new DataStore();
-}
+    await dataStore.fetchCollective();
+};
 
 export let dataStore: DataStore;
