@@ -19,7 +19,7 @@ WORKDIR /usr/src/ballot
 COPY . /usr/src/ballot
 RUN npm install
 # RUN npm run sqlinit
-RUN npm run build
+# RUN npm run build
 
 # Set Timezone to EST
 RUN apk add tzdata

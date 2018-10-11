@@ -46,34 +46,32 @@ class Login extends React.Component<LoginProps, LoginState> {
              }}>
                 <H1>Login</H1>
                 <LoginButtons />
-                {process.env.REACT_APP_AUTH_ALLOW_LOCAL ?
-                    <form>
-                        <InputGroup
-                            name='email'
-                            type='email'
-                            autoComplete='off'
-                            placeholder='Email'
-                            autoCapitalize='off'
-                            large={true}
-                            onChange={this.handleChange}
-                            style={spacedInput} />
-                        <InputGroup
-                            name='password'
-                            type='password'
-                            placeholder='Password'
-                            large={true}
-                            onChange={this.handleChange}
-                            style={spacedInput} />
-                        <Button
-                            type='submit'
-                            text='Login'
-                            loading={this.state.loggingIn}
-                            large={true}
-                            intent='primary'
-                            fill={true}
-                            onClick={this.handleLogin} />
-                    </form> : ''
-                }
+                <form>
+                    <InputGroup
+                        name='email'
+                        type='email'
+                        autoComplete='off'
+                        placeholder='Email'
+                        autoCapitalize='off'
+                        large={true}
+                        onChange={this.handleChange}
+                        style={spacedInput} />
+                    <InputGroup
+                        name='password'
+                        type='password'
+                        placeholder='Password'
+                        large={true}
+                        onChange={this.handleChange}
+                        style={spacedInput} />
+                    <Button
+                        type='submit'
+                        text='Login'
+                        loading={this.state.loggingIn}
+                        large={true}
+                        intent='primary'
+                        fill={true}
+                        onClick={this.handleLogin} />
+                </form>
             </div>
         );
     }

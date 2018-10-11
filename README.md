@@ -3,19 +3,20 @@
 Stack ranking solution for judge assignment, management, and scoring.
 
 ## Getting Started
-
-First, clone the repository and run `npm install`. This will create a `.env` file where you should fill in any environment variables that should be loaded in.
+First, clone the repository and run `npm install` in the project directory. This will install dependencies and build each of the three parts of the project.
+In the server folder, this will create a `.env` file where you should fill in any environment variables that should be loaded in.
 
 ### Environment Variables
-OUT OF DATE. PLEASE UPDATE
 
 | Envar                           | Description                                                                                         |
 |---------------------------------|-----------------------------------------------------------------------------------------------------|
-| Port                            |  REQUIRED: The port that the server is running on                                                   |
+| PORT                            |  REQUIRED: The port that the server is running on                                                   |
 | URL                             |  REQUIRED: The URL that the server is running on                                                    |
 | SESSION_SECRET                  |  REQUIRED: A private key used for all session tokens                                                |
 | NODE_ENV                        |  Used to determine whether the server is running in 'production' or 'development', defaults to dev  |
-| PGURL                           |  REQUIRED: the host address of the Postgres server                                                  |
+| SOCKET_AUTH_ENABLED             |  If enabled, will require password to connect to epicenter                                          |
+| SOCKET_PASSWORD                 |  If sockets are enabled, the password needed to authenticate.                                       |
+| POSTGRES_URL                    |  REQUIRED: the host address of the Postgres server                                                  |
 | PGUSERNAME                      |  REQUIRED: the username for the postgres server                                                     |
 | PGDATABASE                      |  REQUIRED: the database used for the application in postgres                                        |
 | PGPASSWORD                      |  REQUIRED: the password for the postgres user                                                       |
@@ -38,16 +39,25 @@ OUT OF DATE. PLEASE UPDATE
 For the external oauth services, make sure you set the callback url to `/auth/{service}/callback`.
 
 ### Running
+Once you have set your environment variables, you will need to go in each of the folders to run each part of the project separately in development.
 
-Once you have set your environment variables, you can build and run the server in development by running `npm start`.
+`cd server` and `npm start` to start the server.
+`cd client` and `npm start` to start the client.
+`cd epicenter` and `npm start` to start the epicenter.
 
-Visit `http://localhost:3000`, and you are good to go! The first user that logs in is automatically given superadmin priveleges.
+The two clients will automatically open in development.
+
+The server is required for other parts to work.
+
+The first user that logs in is automatically given superadmin priveleges.
 
 ## Deployment
 
 ### Manual Deployment
+In the project root directory, run `npm run build` to build the application followed by `npm run serve` to serve the application in production.
 
-Run `npm run build` to build the server followed by `npm run serve` to serve the application in production.
+Type `<SERVER_URL>` to access the judge-facing application.
+Type `<SERVER_URL>/epicenter/` to access the epicenter.
 
 ### Docker
 
