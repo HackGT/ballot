@@ -82,6 +82,7 @@ async function start(): Promise<void> {
         );
 
         app.use('/auth', auth);
+
         app.use('/healthcheck', healthcheck);
         app.use('/graphiql/*', graphiqlExpress({ endpointURL: '/graphql' }));
 
