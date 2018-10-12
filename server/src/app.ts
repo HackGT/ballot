@@ -82,6 +82,8 @@ async function start(): Promise<void> {
         );
 
         app.use('/auth', auth);
+        app.use('/healthcheck', healthcheck);
+        app.use('/graphiql/*', graphiqlExpress({ endpointURL: '/graphql' }));
 
         app.use('/', express.static(path.resolve(__dirname, '../build/public/client')));
         app.use('/', express.static(path.resolve(__dirname, '../build/public/epicenter')));
@@ -94,8 +96,7 @@ async function start(): Promise<void> {
             res.sendFile(path.resolve(__dirname, './public/client/index.html'));
         });
 
-        app.use('/healthcheck', healthcheck);
-        app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+
         // app.use('*', index);
 
         // Activate sockets

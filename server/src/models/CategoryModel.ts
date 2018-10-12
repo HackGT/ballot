@@ -22,8 +22,7 @@ export interface CategoryInstance extends
 }
 
 export const Categories: Sequelize.Model<
-    CategoryInstance,
-    CategoryModelWithoutCriteria> =
+    CategoryInstance, CategoryModelWithoutCriteria> =
     sequelize.define<CategoryInstance, CategoryModel>('categories', {
         category_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: STRING(512), allowNull: false },

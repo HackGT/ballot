@@ -139,31 +139,31 @@ class BallotsWrapper extends React.Component<BallotsWrapperProps, BallotsWrapper
                 query: `{
                     nextBallotSet(user_id: ${this.props.auth.user_id}) {
                         project {
-                            project_id,
-                            devpost_id,
-                            name,
+                            project_id
+                            devpost_id
+                            name
                             table_number
                             expo_number
                             sponsor_prizes
                             categories {
-                                category_id,
-                                name,
-                                is_primary,
+                                category_id
+                                name
+                                is_primary
                                 criteria {
-                                    criteria_id,
-                                    name,
-                                    rubric,
-                                    min_score,
-                                    max_score,
-                                    category_id,
+                                    criteria_id
+                                    name
+                                    rubric
+                                    min_score
+                                    max_score
+                                    category_id
                                 }
                             }
                         }
                         ballots {
-                            ballot_id,
-                            project_id,
-                            criteria_id,
-                            judge_priority,
+                            ballot_id
+                            project_id
+                            criteria_id
+                            judge_priority
                             ballot_status
                         }
                     }

@@ -188,7 +188,6 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
     }
 
     private processUpload() {
-        console.log("UPLOAD BUTTON");
         this.setState((prevState) => {
             return {
                 ...prevState,
@@ -267,7 +266,29 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     const json = await projectUploadResult.json();
                     const returnedProjects: ProjectState[] = json.data.batchUploadProjects;
 
-                    this.props.refreshProjects(returnedProjects);
+                    const categories = {};
+                    const newProjects = returnedProjects.map((project: any) => {
+                        const newProject = project;
+                        const sponsorPrizes = project.sponsor_prizes.split(',').map((sponsorPrize: string) => {
+                            const finalPrizeName = sponsorPrize.trim();
+
+                            if (finalPrizeName) {
+                                categories[finalPrizeName] = true;
+                            }
+
+                            return finalPrizeName;
+                        });
+
+                        if (sponsorPrizes[0]) {
+                            newProject.sponsor_prizes = sponsorPrizes;
+                        } else {
+                            newProject.sponsor_prizes = [];
+                        }
+
+                        return newProject;
+                    });
+
+                    this.props.refreshProjects(newProjects);
 
                 } else {
                     this.setErrorMessage('Each project group must have a unique name and at least 1 project.');

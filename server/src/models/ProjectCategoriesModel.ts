@@ -10,6 +10,6 @@ export interface ProjectCategory {
 
 export const ProjectCategories: Sequelize.Model<ProjectCategory, ProjectCategory> =
     sequelize.define<ProjectCategory, ProjectCategory>('project_categories', {
-        project_id: { type: INTEGER },
-        category_id: { type: INTEGER },
+        project_id: { type: INTEGER, primaryKey: true },
+        category_id: { type: INTEGER, primaryKey: true },
     });

@@ -2,7 +2,7 @@ import { BallotModel, Ballots, BallotStatus } from '../models/BallotModel';
 import { CategoryModel, Categories } from '../models//CategoryModel';
 import { ProjectModel, Projects } from '../models//ProjectModel';
 import { CriteriaModel, Criteria } from '../models//CriteriaModel';
-import { Users, SafeUserModel } from '../models//UserModel';
+import { Users, SafeUserModel, UserModel } from '../models//UserModel';
 import * as fs from 'fs';
 import { sequelize } from '../db';
 
@@ -36,12 +36,9 @@ export class DataStore {
         this.judgeQueues = {};
         this.judgedProjects = {};
         this.usersToProjects = {};
-        // this.projectsToBallots = {};
 
         this.autoassignEnabled = false;
     }
-
-
 
     public async queueProject(userID: number, projectID: number): Promise<{ status: boolean, message: string }> {
         // Check if this user has a queue, if not, create it.
@@ -183,7 +180,6 @@ export class DataStore {
         console.log(this.usersToProjects);
     }
 
-
     public async fetchCollective(): Promise<void> {
         await this.fetchUsers();
         await this.fetchBallots();
@@ -199,7 +195,7 @@ export class DataStore {
         await this.fetchProjects();
     }
 
-    private async fetchCategories(): Promise<void> {
+    public async fetchCategories(): Promise<void> {
         const categoryResult = await Categories.findAll();
         for (const category of categoryResult) {
             this.categories[category.toJSON().category_id!] = {
@@ -209,26 +205,23 @@ export class DataStore {
         }
     }
 
+    public initializeUser(user: UserModel): void {
+        dataStore.users[user.user_id!] = user;
+        dataStore.judgedProjects[user.user_id!] = [];
+        dataStore.usersToProjects[user.user_id!] = {};
+
+        this.judgeQueues[user.user_id!] = {
+            activeProjectID: null,
+            queuedProjectID: null,
+        };
+    }
 
     private async fetchUsers(): Promise<void> {
         const usersResult = await Users.findAll();
         for (const user of usersResult) {
             const userModel = user.toJSON();
-            this.users[userModel.user_id!] = {
-                user_id: userModel.user_id,
-                email: userModel.email,
-                name: userModel.name,
-                user_class: userModel.user_class,
-            };
 
-            this.judgeQueues[userModel.user_id!] = {
-                activeProjectID: null,
-                queuedProjectID: null,
-            };
-
-            this.judgedProjects[userModel.user_id!] = [];
-
-            this.usersToProjects[userModel.user_id!] = {};
+            this.initializeUser(userModel);
         }
     }
 
