@@ -33,8 +33,7 @@ const resolvers = {
                     ' categories');
             }
 
-            let category = undefined;
-            category = await CategoryService.create({
+            const category = await CategoryService.create({
                 name: args.name,
                 is_primary: args.is_primary,
             });

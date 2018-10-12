@@ -28,9 +28,18 @@ export class ProjectService {
         });
 
         dataStore.judgedProjects = {};
-        dataStore.judgeQueues = {};
         dataStore.usersToProjects = {};
         dataStore.projects = {};
+        dataStore.judgeQueues = {};
+
+        for (const user of Object.keys(dataStore.users)) {
+            dataStore.judgedProjects[+user] = [];
+            dataStore.usersToProjects[+user] = {};
+            dataStore.judgeQueues[+user] = {
+                activeProjectID: null,
+                queuedProjectID: null,
+            };
+        }
 
         const projectModels: ProjectModelWithoutCategories[] = [];
 

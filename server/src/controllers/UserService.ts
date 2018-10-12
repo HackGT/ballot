@@ -49,7 +49,7 @@ export class UserService {
         const newUserJSON = newUser.toJSON();
 
         if (newUserJSON) {
-            dataStore.users[newUserJSON.user_id!] = newUserJSON;
+            dataStore.initializeUser(newUserJSON);
 
             io.to('authenticated').emit('add_user', {
                 user_id: newUserJSON.user_id!,

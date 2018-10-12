@@ -38,7 +38,7 @@ export class Environment {
     }
 
     public static getUrl(): string {
-        return process.env.URL || '127.0.0.1';
+        return process.env.ROOT_URL || '127.0.0.1';
     }
 
     public static getSession(): string {

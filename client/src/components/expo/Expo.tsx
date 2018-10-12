@@ -130,8 +130,7 @@ class Expo extends React.Component<ExpoProps, ExpoState> {
                         style={{
                             margin: 5
                         }}
-                        active={this.state.categoriesOpen} intent='primary' />
-
+                        active={this.state.categoriesOpen} />
                     <InputGroup
                         name='filter'
                         type='text'

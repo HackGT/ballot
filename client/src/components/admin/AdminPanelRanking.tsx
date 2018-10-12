@@ -19,37 +19,37 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
         };
     }
 
-    public async componentWillMount(): Promise<void> {
-        const result = await fetch('/graphql', {
-            credentials: 'same-origin',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `{
-                    getRanking {
-                        criteria_name,
-                        category_id,
-                        category_name,
-                        ranking {
-                            name,
-                            project_id,
-                            score,
-                            judge_count,
-                            devpost_id
-                        }
-                    }
-                }
-            `}),
-        });
+    // public async componentWillMount(): Promise<void> {
+    //     const result = await fetch('/graphql', {
+    //         credentials: 'same-origin',
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             query: `{
+    //                 getRanking {
+    //                     criteria_name,
+    //                     category_id,
+    //                     category_name,
+    //                     ranking {
+    //                         name,
+    //                         project_id,
+    //                         score,
+    //                         judge_count,
+    //                         devpost_id
+    //                     }
+    //                 }
+    //             }
+    //         `}),
+    //     });
 
-        const data = await result.json();
-        const ranking = data.data.getRanking;
-        console.log(data);
+    //     const data = await result.json();
+    //     const ranking = data.data.getRanking;
+    //     console.log(data);
 
-        this.setState({ ranking });
-    }
+    //     this.setState({ ranking });
+    // }
 
     public render(): React.ReactElement<HTMLDivElement> {
         return (
