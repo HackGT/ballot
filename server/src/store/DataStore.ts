@@ -173,7 +173,6 @@ export class DataStore {
                 ...project.toJSON(),
                 categories: project.categories!.map((category) => this.categories[category.toJSON().category_id!]),
             };
-<<<<<<< HEAD
         }
 
         fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
@@ -275,113 +274,6 @@ export class DataStore {
 
             dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id].push(actualBallot.ballot_id!);
         }
-=======
-        }
-
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
-
-        console.log(this.usersToProjects);
-    }
-
-
-    public async fetchCollective(): Promise<void> {
-        await this.fetchUsers();
-        await this.fetchBallots();
-        await this.fetchCategories();
-
-        const criteriaResult = await Criteria.findAll();
-        for (const criteria of criteriaResult) {
-            const criteriaModel = criteria.toJSON();
-            this.criteria[criteriaModel.criteria_id!] = criteriaModel;
-            this.categories[criteriaModel.category_id].criteria.push(criteriaModel);
-        }
-
-        await this.fetchProjects();
-    }
-
-    private async fetchCategories(): Promise<void> {
-        const categoryResult = await Categories.findAll();
-        for (const category of categoryResult) {
-            this.categories[category.toJSON().category_id!] = {
-                ...category.toJSON(),
-                criteria: [],
-            };
-        }
-    }
-
-
-    private async fetchUsers(): Promise<void> {
-        const usersResult = await Users.findAll();
-        for (const user of usersResult) {
-            const userModel = user.toJSON();
-            this.users[userModel.user_id!] = {
-                user_id: userModel.user_id,
-                email: userModel.email,
-                name: userModel.name,
-                user_class: userModel.user_class,
-            };
-
-            this.judgeQueues[userModel.user_id!] = {
-                activeProjectID: null,
-                queuedProjectID: null,
-            };
-
-            this.judgedProjects[userModel.user_id!] = [];
-
-            this.usersToProjects[userModel.user_id!] = {};
-        }
-    }
-
-    private async fetchBallots(): Promise<void> {
-        const ballotsResult = await Ballots.findAll();
-        for (const ballot of ballotsResult) {
-            const actualBallot = ballot.toJSON();
-            this.ballots[actualBallot.ballot_id!] = actualBallot;
-            switch (actualBallot.ballot_status) {
-                case BallotStatus.Pending:
-                    if (!this.judgeQueues[actualBallot.user_id]) {
-                        this.judgeQueues[actualBallot.user_id] = {
-                            activeProjectID: null,
-                            queuedProjectID: null,
-                        };
-                    }
-
-                    this.judgeQueues[actualBallot.user_id].queuedProjectID = actualBallot.project_id;
-
-                    break;
-                case BallotStatus.Assigned:
-                case BallotStatus.Started:
-                    if (!this.judgeQueues[actualBallot.user_id]) {
-                        this.judgeQueues[actualBallot.user_id] = {
-                            activeProjectID: null,
-                            queuedProjectID: null,
-                        };
-                    }
-
-                    this.judgeQueues[actualBallot.user_id].activeProjectID = actualBallot.project_id;
-                    break;
-                case BallotStatus.Skipped:
-                case BallotStatus.Submitted:
-                    if (!this.judgedProjects[actualBallot.user_id]) {
-                        this.judgedProjects[actualBallot.user_id] = [];
-                    }
-                    this.judgedProjects[actualBallot.user_id].push(actualBallot.project_id);
-                    break;
-            }
-
-            if (!dataStore.usersToProjects[actualBallot.user_id]) {
-                dataStore.usersToProjects[actualBallot.user_id] = {};
-            }
-
-            if (!dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id]) {
-                dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id] = [];
-            }
-
-            dataStore.usersToProjects[actualBallot.user_id][actualBallot.project_id].push(actualBallot.ballot_id!);
-        }
->>>>>>> 64b32b0b4c92dc55275f6d7595744e3fcf22deb5
     }
 
     private asJSON(): any {
