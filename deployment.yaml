@@ -4,9 +4,6 @@ git:
 wants:
     postgres: true
 
-health:
-  path: /version
-
 secrets:
   - SESSION_SECRET
   - SOCKET_PASSWORD

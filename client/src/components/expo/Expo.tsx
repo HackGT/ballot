@@ -131,7 +131,6 @@ class Expo extends React.Component<ExpoProps, ExpoState> {
                             margin: 5
                         }}
                         active={this.state.categoriesOpen} />
-
                     <InputGroup
                         name='filter'
                         type='text'
