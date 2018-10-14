@@ -109,130 +109,25 @@ const onNextProject = data => {
   });
 };
 
-// const steps = [
-//   () => onQueueProject({
-//     userID: 10,
-//     projectID: 2040,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 11,
-//     projectID: 2102,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 12,
-//     projectID: 2096,
-//   }),
-
-//   () => onNextProject({
-//     userID: 10,
-//     projectID: 2040,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 13,
-//     projectID: 2037,
-//   }),
-
-//   () => onNextProject({
-//     userID: 12,
-//     projectID: 2096,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 14,
-//     projectID: 2112,
-//   }),
-
-//   () => onNextProject({
-//     userID: 11,
-//     projectID: 2102,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 10,
-//     projectID: 2110,
-//   }),
-
-//   () => onNextProject({
-//     userID: 13,
-//     projectID: 2037,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 11,
-//     projectID: 2088,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 12,
-//     projectID: 2066,
-//   }),
-
-//   () => onNextProject({
-//     userID: 14,
-//     projectID: 2112,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 13,
-//     projectID: 2069,
-//   }),
-
-//   () => onQueueProject({
-//     userID: 14,
-//     projectID: 2039,
-//   }),
-
-  // () => onNextProject({
-  //   userID: 12,
-  //   projectID: 2037,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2087,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2100,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2087,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2100,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2087,
-  // }),
-
-  // () => onQueueProject({
-  //   userID: 12,
-  //   projectID: 2100,
-  // }),
-// ];
-
-// for (let i = 0; i < steps.length; i++) {
-//   window.setTimeout(steps[i], 300 * (i + 1));
-// }
-
-const projectJudgePenalty = (judgeID, projectID) => {
+const projectJudgePenalty = (state, judgeID, projectID) => {
   let penalty = 1;
+
+  const judge = state.canonical.users.get(judgeID);
+  const judgeQueue = state.canonical.judgeQueues.get(judgeID);
+  const activeProjectID = judgeQueue.get('activeProjectID');
+  if (activeProjectID !== null) {
+    const [ activeProjectGroup ] = state.canonical.projects.get(activeProjectID).get('table_number').split(' ');
+    const [ testProjectGroup ] = state.canonical.projects.get(projectID).get('table_number').split(' ');
+
+    if (activeProjectGroup !== testProjectGroup) {
+      penalty *= 1.25;
+    }
+  }
 
   return penalty;
 };
 
 const autoAssignToJudge = (judgeID, state) => {
-  // todo: queued and active
   const judgedProjects = state.canonical.judgedProjects.get(judgeID);
   const judgeQueues = state.canonical.judgeQueues.get(judgeID);
   const lowestHealth = state.derived.project_health
@@ -242,7 +137,7 @@ const autoAssignToJudge = (judgeID, state) => {
                   && judgeQueues.get('queuedProjectID') !== k
                   && state.canonical.projects.get(k).expo_number === state.program.expo_number,
     )
-    .map((health, projectID) => health * projectJudgePenalty(judgeID, projectID))
+    .map((health, projectID) => health * projectJudgePenalty(state, judgeID, projectID))
     .sort().keySeq().first();
   console.log(judgeID, lowestHealth);
   state.program.socket.emit('queue_project', {
@@ -250,6 +145,10 @@ const autoAssignToJudge = (judgeID, state) => {
     userID: judgeID,
     projectID: lowestHealth,
   });
+};
+
+const canJudge = judge => {
+  return judge.user_class !== 'Pending';
 };
 
 document.onkeydown = event => {
@@ -260,7 +159,7 @@ document.onkeydown = event => {
     const emptyJudge = state.canonical.users.filter(
       judge =>
         state.canonical.judgeQueues.get(judge.user_id).get('queuedProjectID') === null
-        && judge.user_class !== 'Pending',
+        && canJudge(judge),
     ).first();
     if (emptyJudge) {
       autoAssignToJudge(emptyJudge.user_id, state);
@@ -298,6 +197,13 @@ socket.on('connect', () => {
   socket.on('score_project', data => {
     store.dispatch({
       type: 'PROJECT_SCORED',
+      ...data,
+    });
+  });
+
+  socket.on('skip_project', data => {
+    store.dispatch({
+      type: 'PROJECT_SKIPPED',
       ...data,
     });
   });

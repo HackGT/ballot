@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SidePaneContainer from './containers/SidePaneContainer.react';
 import JudgeListingContainer from './containers/JudgeListingContainer.react';
 import ProjectListingContainer from './containers/ProjectListingContainer.react';
 
@@ -12,6 +13,7 @@ class App extends Component {
 
     return (
       <div className="App">
+        <SidePaneContainer />
         <JudgeListingContainer />
         <ProjectListingContainer />
       </div>

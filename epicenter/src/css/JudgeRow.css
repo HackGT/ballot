@@ -1,5 +1,5 @@
 .JudgeRow {
-  margin: 8px;
+  margin: 8px 0;
   height: 48px;
   width: 100%;
   display: flex;
@@ -9,4 +9,24 @@
 
 .queuedProject {
   margin-right: 100px;
+}
+
+.history-opacity-1 {
+  opacity: 1;
+}
+
+.history-opacity-2 {
+  opacity: 0.7;
+}
+
+.history-opacity-3 {
+  opacity: 0.4;
+}
+
+.history-opacity-4 {
+  opacity: 0.15;
+}
+
+.history-opacity-5 {
+  opacity: 0.05;
 }
