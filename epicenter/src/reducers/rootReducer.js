@@ -236,7 +236,7 @@ const computeFullDerivedState = canonicalState => {
 };
 
 const computeProjectHealth = derivedState => project => {
-  let health = 0;
+  let health = 1;
 
   const epsilon = 0.00000001 * ((project.project_id * 179426447) % 500);
 
