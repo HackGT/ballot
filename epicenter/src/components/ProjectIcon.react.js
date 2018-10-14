@@ -33,11 +33,7 @@ class ProjectIcon extends Component {
 
   _className() {
     const [ section, _ ] = this._getTableNumberSections();
-    return {
-      'RED': 'red',
-      'GREEN': 'green',
-      'BLUE': 'blue',
-    }[section] + (
+    return section.toLowerCase() + (
       (this.props.inList && this.props.selected)
         ? ' pendingMove'
         : ''

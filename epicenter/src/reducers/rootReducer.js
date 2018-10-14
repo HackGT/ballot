@@ -104,6 +104,7 @@ const ProgramState = Immutable.Record({
   loadedState: false,
   selectedProjectID: null,
   socket: null,
+  leftPane: 'overview',
   activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
@@ -236,7 +237,7 @@ const computeFullDerivedState = canonicalState => {
 };
 
 const computeProjectHealth = derivedState => project => {
-  let health = 0;
+  let health = 1;
 
   const epsilon = 0.00000001 * ((project.project_id * 179426447) % 500);
 
@@ -417,6 +418,35 @@ const rootReducer = (state = new State(), action) => {
           action.userID,
         ], list => list.concat(action.ballots.map(deserializeBallot)));
 
+        if (!state.canonical.judgedProjects.has(action.userID)) {
+          state.setIn([
+            'canonical',
+            'judgedProjects',
+            action.userID,
+          ], Immutable.OrderedSet());
+        }
+        state.updateIn([
+          'canonical',
+          'judgedProjects',
+          action.userID,
+        ], set => set.add(action.projectID));
+
+        state.setIn([
+          'canonical',
+          'judgeQueues',
+          action.userID,
+          'activeProjectID',
+        ], null);
+        state.updateIn([
+          'derived',
+          'project_assignments',
+          action.projectID,
+        ], s => s.delete(action.userID));
+      });
+      return s;
+    },
+    'PROJECT_SKIPPED': (state, action) => {
+      const s = state.withMutations(state => {
         if (!state.canonical.judgedProjects.has(action.userID)) {
           state.setIn([
             'canonical',
