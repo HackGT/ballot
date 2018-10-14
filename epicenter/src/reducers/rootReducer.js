@@ -444,6 +444,35 @@ const rootReducer = (state = new State(), action) => {
       });
       return s;
     },
+    'PROJECT_SKIPPED': (state, action) => {
+      const s = state.withMutations(state => {
+        if (!state.canonical.judgedProjects.has(action.userID)) {
+          state.setIn([
+            'canonical',
+            'judgedProjects',
+            action.userID,
+          ], Immutable.OrderedSet());
+        }
+        state.updateIn([
+          'canonical',
+          'judgedProjects',
+          action.userID,
+        ], set => set.add(action.projectID));
+
+        state.setIn([
+          'canonical',
+          'judgeQueues',
+          action.userID,
+          'activeProjectID',
+        ], null);
+        state.updateIn([
+          'derived',
+          'project_assignments',
+          action.projectID,
+        ], s => s.delete(action.userID));
+      });
+      return s;
+    },
 
     'SET_ACTIVE_ICON_REF': (state, action) => {
       return state.setIn([

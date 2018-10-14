@@ -201,6 +201,13 @@ socket.on('connect', () => {
     });
   });
 
+  socket.on('skip_project', data => {
+    store.dispatch({
+      type: 'PROJECT_SKIPPED',
+      ...data,
+    });
+  });
+
   socket.on('all_data', data => {
     store.dispatch({
       type: 'FULL_SYNC',
