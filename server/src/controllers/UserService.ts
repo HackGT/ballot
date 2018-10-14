@@ -66,6 +66,20 @@ export class UserService {
                          user: Partial<UserModel>):
         BPromise<UserModel | undefined> {
 
+        if (dataStore.users[id]) {
+            const newUser: UserModel = {
+                ...dataStore.users[id],
+                ...user,
+            };
+
+            dataStore.users[id] = {
+                user_id: newUser.user_id!,
+                email: newUser.email,
+                name: newUser.name,
+                user_class: newUser.user_class,
+            };
+        };
+
         return Users.update(user as UserModel,
             { where: { user_id: id }, returning: true })
             .then((val) => {
