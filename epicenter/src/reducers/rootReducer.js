@@ -104,6 +104,7 @@ const ProgramState = Immutable.Record({
   loadedState: false,
   selectedProjectID: null,
   socket: null,
+  leftPane: 'overview',
   activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
