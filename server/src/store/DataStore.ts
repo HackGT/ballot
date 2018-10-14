@@ -212,7 +212,7 @@ export class DataStore {
         dataStore.judgedProjects[user.user_id!] = [];
         dataStore.usersToProjects[user.user_id!] = {};
 
-        this.judgeQueues[user.user_id!] = {
+        dataStore.judgeQueues[user.user_id!] = {
             activeProjectID: null,
             queuedProjectID: null,
         };
