@@ -5,9 +5,8 @@ import '../css/OverviewPane.css';
 
 class OverviewPane extends Component {
   state = {
-    // sort: 'health',
-    sort: 1,
-    sortDirection: 1,
+    sort: 'health',
+    sortDirection: -1,
   };
 
   render() {
@@ -47,7 +46,7 @@ class OverviewPane extends Component {
           {sortedProjects.map((project, i) => {
             return (
               <div key={i} onClick={() => this.props.setSelectedProject(project)}>
-                ({displayCategoryScore(project)}{this.props.counts.get(project.project_id)} / {this.props.health.get(project.project_id).toFixed(2)}) {project.table_number}: {project.name}
+                ({displayCategoryScore(project)}{this.props.counts.get(project.project_id)}, {this.props.project_skipped_count.get(project.project_id)}s / {this.props.health.get(project.project_id).toFixed(2)}) {project.table_number}: {project.name}
               </div>
             );
           })}

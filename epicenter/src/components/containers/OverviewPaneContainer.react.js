@@ -10,6 +10,7 @@ const mapStateToProps = state => {
               : 0
             ),
     project_scores: state.derived.project_scores,
+    project_skipped_count: state.derived.project_skipped_count,
     categories: state.canonical.categories,
     expo: state.program.expo_number,
   };
