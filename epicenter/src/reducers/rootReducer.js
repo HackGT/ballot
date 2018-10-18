@@ -97,6 +97,15 @@ const DerivedState = Immutable.Record({
     }
   */
   project_health: Immutable.Map(),
+  /*
+    project_scores: {
+      [project_id]: {
+        [category_id]: [number, number],  // mean, sstdev
+        "overall": [number, number],    // score for every primary category
+      },
+    }
+  */
+  project_scores: Immutable.Map(),
 });
 
 const ProgramState = Immutable.Record({
@@ -139,6 +148,10 @@ const deserializeCanonicalState = serializedState => {
 
   const ballots = Immutable.Map().withMutations(map => {
     for (const ballotId in serializedState.ballots) {
+      if (serializedState.ballots[ballotId].ballot_status === 'Pending'
+          || serializedState.ballots[ballotId].ballot_status === 'Skipped') {
+            continue; // I DON'T WANT IT
+          }
       map.set(
         parseInt(ballotId, 10),
         deserializeBallot(serializedState.ballots[ballotId]),
@@ -207,7 +220,7 @@ const deserializeCanonicalState = serializedState => {
 };
 
 const computeFullDerivedState = canonicalState => {
-  const { ballots, judgeQueues, projects } = canonicalState;
+  const { ballots, judgeQueues, projects, categories, criteria } = canonicalState;
 
   const judge_ballot_history =
     ballots
@@ -228,12 +241,55 @@ const computeFullDerivedState = canonicalState => {
   const project_assignments = projects.map(_ => Immutable.Set())
     .merge(judgeQueues.groupBy(m => m.get('activeProjectID')).map(m => m.keySeq().toSet()));
 
+  const project_scores = projects.map(computeAllScoresForProject(project_ballots, categories, criteria, ballots));
+
   return new DerivedState({
     judge_ballot_history,
     project_ballots,
     project_queues,
     project_assignments,
+    project_scores,
   });
+};
+
+const computeAllScoresForProject = (project_ballots, categories, criteria, ballots) => project => Immutable.Map().withMutations(map => {
+  const judge_ballots = project_ballots.get(project.project_id) || Immutable.Map();
+
+  const categoryScoresMap = {};
+
+  judge_ballots.forEach((ballot_ids, judge_id) => {
+    const categoryScoresForThisJudge = {};
+    ballot_ids.forEach(id => {
+      const ballot = ballots.get(id);
+      const { criteria_id, score } = ballot;
+      const { category_id } = criteria.get(criteria_id);
+      if (!(category_id in categoryScoresForThisJudge)) {
+        categoryScoresForThisJudge[category_id] = 0;
+      }
+      categoryScoresForThisJudge[category_id] += score;
+    });
+    for (const category_id in categoryScoresForThisJudge) {
+      if (!(category_id in categoryScoresMap)) {
+        categoryScoresMap[category_id] = [];
+      }
+      categoryScoresMap[category_id].push(categoryScoresForThisJudge[category_id]);
+    }
+  });
+
+  for (const category_id in categoryScoresMap) {
+    const scores = categoryScoresMap[category_id];
+    map.set(category_id, Immutable.List([ mean(scores), sstdev(scores) ]));
+  }
+  return map;
+});
+
+const mean = arr => arr.reduce((a, b) => a + b) / arr.length;
+const sstdev = arr => {
+  if (arr.length < 2) {
+    return 0;
+  }
+  const m = mean(arr);
+  return Math.pow(arr.map(a => (a - m) * (a - m)).reduce((a, b) => a + b) / (arr.length - 1), 0.5);
 };
 
 const computeProjectHealth = derivedState => project => {
@@ -442,6 +498,17 @@ const rootReducer = (state = new State(), action) => {
           'project_assignments',
           action.projectID,
         ], s => s.delete(action.userID));
+
+        state.setIn([
+          'derived',
+          'project_scores',
+          action.projectID,
+        ], computeAllScoresForProject(
+          state.derived.project_ballots,
+          state.canonical.categories,
+          state.canonical.criteria,
+          state.canonical.ballots,
+        )(state.canonical.projects.get(action.projectID)));
       });
       return s;
     },
