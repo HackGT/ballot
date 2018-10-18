@@ -178,7 +178,7 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
                         score += projectValue.ballots[+ballotID].score!;
                     }
                 }
-                projectValue.score = score / totalUsers.size;
+                projectValue.score = score / totalUsers.size || 0;
             }
         }
 
