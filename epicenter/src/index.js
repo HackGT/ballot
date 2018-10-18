@@ -148,7 +148,7 @@ const autoAssignToJudge = (judgeID, state) => {
 };
 
 const canJudge = judge => {
-  return judge.user_class !== 'Pending';
+  return judge.user_class !== 'Pending' && !store.getState().program.excludedJudges.has(judge.user_id);
 };
 
 document.onkeydown = event => {

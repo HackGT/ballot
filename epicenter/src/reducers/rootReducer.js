@@ -117,6 +117,8 @@ const ProgramState = Immutable.Record({
   activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
+  excludedJudges: Immutable.Set(),
+  selectedJudge: 0,
 });
 
 const State = Immutable.Record({
@@ -255,11 +257,13 @@ const computeFullDerivedState = canonicalState => {
 const computeAllScoresForProject = (project_ballots, categories, criteria, ballots) => project => Immutable.Map().withMutations(map => {
   const judge_ballots = project_ballots.get(project.project_id) || Immutable.Map();
 
+  // console.log(judge_ballots.toJS());
+
   const categoryScoresMap = {};
 
-  judge_ballots.forEach((ballot_ids, judge_id) => {
+  judge_ballots.forEach((ballots_for_this_judge, judge_id) => {
     const categoryScoresForThisJudge = {};
-    ballot_ids.forEach(id => {
+    ballots_for_this_judge.forEach(id => {
       const ballot = ballots.get(id);
       const { criteria_id, score } = ballot;
       const { category_id } = criteria.get(criteria_id);
@@ -467,12 +471,12 @@ const rootReducer = (state = new State(), action) => {
             action.userID,
           ], Immutable.List());
         }
-        state.setIn([
+        state.updateIn([
           'derived',
           'project_ballots',
           action.projectID,
           action.userID,
-        ], list => list.concat(action.ballots.map(deserializeBallot)));
+        ], list => list.concat(action.ballots.map(b => b.ballot_id)));
 
         if (!state.canonical.judgedProjects.has(action.userID)) {
           state.setIn([
@@ -575,6 +579,33 @@ const rootReducer = (state = new State(), action) => {
         'program',
         'expo_number',
       ], action.expo);
+    },
+    'EXCLUDE_JUDGE': (state, action) => {
+      return state.updateIn([
+        'program',
+        'excludedJudges',
+      ], s => s.add(action.judge_id));
+    },
+    'UN_EXCLUDE_JUDGE': (state, action) => {
+      return state.updateIn([
+        'program',
+        'excludedJudges',
+      ], s => s.remove(action.judge_id));
+    },
+    'SELECT_JUDGE': (state, action) => {
+      return state.setIn([
+        'program',
+        'leftPane',
+      ], 'judgeInfo').setIn([
+        'program',
+        'selectedJudge',
+      ], action.judge_id);
+    },
+    'SET_PANE': (state, action) => {
+      return state.setIn([
+        'program',
+        'leftPane',
+      ], action.pane);
     },
 
     'SET_SOCKET': (state, action) => {
