@@ -8,7 +8,7 @@ export const UPDATE_CLASS = 'UPDATE_CLASS';
 
 export const updateClass =
     (json: UpdateClassRequestType): UpdateClassActionType => {
-        console.log(json);
+        // console.log(json);
         return {
             type: UPDATE_CLASS,
             email: json.email ? json.email : '',
@@ -19,7 +19,7 @@ export const updateClass =
     };
 
 export const fetchProfileClass = () => {
-    console.log('fetch');
+    // console.log('fetch');
     return async (dispatch: Dispatch<any>) => {
         try {
             const authResult = await fetch('/auth/user_data', { credentials: 'same-origin' });

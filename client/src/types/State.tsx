@@ -9,7 +9,7 @@ export interface BallotState {
     ballot_id: number;
     project_id: number;
     criteria_id: number;
-    // user_id: number;
+    user_id?: number;
     judge_priority: number;
     ballot_status: any;
     score?: number;

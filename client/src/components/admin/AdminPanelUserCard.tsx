@@ -5,10 +5,7 @@ import { UserState } from '../../types/State';
 import { Card, Button, EditableText, Popover, Alert, Dialog, Classes, InputGroup } from '@blueprintjs/core';
 
 export interface AdminPanelUserCardProps {
-    user_id: number;
-    name: string;
-    email: string;
-    user_class: string;
+    user: UserState;
     isCurrentUser: boolean;
     editUser: (user: UserState) => void;
     removeUser: (user: UserState) => void;
@@ -29,7 +26,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
         super(props);
 
         this.state = {
-            name: props.name,
+            name: props.user.name,
             editMode: false,
             deleteOpen: false,
             passwordDialog: false,
@@ -110,7 +107,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
                     <p>Are you sure you want to delete this user?</p>
                 </Alert>
                 <h3>
-                    {this.props.user_id}: <EditableText defaultValue={this.props.name} disabled={!this.state.editMode} onChange={this.handleNameChange} />
+                    {this.props.user.user_id}: <EditableText defaultValue={this.props.user.name} disabled={!this.state.editMode} onChange={this.handleNameChange} />
                     <span style={{ float: 'right' }}>
                         {this.state.editMode ?
                         <div>
@@ -120,13 +117,13 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
                         <Button name='edit' icon='edit' small={true} minimal={true} onClick={this.handleEdit} />}
                     </span>
                 </h3>
-                <div style={{ padding: '5px 0' }}><p>{this.props.email}</p></div>
+                <div style={{ padding: '5px 0' }}><p>{this.props.user.email}</p></div>
                 {this.state.editMode ?
                     <div>
                         <UserClassSelector
                             disabled={this.props.isCurrentUser}
-                            user_id={this.props.user_id}
-                            user_class={this.props.user_class} />
+                            user={this.props.user}
+                            editUser={this.props.editUser} />
                         <Button
                             style={{
                                 marginTop: 10,
@@ -136,7 +133,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
                             onClick={this.openPasswordDialog}
                             small={true} />
                     </div> :
-                    <div>{this.props.user_class}</div>
+                    <div>{this.props.user.user_class}</div>
                 }
             </Card>
         );
@@ -160,7 +157,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
                         query: `
                             mutation {
                                 changePassword(
-                                    id: ${this.props.user_id}
+                                    id: ${this.props.user.user_id}
                                     newPassword: "${this.state.password}"
                                 ) {
                                     user_id
@@ -174,7 +171,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
 
                 console.log(changePasswordResultJSON);
 
-                if (changePasswordResultJSON.data.changePassword.user_id === this.props.user_id) {
+                if (changePasswordResultJSON.data.changePassword.user_id === this.props.user.user_id) {
                     this.setState((prevState) => {
                         return {
                             ...prevState,
@@ -263,7 +260,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
     }
 
     private async handleSave() {
-        if (this.state.name !== this.props.name) {
+        if (this.state.name !== this.props.user.name) {
             const deleteResult = await fetch('/graphql', {
                 credentials: 'same-origin',
                 method: 'POST',
@@ -274,7 +271,7 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
                     query: `
                         mutation {
                             changeName(
-                                id: ${this.props.user_id}
+                                id: ${this.props.user.user_id}
                                 newName: "${this.state.name}"
                             ) {
                                 user_id
@@ -287,9 +284,9 @@ class AdminPanelUserCard extends React.Component<AdminPanelUserCardProps, AdminP
             if (deleteResult.ok) {
                 this.props.editUser({
                     name: this.state.name,
-                    email: this.props.email,
-                    user_id: this.props.user_id,
-                    user_class: this.props.user_class,
+                    email: this.props.user.email,
+                    user_id: this.props.user.user_id,
+                    user_class: this.props.user.user_class,
                 });
             }
         }

@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as papa from 'papaparse';
-import { ProjectState } from '../../types/State';
+import { ProjectState, CategoryState } from '../../types/State';
 import ProjectsTable from '../expo/ProjectsTable';
 import AdminPanelProjectsTable from './AdminPanelProjectsTable';
 import { Button, Dialog, Classes, Spinner, H6, FileInput } from '@blueprintjs/core';
 import AdminPanelUploadProjects from './AdminPanelUploadProjects';
+import { AppToaster } from '../../util/AppToaster';
 // import './Projects.css';
 
 interface AdminPanelProjectsProps {
+    categories: CategoryState[];
     projects: ProjectState[];
     refreshProjects: (projects: ProjectState[]) => void;
 }
@@ -84,7 +86,7 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
                 </h1>
                 {
                     this.props.projects ?
-                    <ProjectsTable projects={this.props.projects} />
+                    <ProjectsTable projects={this.props.projects} currentCategory='All' />
                     : undefined
                 }
             </div>
@@ -172,12 +174,26 @@ class AdminPanelProjects extends React.Component<AdminPanelProjectsProps, AdminP
     }
 
     private openUploadDialog() {
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                uploadDialogOpen: true,
-            };
-        });
+        let hasPrimary = false;
+        for (const category of this.props.categories) {
+            if (category.is_primary) {
+                hasPrimary = true;
+            }
+        }
+
+        if (hasPrimary) {
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    uploadDialogOpen: true,
+                };
+            });
+        } else {
+            AppToaster.show({
+                message: 'There must be at least 1 primary category.',
+                intent: 'danger',
+            });
+        }
     }
 
     private closeUploadDialog() {
