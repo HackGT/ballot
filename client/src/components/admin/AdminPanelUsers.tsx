@@ -2,6 +2,7 @@ import * as React from 'react';
 import AdminPanelUserList from './AdminPanelUserList';
 import { AuthState, UserState } from '../../types/State';
 import { AdminPanelUserCardProps } from './AdminPanelUserCard';
+import { Button } from '@blueprintjs/core';
 
 interface AdminPanelUsersProps {
     auth: AuthState;
@@ -15,9 +16,37 @@ interface AdminPanelUsersProps {
 class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {}> {
     constructor(props: any) {
         super(props);
+
+        this.fetchUsers = this.fetchUsers.bind(this);
     }
 
     public async componentWillMount(): Promise<void> {
+        await this.fetchUsers();
+    }
+
+    public render(): React.ReactElement<HTMLDivElement> {
+        return (
+            <div>
+                <h1>
+                    Users
+                    <span style={{
+                        float: 'right',
+                    }}>
+                        <Button name='refresh' icon='refresh' large={true} intent='primary' minimal={true} onClick={this.fetchUsers} />
+                    </span>
+                </h1>
+                <AdminPanelUserList
+                    userData={this.props.users.sort((a, b) => {
+                        return a.user_id - b.user_id;
+                    })}
+                    currentUser={this.props.auth}
+                    editUser={this.props.editUser}
+                    removeUser={this.props.removeUser} />
+            </div>
+        );
+    }
+
+    private async fetchUsers() {
         const result = await fetch('/graphql', {
             credentials: 'same-origin',
             method: 'POST',
@@ -41,16 +70,6 @@ class AdminPanelUsers extends React.Component<AdminPanelUsersProps, {}> {
         }
 
         this.props.refreshUsers(newUserData);
-    }
-
-    public render(): React.ReactElement<HTMLDivElement> {
-        return (
-            <AdminPanelUserList
-                userData={this.props.users}
-                currentUser={this.props.auth}
-                editUser={this.props.editUser}
-                removeUser={this.props.removeUser} />
-        );
     }
 }
 

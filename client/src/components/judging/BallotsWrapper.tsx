@@ -172,7 +172,7 @@ class BallotsWrapper extends React.Component<BallotsWrapperProps, BallotsWrapper
         });
 
         const ballotsJSON = await ballotsResult.json();
-        console.log(ballotsJSON.data);
+        // console.log(ballotsJSON.data);
 
         if (ballotsJSON.data.nextBallotSet) {
             const ballots = ballotsJSON.data.nextBallotSet.ballots;
@@ -259,38 +259,41 @@ class BallotsWrapper extends React.Component<BallotsWrapperProps, BallotsWrapper
     }
 
     private async skipProject() {
-        const skipProjectResult = await fetch('/graphql', {
-            credentials: 'same-origin',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `mutation {
-                    skipProject(
-                        user_id: ${this.props.auth.user_id}
-                        project_id: ${this.state.currentProject!.project_id}
-                    )
-                }`
-            }),
-        });
-
-        const skipProjectResultJSON = await skipProjectResult.json();
-        if (skipProjectResultJSON.data.skipProject) {
-            this.props.loadNextBallotSets([]);
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    criteriaToBallot: {},
-                    done: true,
-                    fetching: false,
-                };
+        const confirmed = window.confirm('Are you sure you want to skip this project?');
+        if (confirmed) {
+            const skipProjectResult = await fetch('/graphql', {
+                credentials: 'same-origin',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: `mutation {
+                        skipProject(
+                            user_id: ${this.props.auth.user_id}
+                            project_id: ${this.state.currentProject!.project_id}
+                        )
+                    }`
+                }),
             });
+
+            const skipProjectResultJSON = await skipProjectResult.json();
+            if (skipProjectResultJSON.data.skipProject) {
+                this.props.loadNextBallotSets([]);
+                this.setState((prevState) => {
+                    return {
+                        ...prevState,
+                        criteriaToBallot: {},
+                        done: true,
+                        fetching: false,
+                    };
+                });
+            }
         }
     }
 
     private async startProject() {
-        console.log('start');
+        // console.log('start');
         const ballotsResult = await fetch('/graphql', {
             credentials: 'same-origin',
             method: 'POST',
@@ -309,7 +312,7 @@ class BallotsWrapper extends React.Component<BallotsWrapperProps, BallotsWrapper
 
         const data = (await ballotsResult.json()).data;
 
-        console.log(data);
+        // console.log(data);
 
         if (data.startProject) {
             const newCriteriaToBallots: { [criteriaID: number]: BallotState } = {};

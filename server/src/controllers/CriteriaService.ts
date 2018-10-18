@@ -26,17 +26,28 @@ export class CriteriaService {
         return newCriteriaJSON;
     }
 
-    public static update(criteriaId: number, criteria: Partial<CriteriaModel>):
+    public static update(criteriaID: number, criteria: Partial<CriteriaModel>):
     BPromise<CriteriaModel | undefined> {
-        if (dataStore.criteria[criteriaId]) {
-            dataStore.criteria[criteriaId] = {
-                ...dataStore.criteria[criteriaId],
+        if (dataStore.criteria[criteriaID]) {
+            dataStore.criteria[criteriaID] = {
+                ...dataStore.criteria[criteriaID],
                 ...criteria,
             };
+
+            const newCriteria = dataStore.categories[dataStore.criteria[criteriaID].category_id].criteria;
+            for (let i = 0; i < newCriteria.length; i++) {
+                if (newCriteria[i].criteria_id! === criteriaID) {
+                    newCriteria[i] = dataStore.criteria[criteriaID];
+                }
+            }
+
+            dataStore.categories[dataStore.criteria[criteriaID].category_id].criteria = newCriteria;
         }
 
+        dataStore.fetchProjects();
+
         return Criteria.update(criteria as CriteriaModel,
-                { where: { criteria_id : criteriaId }, returning: true })
+                { where: { criteria_id : criteriaID }, returning: true })
             .then((val) => {
                 const [num, updatedCriteria] = val;
                 if (num === 0) {
@@ -54,6 +65,13 @@ export class CriteriaService {
 
         if (criteriaToDelete) {
             const criteria = criteriaToDelete.toJSON();
+            const allCriteria = dataStore.categories[criteria.category_id].criteria;
+            for (let i = allCriteria.length - 1; i >= 0; i--) {
+                if (allCriteria[i].criteria_id === criteriaID) {
+                    allCriteria.splice(i, 1);
+                }
+            }
+
             delete dataStore.criteria[criteria.criteria_id!];
         }
 

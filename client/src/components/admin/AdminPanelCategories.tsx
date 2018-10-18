@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { CategoryState, CriteriaState } from '../../types/State';
-import { Card, H1, H3, H4, H6, Button, Dialog, Classes, EditableText, NumericInput, Spinner, NonIdealState } from '@blueprintjs/core';
+import { Card, H1, H3, H4, H6, Button, Dialog, Classes, EditableText, NumericInput, Spinner, NonIdealState, Callout } from '@blueprintjs/core';
 import AdminPanelNewCategoryCriteria from './AdminPanelNewCategoryCriteria';
 import AdminPanelNewCategory from './AdminPanelNewCategory';
 import AdminPanelCategoryCard from './AdminPanelCategoryCard';
@@ -84,6 +84,7 @@ class AdminPanelCategories extends React.Component<AdminPanelCategoriesProps, Ad
                         <Button name='new' icon='plus' large={true} intent='primary' minimal={true} onClick={this.openNewCategoryDialog} />
                     </span>
                 </h1>
+                <Callout intent='warning' icon='warning-sign'>You must reupload projects if you change criteria or categories.</Callout>
                 <div style={{
                     width: '100%',
                     display: 'flex',

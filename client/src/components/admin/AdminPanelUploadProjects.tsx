@@ -3,6 +3,7 @@ import * as papa from 'papaparse';
 import { ProjectState } from '../../types/State';
 import { FileInput, Button, NumericInput, H4, FormGroup } from '@blueprintjs/core';
 import AdminPanelUploadProjectsGroup from './AdminPanelUploadProjectsGroup';
+import { AppToaster } from '../../util/AppToaster';
 
 interface ProjectGroup {
     name: string;
@@ -50,7 +51,6 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
         this.handleNewProjectGroup = this.handleNewProjectGroup.bind(this);
         this.handleUpdateNumberProjects = this.handleUpdateNumberProjects.bind(this);
         this.handleUpdateName = this.handleUpdateName.bind(this);
-        this.setErrorMessage = this.setErrorMessage.bind(this);
         this.processUpload = this.processUpload.bind(this);
     }
 
@@ -291,22 +291,19 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     this.props.refreshProjects(newProjects);
 
                 } else {
-                    this.setErrorMessage('Each project group must have a unique name and at least 1 project.');
+                    AppToaster.show({
+                        message: 'Each project group must have a unique name and at least 1 project.',
+                        intent: 'warning',
+                    });
                 }
             } else {
-                this.setErrorMessage('You have not accounted for the correct number of projects.');
+                AppToaster.show({
+                    message: 'You have not accounted for the correct number of projects.',
+                    intent: 'warning',
+                });
             }
         });
 
-    }
-
-    private setErrorMessage(message: string) {
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                errorMessage: message,
-            };
-        });
     }
 
     private parseCSV(results: papa.ParseResult) {
@@ -364,7 +361,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
         const target = event.target;
         console.log(target.files);
 
-        if (target.files.length > 0) {
+        if (target.files.length > 0 && target.files[0].name.includes('.csv')) {
             this.setState((prevState) => {
                 return {
                     ...prevState,
@@ -385,6 +382,11 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     uploadFileName: 'Click to upload...',
                     csv: undefined,
                 };
+            }, () => {
+                AppToaster.show({
+                    message: 'File must be of type .csv',
+                    intent: 'danger',
+                });
             });
         }
 

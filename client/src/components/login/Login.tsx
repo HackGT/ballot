@@ -7,6 +7,7 @@ import { FormGroup, InputGroup, Button, H1 } from '@blueprintjs/core';
 import LoginButtons from './LoginButtons';
 import YesSessionContainer from '../../util/RedirectYesSession';
 import { UpdateClassRequestType } from '../../types/UpdateClass';
+import { AppToaster } from '../../util/AppToaster';
 
 interface LoginProps {
     updateClass: (json: UpdateClassRequestType) => void;
@@ -78,39 +79,53 @@ class Login extends React.Component<LoginProps, LoginState> {
 
     private handleLogin(event: any) {
         event.preventDefault();
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                loggingIn: true,
-            };
-        }, async () => {
-            const loginResult = await axios.post('/auth/login',
-                qs.stringify({
-                    'email': this.state.email.toLowerCase(),
-                    'password': this.state.password,
-                }), {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
+        if (this.state.email.length > 0 && this.state.password.length > 0) {
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    loggingIn: true,
+                };
+            }, async () => {
+                const loginResult = await axios.post('/auth/login',
+                    qs.stringify({
+                        'email': this.state.email.toLowerCase(),
+                        'password': this.state.password,
+                    }), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                    }
+                );
+
+                if (loginResult.data.class !== 'None') {
+                    this.setState((prevState) => {
+                        return {
+                            ...prevState,
+                            loggingIn: false,
+                        };
+                    });
                 }
-            );
 
-            if (loginResult.data.class !== 'None') {
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        loggingIn: false,
-                    };
+                this.props.updateClass({
+                    name: loginResult.data.name,
+                    email: loginResult.data.email,
+                    class: loginResult.data.class,
+                    user_id: loginResult.data.user_id,
                 });
-            }
 
-            this.props.updateClass({
-                name: loginResult.data.name,
-                email: loginResult.data.email,
-                class: loginResult.data.class,
-                user_id: loginResult.data.user_id,
+                if (!loginResult.data.class || loginResult.data.class === 'None') {
+                    AppToaster.show({
+                        message: 'Invalid email or password.',
+                        intent: 'danger',
+                    });
+                }
             });
-        });
+        } else {
+            AppToaster.show({
+                message: 'Email or password is blank',
+                intent: 'warning',
+            });
+        }
     }
 
     private handleChange(event: any) {
