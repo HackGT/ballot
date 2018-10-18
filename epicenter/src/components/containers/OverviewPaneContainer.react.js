@@ -11,6 +11,7 @@ const mapStateToProps = state => {
             ),
     project_scores: state.derived.project_scores,
     categories: state.canonical.categories,
+    expo: state.program.expo_number,
   };
 };
 
@@ -22,6 +23,12 @@ const mapDispatchToProps = dispatch => {
         projectID: project.project_id,
       });
     },
+    setExpo: expo => {
+      dispatch({
+        type: 'SET_EXPO',
+        expo,
+      });
+    }
   };
 };
 

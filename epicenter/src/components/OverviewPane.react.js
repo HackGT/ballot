@@ -30,6 +30,9 @@ class OverviewPane extends Component {
     return (
       <div className="OverviewPane">
         <p>
+          Expo <input type="number" value={this.props.expo} onChange={event => this.props.setExpo(parseInt(event.target.value, 10))} />
+        </p>
+        <p>
           Sorting by: {displaySort}
         </p>
         <button onClick={() => this.setState(prevState => ({ sortDirection: -1 * prevState.sortDirection }))}>Swap sort direction</button><br />

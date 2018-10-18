@@ -570,6 +570,12 @@ const rootReducer = (state = new State(), action) => {
         'selectedProjectID',
       ], action.projectID);
     },
+    'SET_EXPO': (state, action) => {
+      return state.setIn([
+        'program',
+        'expo_number',
+      ], action.expo);
+    },
 
     'SET_SOCKET': (state, action) => {
       return state.setIn([
