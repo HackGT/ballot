@@ -91,6 +91,8 @@ export class CategoryService {
             };
         }
 
+        dataStore.fetchProjects();
+
         return Categories.update(category as CategoryModel,
             { where: { category_id: categoryID }, returning: true })
             .then((val) => {

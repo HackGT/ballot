@@ -78,6 +78,13 @@ export class BallotService {
         return Object.values(criteria);
     }
 
+    public static async getBallots(): Promise<BallotModel[]> {
+        const allBallots = await Ballots.findAll();
+        return allBallots.map((ballot) => {
+            return ballot.toJSON();
+        });
+    }
+
     public static async getNextProject(userID: number):
         Promise<{
             project: ProjectModel,
@@ -276,26 +283,5 @@ export class BallotService {
         }
 
         return false;
-
-        // Write the scores for each ballot
-        // let projectId: number | undefined;
-        // let priority: number;
-        // for (const ballot of curBallots) {
-
-        //     const id: number = ballot.get('ballot_id');
-
-        //     if (projectId && projectId !== ballot.get('project_id')) {
-        //         logger.error(`Ballot ${id} does not match the others
-        //         (project ${projectId} !== ${ballot.get('project_id')})`);
-        //     }
-        //     projectId = ballot.get('project_id');
-        //     priority = ballot.get('judge_priority');
-
-        //     ballot.set('score', scoreDict[id]);
-        //     ballot.set('ballot_status', BallotStatus.Submitted);
-        //     ballot.save();
-        // }
-        // // Increment ballot count for projectID
-        // this.projectBallotCounts[projectId!]++;
     }
 }

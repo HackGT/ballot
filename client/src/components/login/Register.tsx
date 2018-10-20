@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as qs from 'querystring';
 import { Link, Redirect } from 'react-router-dom';
 import { H1, InputGroup, Button } from '@blueprintjs/core';
+import { AppToaster } from '../../util/AppToaster';
 
 interface RegisterProps {}
 
@@ -13,7 +14,6 @@ interface RegisterState {
     passwordConfirm: string;
     registering: boolean;
     success: boolean;
-    errorMessage: string;
 }
 
 const spacedInput = {
@@ -31,7 +31,6 @@ class Register extends React.Component<RegisterProps, RegisterState> {
             passwordConfirm: '',
             registering: false,
             success: false,
-            errorMessage: '',
         };
 
         this.handleRegister = this.handleRegister.bind(this);
@@ -52,7 +51,6 @@ class Register extends React.Component<RegisterProps, RegisterState> {
                     margin: '0 auto',
                  }}>
                     <H1>Register</H1>
-                    <strong>{this.state.errorMessage}</strong>
                     <form>
                         <InputGroup
                             name='name'
@@ -145,17 +143,19 @@ class Register extends React.Component<RegisterProps, RegisterState> {
                             ...prevState,
                             success: false,
                             registering: false,
-                            errorMessage: registerResult.data.message,
                         };
+                    }, () => {
+                        AppToaster.show({
+                            message: registerResult.data.message,
+                            intent: 'warning',
+                        });
                     });
                 }
             });
         } else {
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    errorMessage: 'One or more of the inputs is not valid.'
-                };
+            AppToaster.show({
+                message: 'One or more of the inputs is not valid.',
+                intent: 'warning',
             });
         }
     }
