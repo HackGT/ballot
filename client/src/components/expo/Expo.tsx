@@ -215,7 +215,7 @@ class Expo extends React.Component<ExpoProps, ExpoState> {
         let text = '';
 
         for (const project of projects) {
-            text += `${project.name}\nExpo: ${project.expo_number} Table: ${project.table_number}\n\n`
+            text += `${project.name}\n${project.devpost_id}\nExpo: ${project.expo_number} - Table: ${project.table_number}\n\n`;
         }
 
         this.setState((prevState) => {

@@ -106,7 +106,7 @@ export class DataStore {
 
                 this.usersToProjects[userID][projectID] = ballotIDs;
 
-                console.log(this.judgeQueues);
+                // console.log(this.judgeQueues);
 
                 return {
                     status: true,
@@ -180,11 +180,7 @@ export class DataStore {
             };
         }
 
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
-
-        console.log(this.usersToProjects);
+        // console.log(this.usersToProjects);
     }
 
     public async fetchCollective(): Promise<void> {
@@ -221,6 +217,14 @@ export class DataStore {
             activeProjectID: null,
             queuedProjectID: null,
         };
+    }
+
+    public backup(): void {
+        const date = new Date();
+        const time = date.getTime();
+        fs.writeFile(`./backups/dump-${time}.json`, JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
+            console.log(`Saved to ./dump-${time}.json`);
+        });
     }
 
     private async fetchUsers(): Promise<void> {
@@ -331,6 +335,7 @@ export class DataStore {
             users: dataStore.users,
             judgeQueues: dataStore.judgeQueues,
             judgedProjects: dataStore.judgedProjects,
+            usersToProjects: dataStore.usersToProjects,
         };
     }
 
