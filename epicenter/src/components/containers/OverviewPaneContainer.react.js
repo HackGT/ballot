@@ -13,6 +13,9 @@ const mapStateToProps = state => {
     project_skipped_count: state.derived.project_skipped_count,
     categories: state.canonical.categories,
     expo: state.program.expo_number,
+    goodnessPower: state.program.goodnessPower,
+    stdevPower: state.program.stdevPower,
+    skipPower: state.program.skipPower,
   };
 };
 
@@ -29,7 +32,28 @@ const mapDispatchToProps = dispatch => {
         type: 'SET_EXPO',
         expo,
       });
-    }
+    },
+    setGoodnessPower: goodnessPower => {
+      const parsed = parseFloat(goodnessPower);
+      dispatch({
+        type: 'SET_GOODNESS_POWER',
+        goodnessPower: isNaN(parsed) ? 0 : parsed,
+      });
+    },
+    setStdevPower: stdevPower => {
+      const parsed = parseFloat(stdevPower);
+      dispatch({
+        type: 'SET_STDEV_POWER',
+        stdevPower: isNaN(parsed) ? 0 : parsed,
+      });
+    },
+    setSkipPower: skipPower => {
+      const parsed = parseFloat(skipPower);
+      dispatch({
+        type: 'SET_SKIP_POWER',
+        skipPower: isNaN(parsed) ? 0 : parsed,
+      });
+    },
   };
 };
 

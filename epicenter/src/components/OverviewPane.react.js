@@ -32,6 +32,18 @@ class OverviewPane extends Component {
           Expo <input type="number" value={this.props.expo} onChange={event => this.props.setExpo(parseInt(event.target.value, 10))} />
         </p>
         <p>
+          Goodness power (default 0.5): <input type="number" step="0.01" value={this.props.goodnessPower} onChange={event => this.props.setGoodnessPower(event.target.value)} /><br />
+          Good projects with >= 2 judges have lower health. Multiplier is taken to the (times judged * goodness power) power. 0 to disable.
+        </p>
+        <p>
+          Variance power (default 1): <input type="number" step="0.01" value={this.props.stdevPower} onChange={event => this.props.setStdevPower(event.target.value)} /><br />
+          Higher-variance projects with >= 2 judges have lower health. (5 / (5 + sstdev)) to the variancePower. 0 to disable.
+        </p>
+        <p>
+          Skip power (default 1): <input type="number" step="0.01" value={this.props.skipPower} onChange={event => this.props.setSkipPower(event.target.value)} /><br />
+          Twice-skipped projects have lower health. Multiplier is (# skipped) to the skipPower. 0 to disable.
+        </p>
+        <p>
           Sorting by: {displaySort}
         </p>
         <button onClick={() => this.setState(prevState => ({ sortDirection: -1 * prevState.sortDirection }))}>Swap sort direction</button><br />

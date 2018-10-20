@@ -123,6 +123,9 @@ const ProgramState = Immutable.Record({
   projectIconRefs: Immutable.Map(),
   excludedJudges: Immutable.Set(),
   selectedJudge: 0,
+  goodnessPower: 0.5,
+  stdevPower: 1,
+  skipPower: 1,
 });
 
 const State = Immutable.Record({
@@ -338,7 +341,7 @@ const sstdev = arr => {
   return Math.pow(arr.map(a => (a - m) * (a - m)).reduce((a, b) => a + b) / (arr.length - 1), 0.5);
 };
 
-const computeProjectHealth = derivedState => project => {
+const computeProjectHealth = (derivedState, programState) => project => {
   let health = 1;
 
   const epsilon = 0.00000001 * ((project.project_id * 179426447) % 500);
@@ -369,14 +372,14 @@ const computeProjectHealth = derivedState => project => {
       // between 81st place and 82nd place, but 8th vs 9th matters.
       const dividend = derivedState.primary_category_max_score * 1 / 2;
       const quotient = dividend / score_mean;
-      const multiplier = Math.pow(quotient, times_judged / 2);
+      const multiplier = Math.pow(quotient, times_judged * programState.goodnessPower);
       health *= multiplier;
 
       // multiply health by (5 / (5 + sample standard deviation)).
       // as we get more judges, high standard deviation means we should throw more
       // judges at the problem.
       const one_eighth_max_score = derivedState.primary_category_max_score / 8;
-      health *= one_eighth_max_score / (one_eighth_max_score + score_stdev);
+      health *= Math.pow(one_eighth_max_score / (one_eighth_max_score + score_stdev), programState.stdevPower);
     }
   }
 
@@ -384,7 +387,7 @@ const computeProjectHealth = derivedState => project => {
   // by # skips.
   const skip_count = derivedState.project_skipped_count.get(project.project_id);
   if (skip_count > 0) {
-    health *= skip_count;
+    health *= Math.pow(skip_count, programState.skipPower);
   }
 
   return health;
@@ -674,6 +677,24 @@ const rootReducer = (state = new State(), action) => {
         'leftPane',
       ], action.pane);
     },
+    'SET_GOODNESS_POWER': (state, action) => {
+      return state.setIn([
+        'program',
+        'goodnessPower',
+      ], action.goodnessPower);
+    },
+    'SET_STDEV_POWER': (state, action) => {
+      return state.setIn([
+        'program',
+        'stdevPower',
+      ], action.stdevPower);
+    },
+    'SET_SKIP_POWER': (state, action) => {
+      return state.setIn([
+        'program',
+        'skipPower',
+      ], action.skipPower);
+    },
 
     'SET_SOCKET': (state, action) => {
       return state.setIn([
@@ -694,7 +715,7 @@ const rootReducer = (state = new State(), action) => {
         'derived',
         'project_health',
       ],
-      newState.canonical.projects.map(computeProjectHealth(newState.derived)),
+      newState.canonical.projects.map(computeProjectHealth(newState.derived, newState.program)),
     );
   } else {
     return state;
