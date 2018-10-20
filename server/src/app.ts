@@ -21,11 +21,14 @@ import { strategies, serialize, deserialize } from './config/auth';
 import schema from './api';
 import { sync } from './models';
 import socketHandler from './routes/socket';
-import { createDataStore } from './store/DataStore';
+import { createDataStore, dataStore } from './store/DataStore';
 
 const app = express();
 const server = http.createServer(app);
 export const io = socketio(server);
+
+let backupsEnabled = false;
+let backupsInterval: NodeJS.Timer;
 
 async function start(): Promise<void> {
     // Throw any errors if missing configurations
@@ -80,6 +83,20 @@ async function start(): Promise<void> {
                 };
             })
         );
+
+        app.use('/backups', (req, res) => {
+            if (backupsEnabled) {
+                backupsEnabled = false;
+                res.send('Backups disabled');
+                clearInterval(backupsInterval);
+            } else {
+                backupsEnabled = true;
+                backupsInterval = setInterval(() => {
+                    dataStore.backup();
+                }, 60000);
+                res.send('Backups enabled');
+            }
+        });
 
         app.use('/auth', auth);
 

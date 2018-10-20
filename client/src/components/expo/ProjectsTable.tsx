@@ -7,6 +7,13 @@ interface ProjectsTableProps {
     currentCategory: string;
 }
 
+const colorMap = {
+    'orange': '#FF851B',
+    'green': '#009432',
+    'blue': '#0074D9',
+    'purple': '#B10DC9',
+}
+
 const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
     return (
         <div style={{
@@ -28,7 +35,9 @@ const ProjectsTable: React.SFC<ProjectsTableProps> = (props) => {
                             maxWidth: 300,
                             margin: 5,
                         }}>
-                        <h3>{project.name}</h3>
+                        <h3 style={{
+                            color: colorMap[project.table_number.toLowerCase().split(' ')[0]],
+                        }}>{project.name}</h3>
                         <p>Expo: {project.expo_number} Table: {project.table_number}</p>
                         <div>{project.sponsor_prizes.map((prize: string, index: number) => {
                             return (
