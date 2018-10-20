@@ -28,6 +28,7 @@ const mapStateToProps = (state, ownProps) => {
         });
       }
     },
+    excluded: state.program.excludedJudges.has(ownProps.judgeID),
   };
 };
 
@@ -45,6 +46,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         type: 'SET_QUEUE_ICON_REF',
         judgeID: ownProps.judgeID,
         ref,
+      });
+    },
+    selectJudge: () => {
+      dispatch({
+        type: 'SELECT_JUDGE',
+        judge_id: ownProps.judgeID,
       });
     },
   };

@@ -12,6 +12,7 @@ import io from 'socket.io-client';
 import uuid from 'uuid/v4';
 
 const store = createStore(rootReducer);
+window.store = store;
 
 const animateProject = (fromRef, toRef, oldProject, newProject, duration) => {
   const phonyElement = document.createElement('div');
@@ -148,7 +149,7 @@ const autoAssignToJudge = (judgeID, state) => {
 };
 
 const canJudge = judge => {
-  return judge.user_class !== 'Pending';
+  return judge.user_class !== 'Pending' && !store.getState().program.excludedJudges.has(judge.user_id);
 };
 
 document.onkeydown = event => {

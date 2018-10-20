@@ -11,7 +11,7 @@ class ProjectListing extends Component {
             <ProjectIconContainer
               projectID={project.project_id}
               inList={true}
-              key={i} />
+              key={project.project_id} />
           ))}
         </div>
       </div>

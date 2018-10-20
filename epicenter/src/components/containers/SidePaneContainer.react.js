@@ -7,8 +7,20 @@ const mapStateToProps = state => {
   };
 };
 
+const mapDispatchToProps = dispatch => {
+  return {
+    setPane: pane => {
+      dispatch({
+        type: 'SET_PANE',
+        pane,
+      });
+    },
+  };
+};
+
 const SidePaneContainer = connect(
   mapStateToProps,
+  mapDispatchToProps,
 )(SidePane);
 
 export default SidePaneContainer;

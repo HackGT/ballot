@@ -19,7 +19,7 @@ class JudgeRow extends Component {
             )
           }
         </div>
-        <div className="judgeName">{this.props.name}</div>
+        <div className={'judgeName' + (this.props.excluded ? ' excluded' : '')} onClick={this.props.selectJudge}>{this.props.name}</div>
         <div className="activeProject" ref="activeIcon"><MaybeProjectIcon project={this.props.activeProject} /></div>
         <div
           className="queuedProject"

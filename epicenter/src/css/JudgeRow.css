@@ -7,6 +7,10 @@
   justify-content: flex-end;
 }
 
+.excluded {
+  opacity: 0.4;
+}
+
 .queuedProject {
   margin-right: 100px;
 }

@@ -56,6 +56,7 @@ const CanonicalState = Immutable.Record({
   projects: Immutable.Map(),
   users: Immutable.Map(),
   ballots: Immutable.Map(),
+  skipped_ballots: Immutable.Map(),
   categories: Immutable.Map(),
   criteria: Immutable.Map(),
   judgeQueues: Immutable.Map(),
@@ -97,6 +98,18 @@ const DerivedState = Immutable.Record({
     }
   */
   project_health: Immutable.Map(),
+  /*
+    project_scores: {
+      [project_id]: {
+        [category_id]: [number, number],  // mean, sstdev
+        "overall": [number, number],    // score for every primary category
+      },
+    }
+  */
+  project_scores: Immutable.Map(),
+  primary_category_id: -1,
+  primary_category_max_score: -1,
+  project_skipped_count: Immutable.Map(),
 });
 
 const ProgramState = Immutable.Record({
@@ -108,6 +121,8 @@ const ProgramState = Immutable.Record({
   activeIconRefs: Immutable.Map(),
   queueIconRefs: Immutable.Map(),
   projectIconRefs: Immutable.Map(),
+  excludedJudges: Immutable.Set(),
+  selectedJudge: 0,
 });
 
 const State = Immutable.Record({
@@ -139,10 +154,26 @@ const deserializeCanonicalState = serializedState => {
 
   const ballots = Immutable.Map().withMutations(map => {
     for (const ballotId in serializedState.ballots) {
+      if (serializedState.ballots[ballotId].ballot_status === 'Pending'
+        || serializedState.ballots[ballotId].ballot_status === 'Skipped') {
+        continue; // I DON'T WANT IT
+      }
       map.set(
         parseInt(ballotId, 10),
         deserializeBallot(serializedState.ballots[ballotId]),
       );
+    }
+  });
+
+  const skipped_ballots = Immutable.Map().withMutations(map => {
+    for (const ballotId in serializedState.ballots) {
+      if (serializedState.ballots[ballotId].ballot_status === 'Skipped') {
+        // ok I kind of want it
+        map.set(
+          parseInt(ballotId, 10),
+          deserializeBallot(serializedState.ballots[ballotId]),
+        );
+      }
     }
   });
 
@@ -199,6 +230,7 @@ const deserializeCanonicalState = serializedState => {
     projects,
     users,
     ballots,
+    skipped_ballots,
     criteria,
     categories,
     judgeQueues,
@@ -207,7 +239,7 @@ const deserializeCanonicalState = serializedState => {
 };
 
 const computeFullDerivedState = canonicalState => {
-  const { ballots, judgeQueues, projects } = canonicalState;
+  const { ballots, skipped_ballots, judgeQueues, projects, categories, criteria } = canonicalState;
 
   const judge_ballot_history =
     ballots
@@ -223,17 +255,87 @@ const computeFullDerivedState = canonicalState => {
       .map(project_ballots => project_ballots
         .groupBy(project_ballot_id => ballots.get(project_ballot_id).user_id));
 
+  const project_skipped_ballots =
+    skipped_ballots
+      .keySeq()
+      .groupBy(ballot_id => skipped_ballots.get(ballot_id).project_id)
+      .map(project_ballots => project_ballots
+        .groupBy(project_ballot_id => skipped_ballots.get(project_ballot_id).user_id));
+
+  const project_skipped_count =
+    projects
+      .map(project =>
+        project_skipped_ballots.has(project.project_id)
+        ? project_skipped_ballots.get(project.project_id).size
+        : 0
+      );
+
   const project_queues = projects.map(_ => Immutable.Set())
     .merge(judgeQueues.groupBy(m => m.get('queuedProjectID')).map(m => m.keySeq().toSet()));
   const project_assignments = projects.map(_ => Immutable.Set())
     .merge(judgeQueues.groupBy(m => m.get('activeProjectID')).map(m => m.keySeq().toSet()));
 
+  const project_scores = projects.map(computeAllScoresForProject(project_ballots, categories, criteria, ballots));
+
+  let primary_category_id = -1;
+  let primary_category_max_score = -1;
+  categories.forEach(category => {
+    if (category.is_primary) {
+      primary_category_id = category.category_id;
+      primary_category_max_score = category.criteria.map(criterion => criterion.max_score).reduce((a, b) => a + b);
+    }
+  });
+
   return new DerivedState({
     judge_ballot_history,
     project_ballots,
+    project_skipped_count,
     project_queues,
     project_assignments,
+    project_scores,
+    primary_category_id,
+    primary_category_max_score,
   });
+};
+
+const computeAllScoresForProject = (project_ballots, categories, criteria, ballots) => project => Immutable.Map().withMutations(map => {
+  const judge_ballots = project_ballots.get(project.project_id) || Immutable.Map();
+
+  const categoryScoresMap = {};
+
+  judge_ballots.forEach((ballots_for_this_judge, judge_id) => {
+    const categoryScoresForThisJudge = {};
+    ballots_for_this_judge.forEach(id => {
+      const ballot = ballots.get(id);
+      const { criteria_id, score } = ballot;
+      const { category_id } = criteria.get(criteria_id);
+      if (!(category_id in categoryScoresForThisJudge)) {
+        categoryScoresForThisJudge[category_id] = 0;
+      }
+      categoryScoresForThisJudge[category_id] += score;
+    });
+    for (const category_id in categoryScoresForThisJudge) {
+      if (!(category_id in categoryScoresMap)) {
+        categoryScoresMap[category_id] = [];
+      }
+      categoryScoresMap[category_id].push(categoryScoresForThisJudge[category_id]);
+    }
+  });
+
+  for (const category_id in categoryScoresMap) {
+    const scores = categoryScoresMap[category_id];
+    map.set(category_id, Immutable.List([ mean(scores), sstdev(scores) ]));
+  }
+  return map;
+});
+
+const mean = arr => arr.reduce((a, b) => a + b) / arr.length;
+const sstdev = arr => {
+  if (arr.length < 2) {
+    return 0;
+  }
+  const m = mean(arr);
+  return Math.pow(arr.map(a => (a - m) * (a - m)).reduce((a, b) => a + b) / (arr.length - 1), 0.5);
 };
 
 const computeProjectHealth = derivedState => project => {
@@ -244,12 +346,46 @@ const computeProjectHealth = derivedState => project => {
   // hacky pseudorandom based on id so they don't get auto-assigned in order
   health += epsilon;
 
+  // the number of times this project has been seen by a judge
   if (derivedState.project_ballots.has(project.project_id)) {
     health += derivedState.project_ballots.get(project.project_id).size;
   }
+  health += derivedState.project_skipped_count.get(project.project_id);
 
   health += 0.75 * derivedState.project_assignments.get(project.project_id).size;
   health += 0.50 * derivedState.project_queues.get(project.project_id).size;
+
+  if (derivedState.primary_category_id !== -1) {
+    const times_judged =
+      derivedState.project_ballots.has(project.project_id)
+        ? derivedState.project_ballots.get(project.project_id).size
+        : 0;
+    if (times_judged >= 2) {
+      const [ score_mean, score_stdev ] = derivedState.project_scores.get(project.project_id).get('' + derivedState.primary_category_id).toJS();
+
+      // multiply health by (20 / (average score)) ^ (n / 2), if n >= 2.
+      // 20 is just 1/2 of the max score.
+      // this means good projects get judged more. we don't care about the difference
+      // between 81st place and 82nd place, but 8th vs 9th matters.
+      const dividend = derivedState.primary_category_max_score * 1 / 2;
+      const quotient = dividend / score_mean;
+      const multiplier = Math.pow(quotient, times_judged / 2);
+      health *= multiplier;
+
+      // multiply health by (5 / (5 + sample standard deviation)).
+      // as we get more judges, high standard deviation means we should throw more
+      // judges at the problem.
+      const one_eighth_max_score = derivedState.primary_category_max_score / 8;
+      health *= one_eighth_max_score / (one_eighth_max_score + score_stdev);
+    }
+  }
+
+  // if a project has been skipped at least once, multiply health
+  // by # skips.
+  const skip_count = derivedState.project_skipped_count.get(project.project_id);
+  if (skip_count > 0) {
+    health *= skip_count;
+  }
 
   return health;
 };
@@ -358,20 +494,6 @@ const rootReducer = (state = new State(), action) => {
         ], s => s.add(action.userID));
       });
     },
-    'SKIP_PROJECT': (state, action) => {
-      return state
-        .setIn([
-          'canonical',
-          'judgeQueues',
-          action.userID,
-          'activeProjectID',
-        ], null)
-        .updateIn([
-          'derived',
-          'project_assignments',
-          action.projectID,
-        ], s => s.delete(action.userID));
-    },
     'PROJECT_SCORED': (state, action) => {
       const s = state.withMutations(state => {
         for (const ballot of action.ballots) {
@@ -411,12 +533,12 @@ const rootReducer = (state = new State(), action) => {
             action.userID,
           ], Immutable.List());
         }
-        state.setIn([
+        state.updateIn([
           'derived',
           'project_ballots',
           action.projectID,
           action.userID,
-        ], list => list.concat(action.ballots.map(deserializeBallot)));
+        ], list => list.concat(action.ballots.map(b => b.ballot_id)));
 
         if (!state.canonical.judgedProjects.has(action.userID)) {
           state.setIn([
@@ -442,6 +564,17 @@ const rootReducer = (state = new State(), action) => {
           'project_assignments',
           action.projectID,
         ], s => s.delete(action.userID));
+
+        state.setIn([
+          'derived',
+          'project_scores',
+          action.projectID,
+        ], computeAllScoresForProject(
+          state.derived.project_ballots,
+          state.canonical.categories,
+          state.canonical.criteria,
+          state.canonical.ballots,
+        )(state.canonical.projects.get(action.projectID)));
       });
       return s;
     },
@@ -471,6 +604,11 @@ const rootReducer = (state = new State(), action) => {
           'project_assignments',
           action.projectID,
         ], s => s.delete(action.userID));
+        state.updateIn([
+          'derived',
+          'project_skipped_count',
+          action.projectID,
+        ], c => c + 1);
       });
       return s;
     },
@@ -502,6 +640,39 @@ const rootReducer = (state = new State(), action) => {
         'program',
         'selectedProjectID',
       ], action.projectID);
+    },
+    'SET_EXPO': (state, action) => {
+      return state.setIn([
+        'program',
+        'expo_number',
+      ], action.expo);
+    },
+    'EXCLUDE_JUDGE': (state, action) => {
+      return state.updateIn([
+        'program',
+        'excludedJudges',
+      ], s => s.add(action.judge_id));
+    },
+    'UN_EXCLUDE_JUDGE': (state, action) => {
+      return state.updateIn([
+        'program',
+        'excludedJudges',
+      ], s => s.remove(action.judge_id));
+    },
+    'SELECT_JUDGE': (state, action) => {
+      return state.setIn([
+        'program',
+        'leftPane',
+      ], 'judgeInfo').setIn([
+        'program',
+        'selectedJudge',
+      ], action.judge_id);
+    },
+    'SET_PANE': (state, action) => {
+      return state.setIn([
+        'program',
+        'leftPane',
+      ], action.pane);
     },
 
     'SET_SOCKET': (state, action) => {
