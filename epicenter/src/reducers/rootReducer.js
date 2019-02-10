@@ -157,8 +157,7 @@ const deserializeCanonicalState = serializedState => {
 
   const ballots = Immutable.Map().withMutations(map => {
     for (const ballotId in serializedState.ballots) {
-      if (serializedState.ballots[ballotId].ballot_status === 'Pending'
-        || serializedState.ballots[ballotId].ballot_status === 'Skipped') {
+      if (serializedState.ballots[ballotId].ballot_status !== BallotStatus.SUBMITTED) {
         continue; // I DON'T WANT IT
       }
       map.set(
@@ -170,7 +169,7 @@ const deserializeCanonicalState = serializedState => {
 
   const skipped_ballots = Immutable.Map().withMutations(map => {
     for (const ballotId in serializedState.ballots) {
-      if (serializedState.ballots[ballotId].ballot_status === 'Skipped') {
+      if (serializedState.ballots[ballotId].ballot_status === BallotStatus.SKIPPED) {
         // ok I kind of want it
         map.set(
           parseInt(ballotId, 10),
