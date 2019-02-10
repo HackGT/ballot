@@ -58,7 +58,7 @@ class OverviewPane extends Component {
           {sortedProjects.map((project, i) => {
             return (
               <div key={i} onClick={() => this.props.setSelectedProject(project)}>
-                ({displayCategoryScore(project)}{this.props.counts.get(project.project_id)}, {this.props.project_skipped_count.get(project.project_id)}s / {this.props.health.get(project.project_id).toFixed(2)}) {project.table_number}: {project.name}
+                ({displayCategoryScore(project)}{this.props.counts.get(project.project_id)}, {this.props.project_skipped_count.get(project.project_id)}s, {this.props.project_queues.has(project.project_id) ? this.props.project_queues.get(project.project_id).size : 0}q, {this.props.project_assignments.has(project.project_id) ? this.props.project_assignments.get(project.project_id).size : 0}a / {this.props.health.get(project.project_id).toFixed(2)}) {project.table_number}: {project.name}
               </div>
             );
           })}

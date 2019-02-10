@@ -113,7 +113,7 @@ const DerivedState = Immutable.Record({
 });
 
 const ProgramState = Immutable.Record({
-  expo_number: 1,
+  expo_number: 2,
   loadedState: false,
   selectedProjectID: null,
   socket: null,
@@ -124,7 +124,7 @@ const ProgramState = Immutable.Record({
   excludedJudges: Immutable.Set(),
   selectedJudge: 0,
   goodnessPower: 0.5,
-  stdevPower: 1,
+  stdevPower: 0,
   skipPower: 1,
 });
 
