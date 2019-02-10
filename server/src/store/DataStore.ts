@@ -40,89 +40,94 @@ export class DataStore {
         this.autoassignEnabled = false;
     }
 
-
-
     public async queueProject(userID: number, projectID: number): Promise<{ status: boolean, message: string }> {
         // Check if this user has a queue, if not, create it.
-        if (!this.judgeQueues[userID]) {
-            this.judgeQueues[userID] = {
-                activeProjectID: null,
-                queuedProjectID: null,
-            };
-        }
+        if (this.users[userID]) {
+            if (!this.judgeQueues[userID]) {
+                this.judgeQueues[userID] = {
+                    activeProjectID: null,
+                    queuedProjectID: null,
+                };
+            }
 
-        // Check if this judge has any logged judged projects, otherwise, create the log.
-        if (!this.judgedProjects[userID]) {
-            this.judgedProjects[userID] = [];
-        }
+            // Check if this judge has any logged judged projects, otherwise, create the log.
+            if (!this.judgedProjects[userID]) {
+                this.judgedProjects[userID] = [];
+            }
 
-        if (!this.usersToProjects[userID]) {
-            this.usersToProjects[userID] = {};
-        }
+            if (!this.usersToProjects[userID]) {
+                this.usersToProjects[userID] = {};
+            }
 
-        // Check if the judge already judged this project.
-        if (this.judgedProjects[userID].includes(projectID)) {
+            // Check if the judge already judged this project.
+            if (this.judgedProjects[userID].includes(projectID)) {
+                return {
+                    status: false,
+                    message: 'Project was already scored by this judge',
+                };
+            }
+
+            // If the project is currently in the queue, do nothing.
+            if (this.judgeQueues[userID].queuedProjectID !== projectID
+                && this.judgeQueues[userID].activeProjectID !== projectID) {
+                // Check if there is already a queued project. If so, remove the project.
+                if (this.judgeQueues[userID].queuedProjectID) {
+                    const dequeueResult = await this.dequeueProject(userID, this.judgeQueues[userID].queuedProjectID!);
+                    if (!dequeueResult.status) {
+                        return dequeueResult;
+                    }
+                }
+
+                this.judgeQueues[userID].queuedProjectID = projectID;
+
+                const newBallots: BallotModel[] = [];
+
+                for (const category of this.projects[projectID].categories) {
+                    for (const criteria of this.categories[category.category_id!].criteria) {
+                        newBallots.push({
+                            project_id: projectID,
+                            user_id: userID,
+                            criteria_id: criteria.criteria_id!,
+                            judge_priority: 1,
+                            ballot_status: BallotStatus.Pending,
+                        });
+                    }
+                }
+
+                const createdBallots = await Ballots.bulkCreate(newBallots, { returning: true });
+
+                const ballotIDs: number[] = [];
+
+                for (const ballot of createdBallots) {
+                    const json = ballot.toJSON();
+                    this.ballots[json.ballot_id!] = json;
+                    ballotIDs.push(json.ballot_id!);
+                }
+
+                this.usersToProjects[userID][projectID] = ballotIDs;
+
+                // console.log(this.judgeQueues);
+
+                return {
+                    status: true,
+                    message: 'Project sucessfully queued',
+                };
+            }
+
             return {
                 status: false,
-                message: 'Project was already scored by this judge',
-            };
-        }
-
-        // If the project is currently in the queue, do nothing.
-        if (this.judgeQueues[userID].queuedProjectID !== projectID
-            && this.judgeQueues[userID].activeProjectID !== projectID) {
-            // Check if there is already a queued project. If so, remove the project.
-            if (this.judgeQueues[userID].queuedProjectID) {
-                const dequeueResult = await this.dequeueProject(userID, this.judgeQueues[userID].queuedProjectID!);
-                if (!dequeueResult.status) {
-                    return dequeueResult;
-                }
-            }
-
-            this.judgeQueues[userID].queuedProjectID = projectID;
-
-            const newBallots: BallotModel[] = [];
-
-            for (const category of this.projects[projectID].categories) {
-                for (const criteria of this.categories[category.category_id!].criteria) {
-                    newBallots.push({
-                        project_id: projectID,
-                        user_id: userID,
-                        criteria_id: criteria.criteria_id!,
-                        judge_priority: 1,
-                        ballot_status: BallotStatus.Pending,
-                    });
-                }
-            }
-
-            const createdBallots = await Ballots.bulkCreate(newBallots, { returning: true });
-
-            const ballotIDs: number[] = [];
-
-            for (const ballot of createdBallots) {
-                const json = ballot.toJSON();
-                this.ballots[json.ballot_id!] = json;
-                ballotIDs.push(json.ballot_id!);
-            }
-
-            this.usersToProjects[userID][projectID] = ballotIDs;
-
-            console.log(this.judgeQueues);
-
-            return {
-                status: true,
-                message: 'Project sucessfully queued',
+                message: 'Project already queued',
             };
         }
 
         return {
             status: false,
-            message: 'Project already queued',
+            message: 'User does not exist',
         };
     }
 
     public async dequeueProject(userID: number, projectID: number): Promise<{status: boolean, message: string}> {
-        if (this.judgeQueues[userID] && this.judgeQueues[userID].queuedProjectID) {
+        if (this.users[userID] && this.judgeQueues[userID] && this.judgeQueues[userID].queuedProjectID) {
             if (this.judgeQueues[userID].queuedProjectID === projectID) {
                 const ballotIDsToDelete: number[] = [];
                 for (const ballot of Object.values(dataStore.ballots)) {
@@ -175,11 +180,7 @@ export class DataStore {
             };
         }
 
-        fs.writeFile('./dump.json', JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
-            console.log('Saved');
-        });
-
-        console.log(this.usersToProjects);
+        // console.log(this.usersToProjects);
     }
 
     public async fetchCollective(): Promise<void> {
@@ -216,6 +217,14 @@ export class DataStore {
             activeProjectID: null,
             queuedProjectID: null,
         };
+    }
+
+    public backup(): void {
+        const date = new Date();
+        const time = date.getTime();
+        fs.writeFile(`./backups/dump-${time}.json`, JSON.stringify(dataStore.asJSON(), null, 0), 'utf-8', () => {
+            console.log(`Saved to ./dump-${time}.json`);
+        });
     }
 
     private async fetchUsers(): Promise<void> {
@@ -326,6 +335,7 @@ export class DataStore {
             users: dataStore.users,
             judgeQueues: dataStore.judgeQueues,
             judgedProjects: dataStore.judgedProjects,
+            usersToProjects: dataStore.usersToProjects,
         };
     }
 

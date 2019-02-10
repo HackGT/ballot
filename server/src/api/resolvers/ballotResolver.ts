@@ -21,8 +21,14 @@ const resolvers = {
                 throw new Error('You do not have permission to view ballots');
             }
 
-            console.log(JSON.stringify(await BallotService.getRanking()));
             return BallotService.getRanking() || [];
+        },
+        getAllBallots: async (obj: any, args: any, context: any) => {
+            if (!context.user || !context.user.can(Action.ViewBallot, args.user_id)) {
+                throw new Error('You do not have permission to view ballots');
+            }
+
+            return BallotService.getBallots();
         },
     },
 

@@ -9,11 +9,12 @@ import {
 import Expo from '../../components/expo/Expo';
 import { refreshProjects } from '../../actions/projects';
 
-import { State, ProjectState } from '../../types/State';
+import { State, ProjectState, CategoryState } from '../../types/State';
 import AdminPanelProjects from '../../components/admin/AdminPanelProjects';
 
 interface StateToProps {
     projects: ProjectState[];
+    categories: CategoryState[];
 }
 
 interface DispatchToProps {
@@ -23,7 +24,8 @@ interface DispatchToProps {
 const mapStateToProps = (state: State): StateToProps => {
     return {
         projects: state.projects,
-    }
+        categories: state.categories,
+    };
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>) => {

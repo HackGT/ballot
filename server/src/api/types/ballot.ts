@@ -4,6 +4,7 @@ scalar Date
 type Query {
     nextBallotSet(user_id: Int!): NextBallot
     getRanking: [CriteriaRanking!]!
+    getAllBallots: [Ballot!]!
 }
 
 type Mutation {
@@ -67,6 +68,7 @@ enum BallotStatus {
     Submitted
     Reviewed
     Started
+    Skipped
 }`;
 
 export interface ProjectScores {

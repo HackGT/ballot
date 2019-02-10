@@ -14,10 +14,7 @@ const AdminPanelUserList: React.SFC<UserTableProps> = (props) => {
     for (let i = 0; i < props.userData.length; i++) {
         tableRender.push(<AdminPanelUserCard
             key={i}
-            user_id={props.userData[i].user_id}
-            name={props.userData[i].name}
-            email={props.userData[i].email}
-            user_class={props.userData[i].user_class}
+            user={props.userData[i]}
             isCurrentUser={props.userData[i].user_id === props.currentUser.user_id}
             editUser={props.editUser}
             removeUser={props.removeUser}
@@ -29,6 +26,7 @@ const AdminPanelUserList: React.SFC<UserTableProps> = (props) => {
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'center',
+            width: '100%',
         }}>
             {tableRender}
         </div>
