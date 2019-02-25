@@ -215,7 +215,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     const projects = this.state.projects;
 
                     const usedTables = new Set<string>();
-                    let allocatedAlready = {};
+                    const allocatedAlready = {};
                     for (const p of projects) {
                         if (p.table_number) {
                             if (usedTables.has(p.table_number)) {
