@@ -372,7 +372,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     project_id: -1,
                     name: project[keys.name],
                     devpost_id: project[keys.url],
-                    table_number: project[keys.table_nums],
+                    table_number: project[keys.table_nums] ? !project[keys.table_nums] : project[keys.table_nums].toUpperCase(),
                     expo_number: -1,
                     sponsor_prizes: project[keys.categories],
                 });
