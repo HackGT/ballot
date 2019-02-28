@@ -23,8 +23,8 @@ const animateProject = (fromRef, toRef, oldProject, newProject, duration) => {
     phonyElement,
   );
   phonyElement.style.position = 'absolute';
-  phonyElement.style.top = toRef.offsetTop + 'px';
-  phonyElement.style.left = toRef.offsetLeft + 'px';
+  phonyElement.style.top = toRef.getBoundingClientRect().top + 'px';
+  phonyElement.style.left = toRef.getBoundingClientRect().left + 'px';
   phonyElement.style.zIndex = '1';
 
   toRef.style.visibility = 'hidden';
@@ -37,14 +37,14 @@ const animateProject = (fromRef, toRef, oldProject, newProject, duration) => {
     animatedElement,
   );
   animatedElement.style.position = 'absolute';
-  animatedElement.style.top = fromRef.offsetTop + 'px';
-  animatedElement.style.left = fromRef.offsetLeft + 'px';
+  animatedElement.style.top = fromRef.getBoundingClientRect().top + 'px';
+  animatedElement.style.left = fromRef.getBoundingClientRect().left + 'px';
   animatedElement.style.zIndex = '2';
   animatedElement.style.transition = `all ${duration}ms`;
 
   window.setTimeout(() => {
-    animatedElement.style.top = toRef.offsetTop + 'px';
-    animatedElement.style.left = toRef.offsetLeft + 'px';
+    animatedElement.style.top = toRef.getBoundingClientRect().top + 'px';
+    animatedElement.style.left = toRef.getBoundingClientRect().left + 'px';
   }, 0);
 
   window.setTimeout(() => {

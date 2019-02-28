@@ -16,6 +16,8 @@ const mapStateToProps = state => {
     goodnessPower: state.program.goodnessPower,
     stdevPower: state.program.stdevPower,
     skipPower: state.program.skipPower,
+    project_queues: state.derived.project_queues,
+    project_assignments: state.derived.project_assignments,
   };
 };
 
