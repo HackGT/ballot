@@ -352,7 +352,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             name: rowTitles.indexOf('Submission Title'),
             url: rowTitles.indexOf('Submission Url'),
             categories: rowTitles.indexOf('Desired Prizes'),
-            table_nums: rowTitles.indexOf('Table Number')
+            table_nums: rowTitles.indexOf('Table Number'),
         }
 
         console.log(keys);
@@ -372,7 +372,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     project_id: -1,
                     name: project[keys.name],
                     devpost_id: project[keys.url],
-                    table_number: project[keys.table_nums] ? !project[keys.table_nums] : project[keys.table_nums].toUpperCase(),
+                    table_number: project[keys.table_nums],
                     expo_number: -1,
                     sponsor_prizes: project[keys.categories],
                 });
