@@ -352,7 +352,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             name: rowTitles.indexOf('Submission Title'),
             url: rowTitles.indexOf('Submission Url'),
             categories: rowTitles.indexOf('Desired Prizes'),
-            table_nums: rowTitles.indexOf('Table Numbers')
+            table_nums: rowTitles.indexOf('Table Number')
         }
 
         console.log(keys);
