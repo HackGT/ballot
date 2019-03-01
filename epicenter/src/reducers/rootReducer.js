@@ -113,7 +113,7 @@ const DerivedState = Immutable.Record({
 });
 
 const ProgramState = Immutable.Record({
-  expo_number: 2,
+  expo_number: 1,
   loadedState: false,
   selectedProjectID: null,
   socket: null,
