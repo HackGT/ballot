@@ -17,6 +17,7 @@ interface AdminPanelRankingState {
         criteria: number[],
         projectBallots: { [projectID: number]: {
             ballots: BallotState[];
+            individualScores: number[];
             score: number;
         }},
     }};
@@ -60,7 +61,8 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
                                     <div key={projectID}>
                                         <h3>{this.state.projects[+projectID].name}</h3>
                                         <p>Expo: {this.state.projects[+projectID].expo_number} Table: {this.state.projects[+projectID].table_number} <br />
-                                        Score: {categorySection.projectBallots[+projectID].score}</p>
+                                        Overall Score: {Math.round(categorySection.projectBallots[+projectID].score * 100) / 100}</p>
+                                        <p>{categorySection.projectBallots[+projectID].individualScores.length} Individual Scores: {categorySection.projectBallots[+projectID].individualScores.toString()}</p>
                                     </div>
                                 )
                             })}
@@ -126,6 +128,7 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
             criteria: number[],
             projectBallots: { [projectID: number]: {
                 ballots: BallotState[];
+                individualScores: number[];
                 score: number;
             }},
         }} = {};
@@ -156,6 +159,7 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
             if (!categoriesState[criteriaToCategories[ballot.criteria_id]].projectBallots[ballot.project_id]) {
                 categoriesState[criteriaToCategories[ballot.criteria_id]].projectBallots[ballot.project_id] = {
                     ballots: [],
+                    individualScores: [],
                     score: 0,
                 };
             }
@@ -168,17 +172,22 @@ class AdminPanelRanking extends React.Component<AdminPanelRankingProps, AdminPan
             for (const projectID of Object.keys(categoryValue.projectBallots)) {
                 const projectValue = categoryValue.projectBallots[+projectID];
                 let score = 0;
-                const totalUsers = new Set();
+                const individualJudgeScores = {};
                 for (const ballotID of Object.keys(projectValue.ballots)) {
                     const ballotValue = projectValue.ballots[+ballotID];
                     if (ballotValue.ballot_status === 'Submitted') {
-                        if (!totalUsers.has(ballotValue.user_id)) {
-                            totalUsers.add(ballotValue.user_id);
+                        if (!individualJudgeScores[ballotValue.user_id!]) {
+                            individualJudgeScores[ballotValue.user_id!] = 0;
                         }
+                        individualJudgeScores[ballotValue.user_id!] += projectValue.ballots[+ballotID].score!;
                         score += projectValue.ballots[+ballotID].score!;
                     }
                 }
-                projectValue.score = score / totalUsers.size || 0;
+                projectValue.score = score / Object.keys(individualJudgeScores).length || 0;
+
+                for (const judgeID of Object.keys(individualJudgeScores)) {
+                    projectValue.individualScores.push(individualJudgeScores[judgeID]);
+                }
             }
         }
 

@@ -214,13 +214,45 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
 
                     const projects = this.state.projects;
 
+                    const usedTables = new Set<string>();
+                    const allocatedAlready = {};
+                    for (const p of projects) {
+                        if (p.table_number) {
+                            if (usedTables.has(p.table_number)) {
+                                AppToaster.show({
+                                    message: 'Table numbers cannot be duplicate within groups.',
+                                    intent: 'warning',
+                                });
+                                return;
+                            }
+                            usedTables.add(p.table_number);
+                        }
+                    }
+
+                    // TODO: Allow projects to have expo preference.
                     for (let expo = 0; expo < this.state.expoCount; expo++) {
                         for (const projectGroup of this.state.projectGroups) {
+                            projectNumber = 0;
                             for (let tableNumber = 0; tableNumber < projectGroup.numberProjects; tableNumber++) {
                                 if (projectNumber < this.state.projects.length) {
-                                    projects[projectNumber].expo_number = expo + 1;
-                                    projects[projectNumber].table_number = projectGroup.name + ' ' + (tableNumber + 1);
-                                    projectNumber++;
+                                    if (allocatedAlready[projectNumber]) {
+                                        projectNumber++;
+                                        tableNumber--;
+                                    } else if (projects[projectNumber].table_number) {
+                                        projects[projectNumber].expo_number = expo + 1;
+                                        allocatedAlready[projectNumber] = true;
+                                        tableNumber--;
+                                        projectNumber++;
+                                    } else {
+                                        projects[projectNumber].expo_number = expo + 1;
+                                        projects[projectNumber].table_number = projectGroup.name + ' ' + (tableNumber + 1);
+                                        if (!usedTables.has(projects[projectNumber].table_number)) {
+                                            allocatedAlready[projectNumber] = true;
+                                            projectNumber++;
+                                        } else {
+                                            projects[projectNumber].table_number = '';
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -237,16 +269,16 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                                 mutation {
                                     batchUploadProjects(
                                         projects: [${
-                                            this.state.projects.map((project) => {
-                                                return `{
+                                this.state.projects.map((project) => {
+                                    return `{
                                                     name: "${project.name}"
                                                     devpost_id: "${project.devpost_id}"
                                                     expo_number: ${project.expo_number}
                                                     table_number: "${project.table_number}"
                                                     sponsor_prizes: "${project.sponsor_prizes}"
                                                 }`
-                                            })
-                                        }]
+                                })
+                                }]
                                     ) {
                                         project_id
                                         devpost_id
@@ -320,11 +352,12 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
             name: rowTitles.indexOf('Submission Title'),
             url: rowTitles.indexOf('Submission Url'),
             categories: rowTitles.indexOf('Desired Prizes'),
+            table_nums: rowTitles.indexOf('Table Number'),
         }
 
         console.log(keys);
 
-        if (keys.name === -1 || keys.url === -1 || keys.categories === -1) {
+        if (keys.name === -1 || keys.url === -1 || keys.categories === -1 || keys.table_nums === -1) {
             throw new Error('First row is invalid');
         }
 
@@ -339,7 +372,7 @@ class AdminPanelUploadProjects extends React.Component<AdminPanelUploadProjectsP
                     project_id: -1,
                     name: project[keys.name],
                     devpost_id: project[keys.url],
-                    table_number: '-1',
+                    table_number: project[keys.table_nums],
                     expo_number: -1,
                     sponsor_prizes: project[keys.categories],
                 });
