@@ -32,7 +32,7 @@ const Ballots: React.SFC<BallotsProps> = (props) => {
 
                 <p>Once you find the table and project, press "I'm Here!"</p>
 
-                <JudgingRoom tablxe={props.project.table_number}/>
+                <JudgingRoom table={props.project.table_number}/>
                 <Button
                     text={`I'm here!`}
                     large={true}
