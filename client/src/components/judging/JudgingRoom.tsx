@@ -1,6 +1,7 @@
 import * as React from 'react';
 import roomData = require('../../data.json');
 
+
 interface JudgingRoomProps {
     table: string;
 }
@@ -12,33 +13,80 @@ interface JudgingRoomProps {
 class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
     constructor(props: JudgingRoomProps) {
         super(props)
-        console.log(roomData)
     }
     public render() {
+        let index = 0;
+        const tableColor = this.props.table.split(" ")[0].toLowerCase();
+        if (tableColor === "green") {
+            index = 1;
+        } else if (tableColor === "orange") {
+            index = 2;
+        }
+        let tableId = 0
+        let widthSize = "817.33331"
+        let heightSize = "486.6666"
+        if (window.innerWidth < 853) {
+            widthSize = "400"
+            heightSize = "200"
+        }
         return (
-            <svg width="817.33331" height="486.66666" viewBox="0 0 817.33331 486.66666">
-                <path d={roomData.path} fill="none" stroke="#000000"/>
-                // render n number of rectangles
-                {roomData.tables.map(table => {
-                    return <rect fill="#000000" key={table.id} x={table.x} y={table.y} width={table.width} height={table.height} className="table" id={table.id} transform={table.transform}/>
-                })}
-            </svg>
+
+            <div>
+                <h1>{roomData[index].title}</h1>
+                <svg width={widthSize} height={heightSize} viewBox="0 0 817.33331 486.66666">
+                    <path style={{fill: "none", stroke: `${this.props.table.split(" ")[0].toLowerCase()}`, strokeWidth: "3"}} d={roomData[index].path}/>
+                    {
+                        roomData[index].groups.map((group, i) => {
+                            return (
+                                <g key={i} transform={group.transform}>
+                                {
+                                    group.tables.map((table, j) => {
+                                        tableId += 1;
+                                        return (
+                                            <rect
+                                                id={`${tableId - 1}`}
+                                                key={j}
+                                                x={table.x}
+                                                y={table.y}
+                                                width={table.width}
+                                                height={table.height}
+                                                transform={table.transform}
+                                                fill="grey"
+                                                style={{stroke: "black", strokeWidth: "3"}}
+                                            />
+                                        )
+                                    })
+                                }
+                                {
+                                    group.paths.map((arrow, k) => {
+                                        return (
+                                            <path
+                                                key={k}
+                                                d={arrow.d}
+                                                transform={arrow.transform}
+                                            />
+                                        )
+                                    })
+                                }
+
+                                </g>
+                            )
+                        })
+                    }
+                </svg>
+            </div>
         )
     }
 
     public componentDidMount() {
         const tableNumber = this.props.table.split(" ")[1];
-        console.log(tableNumber)
+        const tableColor = this.props.table.split(" ")[0].toLowerCase();
         const highlightTable = document.getElementById(tableNumber + "");
         if (! highlightTable) {
             console.log("null");
         } else {
-            highlightTable.setAttribute("fill", "green")
+            highlightTable.setAttribute("fill", tableColor)
         }
-    }
-
-    private disproomData() {
-        console.log(roomData);
     }
 
 }
