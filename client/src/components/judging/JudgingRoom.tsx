@@ -1,26 +1,22 @@
-import * as React from 'react';
-import roomData = require('../../data.json');
+import * as React from 'react'
+import roomData = require('../../data.json')
 
 
 interface JudgingRoomProps {
-    table: string;
+    table: string
 }
-
-// let styles = {
-//     fill:none;stroke:#000000;stroke-width:3.14576221px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1
-// }
 
 class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
     constructor(props: JudgingRoomProps) {
         super(props)
     }
     public render() {
-        let index = 0;
-        const tableColor = this.props.table.split(" ")[0].toLowerCase();
+        let index = 0
+        const tableColor = this.props.table.split(" ")[0].toLowerCase()
         if (tableColor === "green") {
-            index = 1;
+            index = 1
         } else if (tableColor === "orange") {
-            index = 2;
+            index = 2
         }
         let tableId = 0
         let widthSize = "817.33331"
@@ -41,7 +37,7 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
                                 <g key={i} transform={group.transform}>
                                 {
                                     group.tables.map((table, j) => {
-                                        tableId += 1;
+                                        tableId += 1
                                         return (
                                             <rect
                                                 id={`${tableId - 1}`}
@@ -79,11 +75,11 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
     }
 
     public componentDidMount() {
-        const tableNumber = this.props.table.split(" ")[1];
-        const tableColor = this.props.table.split(" ")[0].toLowerCase();
-        const highlightTable = document.getElementById(tableNumber + "");
+        const [tableNumber, tableColorRaw] = this.props.table.split(" ")
+        const tableColor = tableColorRaw.toLowerCase()
+        const highlightTable = document.getElementById(tableNumber + "")
         if (! highlightTable) {
-            console.log("null");
+            console.error("null")
         } else {
             highlightTable.setAttribute("fill", tableColor)
         }
@@ -91,4 +87,4 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
 
 }
 
-export default JudgingRoom;
+export default JudgingRoom
