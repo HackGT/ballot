@@ -75,7 +75,7 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
     }
 
     public componentDidMount() {
-        const [tableNumber, tableColorRaw] = this.props.table.split(" ")
+        const [tableColorRaw, tableNumber] = this.props.table.split(" ")
         const tableColor = tableColorRaw.toLowerCase()
         const highlightTable = document.getElementById(tableNumber + "")
         if (! highlightTable) {
