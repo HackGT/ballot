@@ -19,12 +19,10 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
             index = 2
         }
         let tableId = 0
-        let widthSize = "817.33331"
-        let heightSize = "486.6666"
-        if (window.innerWidth < 853) {
-            widthSize = "400"
-            heightSize = "200"
-        }
+        let widthSize = 817.33331
+        let heightSize = 486.6666
+        widthSize = 500 * window.innerWidth / 853;
+        heightSize = 0.677 * widthSize;
         return (
 
             <div>
@@ -64,7 +62,6 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
                                         )
                                     })
                                 }
-
                                 </g>
                             )
                         })
@@ -84,7 +81,6 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
             highlightTable.setAttribute("fill", tableColor)
         }
     }
-
 }
 
 export default JudgingRoom
