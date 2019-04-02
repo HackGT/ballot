@@ -6,21 +6,21 @@ interface JudgingRoomProps {
     table: string
 }
 
-class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
+class JudgingRoom extends React.Component<JudgingRoomProps>{
     constructor(props: JudgingRoomProps) {
-        super(props)
+        super(props);
     }
     public render() {
         let index = 0
         const tableColor = this.props.table.split(" ")[0].toLowerCase()
         if (tableColor === "green") {
-            index = 1
+            index = 1;
         } else if (tableColor === "orange") {
-            index = 2
+            index = 2;
         }
-        let tableId = 0
-        let widthSize = 817.33331
-        let heightSize = 486.6666
+        let tableId = 0;
+        let widthSize = 817.33331;
+        let heightSize = 486.6666;
         widthSize = 500 * window.innerWidth / 853;
         heightSize = 0.677 * widthSize;
         return (
@@ -72,15 +72,15 @@ class JudgingRoom extends React.Component<JudgingRoomProps, {}>{
     }
 
     public componentDidMount() {
-        const [tableColorRaw, tableNumber] = this.props.table.split(" ")
-        const tableColor = tableColorRaw.toLowerCase()
-        const highlightTable = document.getElementById(tableNumber + "")
-        if (! highlightTable) {
-            console.error("null")
+        const [tableColorRaw, tableNumber] = this.props.table.split(" ");
+        const tableColor = tableColorRaw.toLowerCase();
+        const highlightTable = document.getElementById(tableNumber + "");
+        if (!highlightTable) {
+            console.error("null");
         } else {
-            highlightTable.setAttribute("fill", tableColor)
+            highlightTable.setAttribute("fill", tableColor);
         }
     }
 }
 
-export default JudgingRoom
+export default JudgingRoom;
