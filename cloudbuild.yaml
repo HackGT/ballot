@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'hackgt/$REPO_NAME:$COMMIT_SHA', '-t', 'hackgt/$REPO_NAME:latest', '.']
-  timeout: 120s
+  timeout: 300s
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   args: ['-c', 'docker login --username=hackgt --password=$$DOCKER_PASSWORD']
