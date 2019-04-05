@@ -2,6 +2,7 @@ import * as React from 'react';
 import { H1, H2, H3, H4, Button, Slider } from '@blueprintjs/core';
 import { BallotState, ProjectState, CategoryState } from '../../types/State';
 import Ballot from './Ballot';
+import JudgingRoom from './JudgingRoom'
 
 interface BallotsProps {
     ballotStatus: string;
@@ -31,6 +32,7 @@ const Ballots: React.SFC<BallotsProps> = (props) => {
 
                 <p>Once you find the table and project, press "I'm Here!"</p>
 
+                <JudgingRoom table={props.project.table_number}/>
                 <Button
                     text={`I'm here!`}
                     large={true}
