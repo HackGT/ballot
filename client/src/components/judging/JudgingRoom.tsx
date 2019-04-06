@@ -12,22 +12,12 @@ class JudgingRoom extends React.Component<JudgingRoomProps>{
     }
     public render() {
         let index = 0
-        const tableColor = this.props.table.split(" ")[0].toLowerCase()
-        if (tableColor === "green") {
-            index = 1;
-        } else if (tableColor === "orange") {
-            index = 2;
-        }
         let tableId = 0;
-        let widthSize = 817.33331;
-        let heightSize = 486.6666;
-        widthSize = 500 * window.innerWidth / 853;
-        heightSize = 0.677 * widthSize;
         return (
 
             <div>
                 <h1>{roomData[index].title}</h1>
-                <svg width={widthSize} height={heightSize} viewBox="0 0 817.33331 486.66666">
+                <svg style="width: 90vw, height: 60vw" viewBox="0 0 817.33331 486.66666">
                     <path style={{fill: "none", stroke: `${this.props.table.split(" ")[0].toLowerCase()}`, strokeWidth: "3"}} d={roomData[index].path}/>
                     {
                         roomData[index].groups.map((group, i) => {
@@ -38,7 +28,7 @@ class JudgingRoom extends React.Component<JudgingRoomProps>{
                                         tableId += 1
                                         return (
                                             <rect
-                                                id={`${tableId - 1}`}
+                                                id={`${tableId}`}
                                                 key={j}
                                                 x={table.x}
                                                 y={table.y}
