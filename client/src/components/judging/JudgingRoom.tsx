@@ -11,20 +11,19 @@ class JudgingRoom extends React.Component<JudgingRoomProps>{
         super(props);
     }
     public render() {
-        let index = 0
+        const index = 0
         let tableId = 0;
         return (
-
             <div>
                 <h1>{roomData[index].title}</h1>
-                <svg style="width: 90vw, height: 60vw" viewBox="0 0 817.33331 486.66666">
+                <svg style={{width: '90vw', height: '60vw'}} viewBox="0 0 817.33331 486.66666">
                     <path style={{fill: "none", stroke: `${this.props.table.split(" ")[0].toLowerCase()}`, strokeWidth: "3"}} d={roomData[index].path}/>
                     {
-                        roomData[index].groups.map((group, i) => {
+                        roomData[index].groups.map((group: any, i: any) => {
                             return (
                                 <g key={i} transform={group.transform}>
                                 {
-                                    group.tables.map((table, j) => {
+                                    group.tables.map((table: any, j: any) => {
                                         tableId += 1
                                         return (
                                             <rect
@@ -42,7 +41,7 @@ class JudgingRoom extends React.Component<JudgingRoomProps>{
                                     })
                                 }
                                 {
-                                    group.paths.map((arrow, k) => {
+                                    group.paths.map((arrow: any, k: any) => {
                                         return (
                                             <path
                                                 key={k}
