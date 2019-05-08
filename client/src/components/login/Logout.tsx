@@ -1,48 +1,36 @@
-import * as React from 'react';
+import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
-import FetcherContainer from '../../containers/FetcherContainer';
-import { UpdateClassRequestType } from '../../types/UpdateClass';
+import User from '../../types/User';
+import { Dimmer, Loader } from 'semantic-ui-react';
 
 interface LogoutProps {
-    updateClass: (json: UpdateClassRequestType) => void;
+    account: User;
+    logoutUser: () => void;
 }
 
-interface LogoutState {
-    success: boolean;
+const sleep = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class Logout extends React.Component<LogoutProps, LogoutState> {
-    constructor(props: LogoutProps) {
-        super(props);
+const Logout: React.FC<LogoutProps> = (props) => {
+    const [success, changeSuccess] = React.useState(false);
+    React.useEffect(() => {
+        const logout = async () => {
+            await Promise.all([axios.get('/auth/logout'), sleep(500)])
+            props.logoutUser();
+            changeSuccess(true);
+        }
 
-        this.state = {
-            success: false,
-        };
-    }
+        logout();
+    }, [success, props]);
 
-    public async componentDidMount() {
-        await axios.get('/auth/logout');
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                success: true,
-            }
-        }, () => {
-            this.props.updateClass({
-                name: null,
-                email: null,
-                class: null,
-                user_id: null,
-            });
-        });
-    }
-
-    public render() {
-        return (
-            this.state.success ? <Redirect to='/' /> : <div>Logging out...</div>
-        )
-    }
+    return (success
+        ? <Redirect to='/' />
+        :   <Dimmer active inverted>
+                <Loader size='huge'>Logging Out...</Loader>
+            </Dimmer>
+    );
 }
 
 export default Logout;
