@@ -1,6 +1,5 @@
 import Category, { Criteria } from '../types/Category';
 
-export const ADD_CATEGORY = 'ADD_CATEGORY';
 export const UPDATE_CATEGORY = 'UPDATE_CATEGORY';
 export const DELETE_CATEGORY = 'DELETE_CATEGORY';
 export const FILL_CATEGORIES = 'FILL_CATEGORIES';

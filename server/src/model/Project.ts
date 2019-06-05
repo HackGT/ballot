@@ -1,12 +1,13 @@
 import { Model } from 'objection';
 import Category from './Category';
+import TableGroup from './TableGroup';
 
 export default class Project extends Model {
     readonly id!: number;
     name: string;
     devpostURL: string;
     expoNumber: number;
-    tableGroup: string;
+    tableGroup: number;
     tableNumber: number;
     sponsorPrizes: string;
     tags: string;
@@ -33,6 +34,14 @@ export default class Project extends Model {
                     to: 'categories.id',
                 },
             },
+            tableGroup: {
+                relation: Model.HasOneRelation,
+                modelClass: TableGroup,
+                join: {
+                    from: 'projects.tableGroup',
+                    to: 'project-groups.id'
+                }
+            }
         };
     }
 }

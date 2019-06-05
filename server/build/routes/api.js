@@ -28,25 +28,43 @@ router.get('/projects', async (req, res) => {
             'id', 'name', 'devpostURL', 'expoNumber', 'tableGroup', 'tableNumber',
             'sponsorPrizes',
         ]);
-        return res.status(200).json({
-            projects,
-        });
+        return res.status(200).json(projects);
     }
     return res.status(401).send('Unauthorized');
 });
 router.put('/projects', postParser, async (req, res) => {
     try {
         if (Permissions_1.can(req.user, Permissions_1.Action.AddProject)) {
-            const project = await Project_1.default.query().insert({
-                name: req.body.name,
-                devpostURL: req.body.devpostURL,
-                expoNumber: req.body.expoNumber,
-                tableGroup: req.body.tableGroup,
-                tableNumber: req.body.tableNumber,
-                sponsorPrizes: req.body.sponsorPrizes,
-                tags: req.body.tags,
-            });
-            return res.status(200).json(project);
+            if (req.body.projects) {
+                const toInsert = [];
+                const projectCategories = [];
+                const categories = await Category_1.default.query();
+                const categoryNames = {};
+                for (const category of categories) {
+                    categoryNames[category.name] = category.id;
+                }
+                for (const project of req.body.projects) {
+                    toInsert.push({
+                        name: project.name,
+                        devpostURL: project.devpostURL,
+                        expoNumber: project.expoNumber,
+                        tableGroup: project.tableGroup,
+                        tableNumber: project.tableNumber,
+                        sponsorPrizes: project.sponsorPrizes,
+                        tags: project.tags,
+                    });
+                    const projectDesiredPrizes = project.sponsorPrizes.split(', ');
+                    for (const desiredPrize of projectDesiredPrizes) {
+                        if (categoryNames[desiredPrize]) {
+                            projectCategories.push({
+                                projectID: project.id,
+                                categoryID: categoryNames[desiredPrize],
+                            });
+                        }
+                    }
+                }
+            }
+            return res.status(200).send('Success');
         }
     }
     catch (err) {
@@ -54,9 +72,9 @@ router.put('/projects', postParser, async (req, res) => {
     }
     return res.status(400).send('Error');
 });
-router.post('/projects/:id', postParser, (req, res) => {
+router.post('/projects', async (req, res) => {
 });
-router.delete('/projects/:id', postParser, (req, res) => {
+router.delete('/projects/:id', (req, res) => {
 });
 router.get('/users', async (req, res) => {
     if (Permissions_1.can(req.user, Permissions_1.Action.ViewUsers)) {

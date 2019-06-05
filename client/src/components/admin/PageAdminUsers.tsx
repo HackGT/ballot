@@ -1,7 +1,7 @@
 import React from 'react';
 import User, { roleStringToEnum } from '../../types/User';
 import axios from 'axios';
-import { Card, Button, Icon } from 'semantic-ui-react';
+import { Card, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import UserCard from './UserCard';
 import { UserState } from '../../state/UserManagement';
 
@@ -69,7 +69,7 @@ const PageAdminUsers: React.FC<PageAdminUsersProps> = (props) => {
                                 updateUser={props.updateUser} />
                         );
                     })
-                    : null
+                    : <Loader active size='large' inline='centered' />
                 }
             </Card.Group>
         </div>

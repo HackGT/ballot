@@ -21,29 +21,60 @@ router.get('/projects', async (req, res) => {
             'sponsorPrizes',
         ]);
 
-        return res.status(200).json({
-            projects,
-        });
+        return res.status(200).json(projects);
     }
 
     return res.status(401).send('Unauthorized');
 });
 
-// Add
+// Batch upload projects
 router.put('/projects', postParser, async (req, res) => {
     try {
         if (can(req.user, Action.AddProject)) {
-            const project = await Project.query().insert({
-                name: req.body.name,
-                devpostURL: req.body.devpostURL,
-                expoNumber: req.body.expoNumber,
-                tableGroup: req.body.tableGroup,
-                tableNumber: req.body.tableNumber,
-                sponsorPrizes: req.body.sponsorPrizes,
-                tags: req.body.tags,
-            });
+            if (req.body.projects) {
+                const toInsert: {
+                    name: string;
+                    devpostURL: string;
+                    expoNumber: number;
+                    tableGroup: string;
+                    tableNumber: string;
+                    sponsorPrizes: string;
+                    tags: string;
+                }[] = [];
+                const projectCategories: {
+                    projectID: number;
+                    categoryID: number;
+                }[] = [];
+                const categories = await Category.query();
+                const categoryNames: { [name: string]: number } = {};
+                for (const category of categories) {
+                    categoryNames[category.name] = category.id;
+                }
 
-            return res.status(200).json(project);
+                for (const project of req.body.projects) {
+                    toInsert.push({
+                        name: project.name,
+                        devpostURL: project.devpostURL,
+                        expoNumber: project.expoNumber,
+                        tableGroup: project.tableGroup,
+                        tableNumber: project.tableNumber,
+                        sponsorPrizes: project.sponsorPrizes,
+                        tags: project.tags,
+                    });
+
+                    const projectDesiredPrizes = project.sponsorPrizes.split(', ');
+                    for (const desiredPrize of projectDesiredPrizes) {
+                        if (categoryNames[desiredPrize]) {
+                            projectCategories.push({
+                                projectID: project.id,
+                                categoryID: categoryNames[desiredPrize],
+                            });
+                        }
+                    }
+                }
+            }
+
+            return res.status(200).send('Success');
         }
     } catch (err) {
         return res.status(400).send('Error');
@@ -52,11 +83,11 @@ router.put('/projects', postParser, async (req, res) => {
     return res.status(400).send('Error');
 });
 
-router.post('/projects/:id', postParser, (req, res) => {
+router.post('/projects', async (req, res) => {
 
 });
 
-router.delete('/projects/:id', postParser, (req, res) => {
+router.delete('/projects/:id', (req, res) => {
 
 });
 

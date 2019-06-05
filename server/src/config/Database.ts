@@ -112,6 +112,15 @@ class Database {
                     table.dateTime('submmitedAt');
                 });
             }
+
+            if (!await this.db.schema.hasTable('table-groups')) {
+                await this.db.schema.createTable('table-groups', (table) => {
+                    table.increments('id').primary();
+                    table.string('name');
+                    table.string('shortcode');
+                    table.string('color');
+                });
+            }
         } catch (err) {
             Logger.error('Error encountered when creating tables');
         }

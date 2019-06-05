@@ -8,7 +8,6 @@ interface CategoryEditorProps {
     category: Category;
     closeModal: () => void;
     updateCategory: (category: Category) => void;
-    deleteCategory: (categoryID: number) => void;
 }
 
 const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
@@ -16,7 +15,10 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
         name: props.category.name,
         isDefault: props.category.isDefault,
     });
-    const [criteria, changeCriteria] = React.useState<Criteria[]>(JSON.parse(JSON.stringify(props.category.criteria))); // Deep copy bc array in object is referenced, causing unnecessary state updates.
+    // Deep copy bc array in object is referenced, causing unnecessary state updates.
+    const [criteria, changeCriteria] = React.useState<Criteria[]>(
+        JSON.parse(JSON.stringify(props.category.criteria))
+    );
     const [newCriteriaID, changeNewCriteriaID] = React.useState(-1);
 
     React.useEffect(() => {
@@ -35,13 +37,13 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
             ...inputs,
             name: value,
         });
-    }
+    };
 
     const deleteCriteria = (index: number) => {
         const newCriteria = criteria;
         newCriteria.splice(index, 1);
         changeCriteria(newCriteria);
-    }
+    };
 
     const updateCriteria = (updatedCriteria: Criteria, index: number) => {
         const newCriteria = criteria;
@@ -49,7 +51,7 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
         console.log('wow');
 
         changeCriteria(newCriteria);
-    }
+    };
 
     const handleSave = () => {
         console.log({
@@ -67,7 +69,7 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
 
         props.updateCategory({ ...props.category, ...inputs, criteria });
         props.closeModal();
-    }
+    };
 
     return (
         <>
@@ -86,7 +88,7 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
             open={props.open}
             onOpen={() => setTimeout(() => document.body.classList.add('modal-fade-in'), 0)}
             transition={{ animation: 'scale', duration: 300 }}>
-            <Modal size='tiny' open={true} closeIcon onClose={() => {
+            <Modal size='small' open={true} closeIcon onClose={() => {
                 document.body.classList.remove('modal-fade-in');
                 props.closeModal();
 
@@ -98,15 +100,26 @@ const CategoryEditor: React.FC<CategoryEditorProps> = (props) => {
                 <Modal.Header>{ props.category.id ? 'Edit Category' : 'New Category' }</Modal.Header>
                 <Modal.Content>
                     <Form>
-                        <Form.Input name='name' placeholder='Category Name' fluid onChange={handleChange} value={inputs.name} />
-                        <Form.Checkbox checked={inputs.isDefault} label='Default Category' toggle onChange={() => changeInputs({ ...inputs, isDefault: !inputs.isDefault })} />
+                        <Form.Input
+                            fluid
+                            name='name'
+                            placeholder='Category Name'
+                            onChange={handleChange}
+                            value={inputs.name} />
+                        <Form.Checkbox
+                            toggle
+                            checked={inputs.isDefault}
+                            label='Default Category'
+                            onChange={() => changeInputs({ ...inputs, isDefault: !inputs.isDefault })} />
                     </Form>
                 </Modal.Content>
-                {criteria.map((c: Criteria, index: number) => {
-                    return (
-                        <CriteriaEditor key={c.id} criteria={c} delete={() => deleteCriteria(index)} updateCriteria={(cParam) => updateCriteria(cParam, index)} />
-                    )
-                })}
+                {criteria.map((c: Criteria, index: number) =>
+                    <CriteriaEditor
+                        key={c.id}
+                        criteria={c}
+                        delete={() => deleteCriteria(index)}
+                        updateCriteria={(cParam) => updateCriteria(cParam, index)} />
+                )}
                 <Modal.Content>
                     <Button color='blue' onClick={() => {
                         criteria.push({
@@ -140,7 +153,8 @@ interface CriteriaEditorProps {
 
 const CriteriaEditor: React.FC<CriteriaEditorProps> = (props) => {
     const [inputs, changeInputs] = React.useState<Criteria>(props.criteria);
-    const [deleted, changeDeleted] = React.useState(false); // Workaround for non-disappearing thing bc I'm not smart enough to work it out.
+    // Workaround for non-disappearing thing bc I'm not smart enough to work it out.
+    const [deleted, changeDeleted] = React.useState(false);
 
     React.useEffect(() => {
         props.updateCriteria(inputs);
@@ -172,14 +186,45 @@ const CriteriaEditor: React.FC<CriteriaEditorProps> = (props) => {
     return (
         <Modal.Content>
             <Form>
-                <Form.Input name='name' placeholder='Criteria Name' label='Criteria Name' value={inputs.name} onChange={handleChange} />
-                <Form.TextArea name='rubric' placeholder='Rubric' label='Rubric' value={inputs.rubric} onChange={handleChange} />
+                <Form.Input
+                    name='name'
+                    placeholder='Criteria Name'
+                    label='Criteria Name'
+                    value={inputs.name}
+                    onChange={handleChange} />
+                <Form.TextArea
+                    style={{
+                        minHeight: 200,
+                    }}
+                    name='rubric'
+                    placeholder='Rubric'
+                    label='Rubric'
+                    value={inputs.rubric}
+                    onChange={handleChange} />
                 <Form.Group widths='equal'>
-                    <Form.Input name='minScore' type='number' label='Min Score' placeholder='Min Score' value={inputs.minScore} onChange={handleChange} />
-                    <Form.Input name='maxScore' type='number' label='Max Score' placeholder='Max Score' value={inputs.maxScore} onChange={handleChange} />
+                    <Form.Input
+                        name='minScore'
+                        type='number'
+                        label='Min Score'
+                        placeholder='Min Score'
+                        value={inputs.minScore}
+                        onChange={handleChange} />
+                    <Form.Input
+                        name='maxScore'
+                        type='number'
+                        label='Max Score'
+                        placeholder='Max Score'
+                        value={inputs.maxScore}
+                        onChange={handleChange} />
                 </Form.Group>
             </Form>
-            <Button size='mini' compact color='red' basic floated='right' onClick={handleDelete}>Delete Criteria</Button>
+            <Button
+                basic
+                compact
+                size='mini'
+                color='red'
+                floated='right'
+                onClick={handleDelete}>Delete Criteria</Button>
         </Modal.Content>
     )
 }

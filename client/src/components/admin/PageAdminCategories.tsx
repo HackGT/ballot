@@ -83,8 +83,7 @@ const PageAdminCategories: React.FC<PageAdminCategoriesProps> = (props) => {
                 </span>
             </div>
             <CategoryEditor open={modalOpen} category={modalCategory} closeModal={closeModal}
-                updateCategory={props.updateCategory}
-                deleteCategory={props.deleteCategory} />
+                updateCategory={props.updateCategory} />
             { Object.values(props.categories).length > 0
                 ? <Accordion fluid styled>
                     { Object.values(props.categories).sort((a: Category, b: Category) => {

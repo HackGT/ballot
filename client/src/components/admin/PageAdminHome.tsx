@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router';
-import PageAdminProjects from './PageAdminProjects';
+import PageAdminProjectsContainer from './PageAdminProjectsContainer';
 import PageAdminUsersContainer from './PageAdminUsersContainer';
 import PageAdminEpicenter from './PageAdminEpicenter';
 import PageAdminCategoriesContainer from './PageAdminCategoriesContainer';
@@ -16,7 +16,7 @@ const PageAdminHome: React.FC<PageAdminHomeProps> = (props) => {
         <div>
             <AdminNavigation />
             <Switch>
-                <Route path={`${adminRoute}/projects`} component={PageAdminProjects} />
+                <Route path={`${adminRoute}/projects`} component={PageAdminProjectsContainer} />
                 <Route path={`${adminRoute}/categories`} component={PageAdminCategoriesContainer} />
                 <Route path={`${adminRoute}/users`} component={PageAdminUsersContainer} />
                 <Route path={`${adminRoute}`} component={PageAdminEpicenter} />
