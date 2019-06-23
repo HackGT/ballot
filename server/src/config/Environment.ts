@@ -1,15 +1,10 @@
 import chalk from 'chalk';
+import Logger from '../util/Logger';
 
 export interface DatabaseConfig {
-    host: string;
-    database: string;
-    username: string;
-    password: string;
-    port?: number;
-}
-
-export interface DatabaseConfigURI {
-    uri: string;
+    url: string;
+    name: string;
+    port: number;
 }
 
 class Environment {
@@ -29,20 +24,12 @@ class Environment {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI | undefined {
-        if (process.env.POSTGRES_URL) {
+    public static getDatabaseConfig(): DatabaseConfig | undefined {
+        if (process.env.MDBNAME && process.env.MDBURL && process.env.MDBPORT) {
             return {
-                uri: process.env.POSTGRES_URL,
-            };
-        }
-
-        if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {
-            return {
-                host: process.env.PGURL,
-                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
-                database: process.env.PGDATABASE,
-                username: process.env.PGUSERNAME,
-                password: process.env.PGPASSWORD,
+                url: process.env.MDBURL,
+                port: process.env.PGPORT ? parseInt((process.env.MDBPORT) as string, 10) : 27017,
+                name: process.env.MDBNAME,
             };
         }
 
@@ -50,20 +37,20 @@ class Environment {
     }
 
     public static verifyEnvironment(): boolean {
-        console.info(chalk.blueBright('[Info]'), 'Verifying environment');
+        Logger.info('Verifying Environment');
 
         if (this.getURL() === '') {
-            console.error(chalk.bgRed('[Error]'), 'URL is not defined in environment variables!');
+            Logger.error('URL is not defined in environment variables!');
             throw new Error('Missing process.env.URL');
         }
 
         if (this.getSession() === '') {
-            console.error(chalk.redBright('[Error]'), 'Session Secret is not defined in environment variables!');
+            Logger.error('Session Secret is not defined in environment variables!');
             throw new Error('Missing process.env.SESSION_SECRET');
         }
 
         if (this.getDatabaseConfig() === undefined) {
-            console.error(chalk.redBright('[Error]'), 'The database configuration in environment variables is not complete!');
+            Logger.error('The database configuration in environment variables is not complete!');
             throw new Error('Missing database environment variables');
         }
 

@@ -3,15 +3,15 @@ export default interface Project {
     name: string;
     devpostURL: string;
     expoNumber: number;
-    tableGroup: string;
+    tableGroup: TableGroup;
     tableNumber: number;
     sponsorPrizes: string;
     tags: string;
 }
 
-// export interface TableGroup {
-//     id?: number;
-//     name: string;
-//     shortcode: string;
-//     color: string;
-// }
+export interface TableGroup {
+    id?: number;
+    name: string;
+    shortcode: string;
+    color: string;
+}

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_model_1 = require("../model/user.model");
 var Role;
 (function (Role) {
     Role["Pending"] = "Pending";
@@ -36,7 +37,7 @@ function can(user, action) {
     if (user) {
         switch (action) {
             case Action.Reset:
-                return user.role === Role.Owner;
+                return user.role === user_model_1.UserRole.Owner;
             case Action.EditUser:
             case Action.DeleteUser:
             case Action.ViewUsers:
@@ -52,13 +53,16 @@ function can(user, action) {
             case Action.AddProject:
             case Action.DeleteProject:
             case Action.UpdateProject:
-                return user.role === Role.Owner || user.role === Role.Admin;
+                return user.role === user_model_1.UserRole.Owner
+                    || user.role === user_model_1.UserRole.Admin;
             case Action.ViewProjects:
             case Action.ViewBallot:
             case Action.ScoreBallot:
             case Action.StartProject:
             case Action.SkipProject:
-                return user.role === Role.Owner || user.role === Role.Admin || user.role === Role.Judge;
+                return user.role === user_model_1.UserRole.Owner
+                    || user.role === user_model_1.UserRole.Admin
+                    || user.role === user_model_1.UserRole.Judge;
             case Action.ViewProjects:
                 return true;
         }

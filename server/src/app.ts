@@ -5,13 +5,15 @@ import session from 'express-session';
 import socketio from 'socket.io';
 import * as http from 'http';
 import passport from 'passport';
+import 'reflect-metadata';
 
 import Environment from './config/Environment';
 import Database from './config/Database';
-import Authentication from './config/Authentication';
+// import Authentication from './config/Authentication';
 import Logger from './util/Logger';
 import auth from './routes/auth';
 import api from './routes/api';
+import Authentication from './config/Authentication';
 
 const app = express();
 const server = http.createServer(app);
@@ -30,8 +32,6 @@ async function start(): Promise<void> {
     try {
         Logger.info('Setting up database');
         await Database.connect();
-        Logger.info('Creating tables');
-        await Database.createSchema();
     } catch {
         Logger.error('Server startup canceled due to an error with the database.');
     } finally {

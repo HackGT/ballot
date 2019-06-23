@@ -2,12 +2,18 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
 const passport_local_1 = require("passport-local");
-const User_1 = __importDefault(require("../model/User"));
-const Permissions_1 = require("../config/Permissions");
 const Logger_1 = __importDefault(require("../util/Logger"));
+const user_model_1 = __importStar(require("../model/user.model"));
 class Authentication {
     static setupStrategies() {
         this.strategies.push(new passport_local_1.Strategy({
@@ -15,7 +21,6 @@ class Authentication {
             passwordField: 'password',
             passReqToCallback: true,
         }, async (req, email, password, done) => {
-            let users = await User_1.default.query().where('email', email);
             if (req.path.match(/\/signup$/i)) {
                 const name = req.body.name.trim();
                 if (!name || !email || !password) {
@@ -23,48 +28,38 @@ class Authentication {
                     return done(undefined, false);
                 }
                 const { salt, hash } = await this.hashPassword(password);
-                let user;
-                if ((await User_1.default.query()).length === 0) {
-                    user = await User_1.default.query().insert({
+                const user = user_model_1.default.findOne({ email: email });
+                if (!user) {
+                    const newUser = await user_model_1.default.create({
                         name,
                         email,
-                        role: Permissions_1.Role.Owner,
+                        role: await user_model_1.default.count({}) === 0 ? user_model_1.UserRole.Owner : user_model_1.UserRole.Pending,
                         salt,
                         hash,
                     });
-                    return done(undefined, user);
+                    return done(undefined, newUser);
                 }
                 else {
-                    if (users.length === 0) {
-                        user = await User_1.default.query().insert({
-                            name,
-                            email,
-                            role: Permissions_1.Role.Pending,
-                            salt,
-                            hash,
-                        });
-                        return done(undefined, user);
-                    }
-                    else {
-                        Logger_1.default.error('Attempted local account signup - Email already in use');
-                        return done(undefined, false);
-                    }
-                }
-            }
-            else if (users[0]) {
-                const actualUser = users[0];
-                const hash = await this.pbkdf2Async(password, Buffer.from(actualUser.salt, 'hex'), 3000, 128, 'sha256');
-                if (hash.toString('hex') === actualUser.hash) {
-                    done(undefined, actualUser);
-                }
-                else {
-                    Logger_1.default.error('Attempted local account login - Incorrect credentials');
-                    done(undefined, false);
+                    Logger_1.default.error('Attempted local account signup - Email already in use');
+                    return done(undefined, false);
                 }
             }
             else {
-                Logger_1.default.error('Attempted local account login - User does not exist');
-                done(undefined, false);
+                const user = await user_model_1.default.findOne({ email: email });
+                if (user) {
+                    const hash = await this.pbkdf2Async(password, Buffer.from(user.salt, 'hex'), 3000, 128, 'sha256');
+                    if (hash.toString('hex') === user.hash) {
+                        done(undefined, user);
+                    }
+                    else {
+                        Logger_1.default.error('Attempted local account login - Incorrect credentials');
+                        done(undefined, false);
+                    }
+                }
+                else {
+                    Logger_1.default.error('Attempted local account login - User does not exist');
+                    done(undefined, false);
+                }
             }
         }));
     }
@@ -76,7 +71,8 @@ class Authentication {
     }
     static async deserialize(id, done) {
         try {
-            done(undefined, await User_1.default.query().findById(id));
+            const user = await user_model_1.default.findById(id);
+            done(undefined, user ? user : undefined);
         }
         catch (err) {
             done(err);

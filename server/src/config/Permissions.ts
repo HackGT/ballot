@@ -1,4 +1,4 @@
-import User from "../model/User";
+import User, { IUser, UserRole } from "../model/user.model";
 
 export enum Role {
     Pending = 'Pending',
@@ -39,11 +39,11 @@ export enum Action {
     ViewRanking = 'ViewRanking',
 }
 
-export function can(user: User, action: Action): boolean {
+export function can(user: IUser, action: Action): boolean {
     if (user) {
         switch (action) {
             case Action.Reset:
-                return user.role === Role.Owner;
+                return user.role === UserRole.Owner;
             case Action.EditUser:
             case Action.DeleteUser:
             case Action.ViewUsers:
@@ -59,13 +59,16 @@ export function can(user: User, action: Action): boolean {
             case Action.AddProject:
             case Action.DeleteProject:
             case Action.UpdateProject:
-                return user.role === Role.Owner || user.role === Role.Admin;
+                return user.role === UserRole.Owner
+                    || user.role === UserRole.Admin;
             case Action.ViewProjects:
             case Action.ViewBallot:
             case Action.ScoreBallot:
             case Action.StartProject:
             case Action.SkipProject:
-                return user.role === Role.Owner || user.role === Role.Admin || user.role === Role.Judge;
+                return user.role === UserRole.Owner
+                    || user.role === UserRole.Admin
+                    || user.role === UserRole.Judge;
             case Action.ViewProjects:
                 return true;
         }
