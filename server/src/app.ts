@@ -9,7 +9,6 @@ import 'reflect-metadata';
 
 import Environment from './config/Environment';
 import Database from './config/Database';
-// import Authentication from './config/Authentication';
 import Logger from './util/Logger';
 import auth from './routes/auth';
 import api from './routes/api';
@@ -23,20 +22,20 @@ async function start(): Promise<void> {
     // Verify environment
     try {
         await Environment.verifyEnvironment();
-    } catch {
-        Logger.error('Server startup canceled due to an error with the environment.')
-    } finally {
-        Logger.success('Environment verified');
+    } catch (error) {
+        Logger.error('Server startup canceled due to an error with the environment.');
+        throw new Error(error);
     }
+    Logger.success('Environment verified');
 
     try {
         Logger.info('Setting up database');
         await Database.connect();
-    } catch {
+    } catch (error) {
         Logger.error('Server startup canceled due to an error with the database.');
-    } finally {
-        Logger.success('Database Initialized');
+        throw new Error(error);
     }
+    Logger.success('Database Initialized');
 
     app.use(session({
         secret: Environment.getSession(),
@@ -44,15 +43,21 @@ async function start(): Promise<void> {
         saveUninitialized: true,
     }));
 
-    Authentication.setupStrategies();
-    for (const strategy of Authentication.getStrategies()) {
-        passport.use(strategy);
-    }
-    passport.serializeUser(Authentication.serialize);
-    passport.deserializeUser(Authentication.deserialize);
+    try {
+        Logger.info('Setting up Passport');
+        Authentication.setupStrategies();
+        for (const strategy of Authentication.getStrategies()) {
+            passport.use(strategy);
+        }
+        passport.serializeUser(Authentication.serialize);
+        passport.deserializeUser(Authentication.deserialize);
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+        app.use(passport.initialize());
+        app.use(passport.session());
+    } catch (error) {
+        Logger.error('Server startup canceled due to an error with Passport');
+        throw new Error(error);
+    }
 
     app.use(express.json());
     app.use('/auth', auth);

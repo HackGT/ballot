@@ -18,11 +18,18 @@ class Environment {
         return process.env.SESSION_SECRET || '';
     }
     static getDatabaseConfig() {
-        if (process.env.MDBNAME && process.env.MDBURL && process.env.MDBPORT) {
+        if (process.env.POSTGRES_URL) {
             return {
-                url: process.env.MDBURL,
-                port: process.env.PGPORT ? parseInt((process.env.MDBPORT), 10) : 27017,
-                name: process.env.MDBNAME,
+                uri: process.env.POSTGRES_URL,
+            };
+        }
+        if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {
+            return {
+                url: process.env.PGURL,
+                port: process.env.PGPORT ? parseInt((process.env.PGPORT), 10) : undefined,
+                database: process.env.PGDATABASE,
+                username: process.env.PGUSERNAME,
+                password: process.env.PGPASSWORD,
             };
         }
         return undefined;

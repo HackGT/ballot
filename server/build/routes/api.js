@@ -6,14 +6,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const bodyParser = __importStar(require("body-parser"));
-const Permissions_1 = require("../config/Permissions");
 const express_1 = require("express");
+const Permissions_1 = require("../config/Permissions");
+const user_1 = __importDefault(require("../routes/user"));
+const category_1 = __importDefault(require("../routes/category"));
+const tablegroup_1 = __importDefault(require("../routes/tablegroup"));
 const postParser = bodyParser.urlencoded({
     extended: false,
 });
 const router = express_1.Router();
+router.use('/users', user_1.default);
+router.use('/categories', category_1.default);
+router.use('/tableGroups', tablegroup_1.default);
 router.get('/projects', async (req, res) => {
     if (Permissions_1.can(req.user, Permissions_1.Action.ViewProjects)) {
     }
@@ -33,16 +42,6 @@ router.put('/projects', postParser, async (req, res) => {
 router.post('/projects', async (req, res) => {
 });
 router.delete('/projects/:id', (req, res) => {
-});
-router.get('/users', async (req, res) => {
-    if (Permissions_1.can(req.user, Permissions_1.Action.ViewUsers)) {
-    }
-    return res.status(401).send('Unauthorized');
-});
-router.post('/users', async (req, res) => {
-    if (Permissions_1.can(req.user, Permissions_1.Action.EditUser)) {
-    }
-    return res.status(401).send('Unauthorized');
 });
 router.get('/categories', async (req, res) => {
     return res.status(400).send('Unauthorized');

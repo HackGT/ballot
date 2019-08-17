@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_model_1 = require("../model/user.model");
+const User_1 = require("../entity/User");
 var Role;
 (function (Role) {
     Role["Pending"] = "Pending";
@@ -15,13 +15,12 @@ var Action;
     Action["DeleteUser"] = "DeleteUser";
     Action["ViewUsers"] = "ViewUsers";
     Action["ViewCategories"] = "ViewCategories";
+    Action["ViewCategoriesCriteria"] = "ViewCategoriesCriteria";
     Action["AddCategory"] = "AddCategory";
     Action["DeleteCategory"] = "DeleteCategory";
     Action["UpdateCategory"] = "UpdateCategory";
-    Action["ViewCriteria"] = "ViewCriteria";
-    Action["AddCriteria"] = "AddCriteria";
-    Action["DeleteCriteria"] = "DeleteCriteria";
-    Action["UpdateCriteria"] = "UpdateCriteria";
+    Action["ManageTableGroups"] = "ManageTableGroups";
+    Action["ViewTableGroups"] = "ViewTableGroups";
     Action["BatchUploadProjects"] = "BatchUploadProjects";
     Action["AddProject"] = "AddProject";
     Action["DeleteProject"] = "DeleteProject";
@@ -37,33 +36,32 @@ function can(user, action) {
     if (user) {
         switch (action) {
             case Action.Reset:
-                return user.role === user_model_1.UserRole.Owner;
+                return user.role === User_1.UserRole.Owner;
             case Action.EditUser:
             case Action.DeleteUser:
             case Action.ViewUsers:
-            case Action.ViewCategories:
+            case Action.ViewCategoriesCriteria:
             case Action.AddCategory:
             case Action.DeleteCategory:
             case Action.UpdateCategory:
-            case Action.ViewCriteria:
-            case Action.AddCriteria:
-            case Action.DeleteCriteria:
-            case Action.UpdateCriteria:
+            case Action.ManageTableGroups:
             case Action.BatchUploadProjects:
             case Action.AddProject:
             case Action.DeleteProject:
             case Action.UpdateProject:
-                return user.role === user_model_1.UserRole.Owner
-                    || user.role === user_model_1.UserRole.Admin;
+                return user.role === User_1.UserRole.Owner
+                    || user.role === User_1.UserRole.Admin;
             case Action.ViewProjects:
             case Action.ViewBallot:
             case Action.ScoreBallot:
             case Action.StartProject:
             case Action.SkipProject:
-                return user.role === user_model_1.UserRole.Owner
-                    || user.role === user_model_1.UserRole.Admin
-                    || user.role === user_model_1.UserRole.Judge;
+                return user.role === User_1.UserRole.Owner
+                    || user.role === User_1.UserRole.Admin
+                    || user.role === User_1.UserRole.Judge;
             case Action.ViewProjects:
+            case Action.ViewCategories:
+            case Action.ViewTableGroups:
                 return true;
         }
     }

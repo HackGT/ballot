@@ -10,31 +10,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-var UserClass;
-(function (UserClass) {
-    UserClass["Pending"] = "Pending";
-    UserClass["Judge"] = "Judge";
-    UserClass["Admin"] = "Admin";
-    UserClass["Owner"] = "Owner";
-})(UserClass = exports.UserClass || (exports.UserClass = {}));
+const Ballot_1 = require("./Ballot");
+var UserRole;
+(function (UserRole) {
+    UserRole["Owner"] = "owner";
+    UserRole["Admin"] = "admin";
+    UserRole["Judge"] = "judge";
+    UserRole["Pending"] = "pending";
+})(UserRole = exports.UserRole || (exports.UserRole = {}));
 let User = class User {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], User.prototype, "userID", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], User.prototype, "name", void 0);
+], User.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], User.prototype, "name", void 0);
+__decorate([
     typeorm_1.Column('enum'),
     __metadata("design:type", String)
-], User.prototype, "userClass", void 0);
+], User.prototype, "role", void 0);
+__decorate([
+    typeorm_1.Column('character varying', { array: true }),
+    __metadata("design:type", Array)
+], User.prototype, "tags", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
@@ -43,7 +48,20 @@ __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], User.prototype, "hash", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
+    __metadata("design:type", Array)
+], User.prototype, "ballots", void 0);
+__decorate([
+    typeorm_1.CreateDateColumn(),
+    __metadata("design:type", Number)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    typeorm_1.UpdateDateColumn(),
+    __metadata("design:type", Number)
+], User.prototype, "updatedAt", void 0);
 User = __decorate([
-    typeorm_1.Entity()
+    typeorm_1.Entity(),
+    typeorm_1.Unique(["email"])
 ], User);
-exports.default = User;
+exports.User = User;

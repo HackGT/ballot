@@ -31,35 +31,40 @@ async function start() {
     try {
         await Environment_1.default.verifyEnvironment();
     }
-    catch (_a) {
+    catch (error) {
         Logger_1.default.error('Server startup canceled due to an error with the environment.');
+        throw new Error(error);
     }
-    finally {
-        Logger_1.default.success('Environment verified');
-    }
+    Logger_1.default.success('Environment verified');
     try {
         Logger_1.default.info('Setting up database');
         await Database_1.default.connect();
     }
-    catch (_b) {
+    catch (error) {
         Logger_1.default.error('Server startup canceled due to an error with the database.');
+        throw new Error(error);
     }
-    finally {
-        Logger_1.default.success('Database Initialized');
-    }
+    Logger_1.default.success('Database Initialized');
     app.use(express_session_1.default({
         secret: Environment_1.default.getSession(),
         resave: true,
         saveUninitialized: true,
     }));
-    Authentication_1.default.setupStrategies();
-    for (const strategy of Authentication_1.default.getStrategies()) {
-        passport_1.default.use(strategy);
+    try {
+        Logger_1.default.info('Setting up Passport');
+        Authentication_1.default.setupStrategies();
+        for (const strategy of Authentication_1.default.getStrategies()) {
+            passport_1.default.use(strategy);
+        }
+        passport_1.default.serializeUser(Authentication_1.default.serialize);
+        passport_1.default.deserializeUser(Authentication_1.default.deserialize);
+        app.use(passport_1.default.initialize());
+        app.use(passport_1.default.session());
     }
-    passport_1.default.serializeUser(Authentication_1.default.serialize);
-    passport_1.default.deserializeUser(Authentication_1.default.deserialize);
-    app.use(passport_1.default.initialize());
-    app.use(passport_1.default.session());
+    catch (error) {
+        Logger_1.default.error('Server startup canceled due to an error with Passport');
+        throw new Error(error);
+    }
     app.use(express_1.default.json());
     app.use('/auth', auth_1.default);
     app.use('/api', api_1.default);

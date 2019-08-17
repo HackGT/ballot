@@ -8,18 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const Category_1 = __importDefault(require("./Category"));
+const TableGroup_1 = require("./TableGroup");
+const Ballot_1 = require("./Ballot");
+const Category_1 = require("./Category");
 let Project = class Project {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], Project.prototype, "projectID", void 0);
+], Project.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
@@ -34,26 +33,27 @@ __decorate([
 ], Project.prototype, "expoNumber", void 0);
 __decorate([
     typeorm_1.Column(),
-    __metadata("design:type", String)
-], Project.prototype, "tableGroup", void 0);
-__decorate([
-    typeorm_1.Column(),
     __metadata("design:type", Number)
 ], Project.prototype, "tableNumber", void 0);
 __decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], Project.prototype, "sponsorPrizes", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
+    typeorm_1.Column('character varying', { array: true }),
+    __metadata("design:type", Array)
 ], Project.prototype, "tags", void 0);
 __decorate([
-    typeorm_1.ManyToMany(type => Category_1.default),
+    typeorm_1.ManyToOne(() => TableGroup_1.TableGroup, tableGroup => tableGroup.projects),
+    __metadata("design:type", TableGroup_1.TableGroup)
+], Project.prototype, "tableGroup", void 0);
+__decorate([
+    typeorm_1.ManyToMany(() => Category_1.Category),
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], Project.prototype, "categories", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
+    __metadata("design:type", Array)
+], Project.prototype, "ballots", void 0);
 Project = __decorate([
     typeorm_1.Entity()
 ], Project);
-exports.default = Project;
+exports.Project = Project;
+exports.EMPTY_PROJECT_DICTIONARY = {};

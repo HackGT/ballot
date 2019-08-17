@@ -4,29 +4,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Environment_1 = __importDefault(require("./Environment"));
-const mongodb_1 = require("mongodb");
-const assert_1 = __importDefault(require("assert"));
-const Logger_1 = __importDefault(require("../util/Logger"));
+const typeorm_1 = require("typeorm");
+const commonConnectionOptions = {
+    entities: [
+        __dirname + '/../entity/*.js'
+    ],
+    synchronize: !Environment_1.default.isProduction(),
+    logging: false,
+};
 class Database {
     static async connect() {
-        if (this.dbConfig) {
-            const url = `mongodb://${this.dbConfig.url}:${this.dbConfig.port}`;
-            const dbName = this.dbConfig.name;
-            this.client = new mongodb_1.MongoClient(url, {
-                useNewUrlParser: true,
+        if (this.dbConfig === undefined) {
+            throw new Error('Expected PostgreSQL configuration in Environemnt Variables');
+        }
+        if (this.dbConfig.uri !== undefined) {
+            await typeorm_1.createConnection({
+                type: 'postgres',
+                url: this.dbConfig.uri,
+                ...commonConnectionOptions
             });
-            this.client.connect((err) => {
-                assert_1.default.equal(null, err);
-                Logger_1.default.info("Database Connected");
-                this.db = this.client.db(dbName);
+        }
+        else {
+            const config = this.dbConfig;
+            await typeorm_1.createConnection({
+                type: 'postgres',
+                host: config.url,
+                port: config.port,
+                username: config.username,
+                password: config.password,
+                database: config.database,
+                ...commonConnectionOptions
             });
         }
     }
-    static getClient() {
-        return this.client;
-    }
-    static getDatabase() {
-        return this.db;
+    static getConnection() {
+        return typeorm_1.getConnection();
     }
 }
 Database.dbConfig = Environment_1.default.getDatabaseConfig();

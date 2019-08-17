@@ -8,24 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const Category_1 = __importDefault(require("./Category"));
+const Category_1 = require("./Category");
+const Ballot_1 = require("./Ballot");
 let Criteria = class Criteria {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], Criteria.prototype, "criteriaID", void 0);
+], Criteria.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], Criteria.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column('text'),
+    typeorm_1.Column("text"),
     __metadata("design:type", String)
 ], Criteria.prototype, "rubric", void 0);
 __decorate([
@@ -37,10 +35,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Criteria.prototype, "maxScore", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => Category_1.default, category => category.criteria),
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
     __metadata("design:type", Array)
-], Criteria.prototype, "categories", void 0);
+], Criteria.prototype, "ballots", void 0);
+__decorate([
+    typeorm_1.ManyToOne(() => Category_1.Category, category => category.criteria, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Category_1.Category)
+], Criteria.prototype, "category", void 0);
 Criteria = __decorate([
     typeorm_1.Entity()
 ], Criteria);
-exports.default = Criteria;
+exports.Criteria = Criteria;

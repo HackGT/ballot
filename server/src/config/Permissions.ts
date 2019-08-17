@@ -1,4 +1,4 @@
-import User, { IUser, UserRole } from "../model/user.model";
+import { User, UserRole } from "../entity/User";
 
 export enum Role {
     Pending = 'Pending',
@@ -15,14 +15,13 @@ export enum Action {
     ViewUsers = 'ViewUsers',
 
     ViewCategories = 'ViewCategories',
+    ViewCategoriesCriteria = 'ViewCategoriesCriteria',
     AddCategory = 'AddCategory',
     DeleteCategory = 'DeleteCategory',
     UpdateCategory = 'UpdateCategory',
 
-    ViewCriteria = 'ViewCriteria',
-    AddCriteria = 'AddCriteria',
-    DeleteCriteria = 'DeleteCriteria',
-    UpdateCriteria = 'UpdateCriteria',
+    ManageTableGroups = 'ManageTableGroups',
+    ViewTableGroups = 'ViewTableGroups',
 
     BatchUploadProjects = 'BatchUploadProjects',
     AddProject = 'AddProject',
@@ -39,7 +38,7 @@ export enum Action {
     ViewRanking = 'ViewRanking',
 }
 
-export function can(user: IUser, action: Action): boolean {
+export function can(user: User, action: Action): boolean {
     if (user) {
         switch (action) {
             case Action.Reset:
@@ -47,14 +46,11 @@ export function can(user: IUser, action: Action): boolean {
             case Action.EditUser:
             case Action.DeleteUser:
             case Action.ViewUsers:
-            case Action.ViewCategories:
+            case Action.ViewCategoriesCriteria:
             case Action.AddCategory:
             case Action.DeleteCategory:
             case Action.UpdateCategory:
-            case Action.ViewCriteria:
-            case Action.AddCriteria:
-            case Action.DeleteCriteria:
-            case Action.UpdateCriteria:
+            case Action.ManageTableGroups:
             case Action.BatchUploadProjects:
             case Action.AddProject:
             case Action.DeleteProject:
@@ -70,6 +66,8 @@ export function can(user: IUser, action: Action): boolean {
                     || user.role === UserRole.Admin
                     || user.role === UserRole.Judge;
             case Action.ViewProjects:
+            case Action.ViewCategories:
+            case Action.ViewTableGroups:
                 return true;
         }
     }

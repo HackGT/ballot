@@ -2,18 +2,12 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
 const passport_local_1 = require("passport-local");
 const Logger_1 = __importDefault(require("../util/Logger"));
-const user_model_1 = __importStar(require("../model/user.model"));
+const Database_1 = __importDefault(require("./Database"));
+const User_1 = require("../entity/User");
 class Authentication {
     static setupStrategies() {
         this.strategies.push(new passport_local_1.Strategy({
@@ -21,6 +15,7 @@ class Authentication {
             passwordField: 'password',
             passReqToCallback: true,
         }, async (req, email, password, done) => {
+            const connection = Database_1.default.getConnection();
             if (req.path.match(/\/signup$/i)) {
                 const name = req.body.name.trim();
                 if (!name || !email || !password) {
@@ -28,16 +23,18 @@ class Authentication {
                     return done(undefined, false);
                 }
                 const { salt, hash } = await this.hashPassword(password);
-                const user = user_model_1.default.findOne({ email: email });
+                const user = await connection.manager.findOne(User_1.User, { email: email });
                 if (!user) {
-                    const newUser = await user_model_1.default.create({
-                        name,
-                        email,
-                        role: await user_model_1.default.count({}) === 0 ? user_model_1.UserRole.Owner : user_model_1.UserRole.Pending,
-                        salt,
-                        hash,
-                    });
-                    return done(undefined, newUser);
+                    const newUser = new User_1.User();
+                    newUser.name = name;
+                    newUser.email = email;
+                    newUser.role = await connection.manager.count(User_1.User) === 0
+                        ? User_1.UserRole.Owner
+                        : User_1.UserRole.Pending;
+                    newUser.tags = [];
+                    newUser.salt = salt;
+                    newUser.hash = hash;
+                    return done(undefined, await connection.manager.save(newUser));
                 }
                 else {
                     Logger_1.default.error('Attempted local account signup - Email already in use');
@@ -45,7 +42,7 @@ class Authentication {
                 }
             }
             else {
-                const user = await user_model_1.default.findOne({ email: email });
+                const user = await connection.manager.findOne(User_1.User, { email: email });
                 if (user) {
                     const hash = await this.pbkdf2Async(password, Buffer.from(user.salt, 'hex'), 3000, 128, 'sha256');
                     if (hash.toString('hex') === user.hash) {
@@ -70,8 +67,9 @@ class Authentication {
         done(undefined, user.id);
     }
     static async deserialize(id, done) {
+        const connection = Database_1.default.getConnection();
         try {
-            const user = await user_model_1.default.findById(id);
+            const user = await connection.manager.findOne(User_1.User, id);
             done(undefined, user ? user : undefined);
         }
         catch (err) {

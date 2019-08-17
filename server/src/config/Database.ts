@@ -1,37 +1,44 @@
-import Environment, { DatabaseConfig } from './Environment';
-import { MongoClient, Db } from 'mongodb';
-import assert from 'assert';
-import Logger from '../util/Logger';
+import Environment, { DatabaseConfig, DatabaseConfigURI } from './Environment';
+import { createConnection, getConnection } from 'typeorm';
+
+const commonConnectionOptions = {
+    entities: [
+        __dirname + '/../entity/*.js'
+    ],
+    synchronize: !Environment.isProduction(),
+    logging: false,
+};
 
 class Database {
     private static dbConfig = Environment.getDatabaseConfig();
-    private static client: MongoClient;
-    private static db: Db;
 
     public static async connect() {
-        if (this.dbConfig) {
-            const url = `mongodb://${this.dbConfig.url}:${this.dbConfig.port}`
-            const dbName = this.dbConfig.name;
+        if (this.dbConfig === undefined) {
+            throw new Error('Expected PostgreSQL configuration in Environemnt Variables');
+        }
 
-            this.client = new MongoClient(url, {
-                useNewUrlParser: true,
+        if ((this.dbConfig as DatabaseConfigURI).uri !== undefined) {
+            await createConnection({
+                type: 'postgres',
+                url: (this.dbConfig as DatabaseConfigURI).uri,
+                ...commonConnectionOptions
             });
-
-            this.client.connect((err) => {
-                assert.equal(null, err);
-                Logger.info("Database Connected");
-
-                this.db = this.client.db(dbName);
+        } else {
+            const config = this.dbConfig as DatabaseConfig;
+            await createConnection({
+                type: 'postgres',
+                host: config.url,
+                port: config.port,
+                username: config.username,
+                password: config.password,
+                database: config.database,
+                ...commonConnectionOptions
             });
         }
     }
 
-    public static getClient() {
-        return this.client;
-    }
-
-    public static getDatabase() {
-        return this.db;
+    public static getConnection() {
+        return getConnection();
     }
 }
 

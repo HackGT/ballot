@@ -1,10 +1,15 @@
-import chalk from 'chalk';
 import Logger from '../util/Logger';
 
 export interface DatabaseConfig {
     url: string;
-    name: string;
-    port: number;
+    database: string;
+    username: string;
+    password: string;
+    port?: number;
+}
+
+export interface DatabaseConfigURI {
+    uri: string;
 }
 
 class Environment {
@@ -24,12 +29,20 @@ class Environment {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): DatabaseConfig | undefined {
-        if (process.env.MDBNAME && process.env.MDBURL && process.env.MDBPORT) {
+    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI | undefined {
+        if (process.env.POSTGRES_URL) {
             return {
-                url: process.env.MDBURL,
-                port: process.env.PGPORT ? parseInt((process.env.MDBPORT) as string, 10) : 27017,
-                name: process.env.MDBNAME,
+                uri: process.env.POSTGRES_URL,
+            };
+        }
+
+        if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {
+            return {
+                url: process.env.PGURL,
+                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
+                database: process.env.PGDATABASE,
+                username: process.env.PGUSERNAME,
+                password: process.env.PGPASSWORD,
             };
         }
 
