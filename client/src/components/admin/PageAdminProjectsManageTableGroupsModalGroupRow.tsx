@@ -1,10 +1,7 @@
-import Axios from 'axios';
 import React from 'react';
-import { Button, Form, Modal, Col } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import { Button, Form, Col } from 'react-bootstrap';
 
-import { fillProjects } from '../../state/Project';
-import { ProjectState, TableGroup } from '../../types/Project';
+import { TableGroup } from '../../types/Project';
 
 interface PageAdminProjectsManageTableGroupsModalGroupRowProps {
   tableGroup: TableGroup;
@@ -51,8 +48,10 @@ const PageAdminProjectsManageTableGroupsModalGroupRow: React.FC<PageAdminProject
             name='color'
             onChange={handleChange}
             placeholder='#000000'
+
             style={{
-              backgroundColor: props.tableGroup.color,
+              backgroundColor: /^#[0-9A-F]{6}$/i.test(props.tableGroup.color) ? props.tableGroup.color : '',
+              color: /^#[0-9A-F]{6}$/i.test(props.tableGroup.color) ? '#FFFFFF' : '#000000',
             }}
             value={props.tableGroup.color} />
         </Form.Group>

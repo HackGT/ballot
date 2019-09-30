@@ -34,7 +34,6 @@ const Navigation: React.FC<NavigationProps> = (props) => {
 
   const genLeftNav = (role: UserRole) => {
     let leftNav: [string, string][] = [];
-
     switch (role) {
       case UserRole.Owner:
       case UserRole.Admin:
@@ -71,8 +70,9 @@ const Navigation: React.FC<NavigationProps> = (props) => {
         return (
           <Nav.Link
             key={navItem[0]}
+            eventKey={navItem[0]}
             active={navItem[1] === curPage}
-            onClick={() => navTo(navItem[1])}>
+            onSelect={() => navTo(navItem[1])}>
             {navItem[0]}
           </Nav.Link>
         );
@@ -87,12 +87,14 @@ const Navigation: React.FC<NavigationProps> = (props) => {
         <Nav>
           <Nav.Link
             active={PATH_PROFILE === curPage}
-            onClick={() => navTo(PATH_PROFILE)}>
+            eventKey={'profile'}
+            onSelect={() => navTo(PATH_PROFILE)}>
             Profile
           </Nav.Link>
           <Nav.Link
             active={PATH_LOGOUT === curPage}
-            onClick={() => navTo(PATH_LOGOUT)}>
+            eventKey={'logout'}
+            onSelect={() => navTo(PATH_LOGOUT)}>
             Logout
           </Nav.Link>
         </Nav>
@@ -102,7 +104,8 @@ const Navigation: React.FC<NavigationProps> = (props) => {
         <Nav>
           <Nav.Link
             active={PATH_LOGIN === curPage}
-            onClick={() => navTo(PATH_LOGIN)}>
+            eventKey={'login'}
+            onSelect={() => navTo(PATH_LOGIN)}>
             Login
           </Nav.Link>
         </Nav>
@@ -111,7 +114,7 @@ const Navigation: React.FC<NavigationProps> = (props) => {
   }
 
   return (
-    <Navbar collapseOnSelect bg='dark' variant='dark' expand="sm">
+    <Navbar collapseOnSelect bg='dark' variant='dark' expand="sm" >
       <Link
         to={'/'}
         style={{ textDecoration: 'none' }}

@@ -93,7 +93,7 @@ const PageHomeComponent: React.FC<PageHomeProps> = (props) => {
       {yourRole}
       {mobileBlurb}
       {projectsBlurb}
-      {judgingBlurb}
+      {pendingBlurb}
       {profileBlurb}
     </div>
   );

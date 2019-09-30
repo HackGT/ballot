@@ -6,32 +6,38 @@ import { Category } from './Category';
 @Entity()
 export class Project {
   @PrimaryGeneratedColumn()
-  id?: number;
+  public id?: number;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column()
-  devpostURL: string;
+  public devpostURL: string;
 
   @Column()
-  expoNumber: number;
+  public expoNumber: number;
 
   @Column()
-  tableNumber: number;
+  public tableNumber: number;
 
   @Column('character varying', { array: true })
-  tags: string[];
+  public tags: string[];
 
-  @ManyToOne(() => TableGroup, tableGroup => tableGroup.projects)
-  tableGroup: TableGroup;
+  @ManyToOne(() => TableGroup, (tableGroup) => tableGroup.projects)
+  public tableGroup: TableGroup;
 
-  @ManyToMany(() => Category)
+  @ManyToMany(() => Category, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
-  categories: Category[];
+  public categories: Category[];
 
-  @OneToMany(() => Ballot, ballot => ballot.user)
-  ballots: Ballot[];
+  @OneToMany(() => Ballot, (ballot) => ballot.project, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  public ballots: Ballot[];
 }
 
 export interface ProjectClient {

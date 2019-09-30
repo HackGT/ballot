@@ -3,6 +3,7 @@ export default interface User {
   name?: string;
   email?: string;
   role: UserRole;
+  isJudging?: boolean;
   tags?: string[];
 }
 
@@ -14,32 +15,31 @@ export enum UserRole {
   Owner = 4,
 }
 
+export interface UserState {
+  [id: number]: User
+}
+
 export const EMPTY_USER: User = {
   id: -1,
   name: '',
   email: '',
   role: UserRole.Pending,
+  isJudging: false,
   tags: [],
 }
 
 export function clientUserToServerUser(user: User) {
   return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
+    ...user,
     role: getRoleEnum(user.role),
-    tags: user.tags,
   };
 }
 
 export function serverDataToClientUser(data: any) {
   if (data.id && data.name && data.email && data.role && data.tags) {
     return {
-      id: data.id,
-      name: data.name,
-      email: data.email,
+      ...data,
       role: roleStringToEnum(data.role),
-      tags: data.tags,
     };
   } else {
     throw new Error('Server returned an unexpected result.');

@@ -6,6 +6,7 @@ import { can, Action } from '../config/Permissions';
 const router = Router();
 
 router.get('/allUsers', async (req, res) => {
+  console.log(req.user);
   if (can(req.user, Action.ViewUsers)) {
     return res.status(200).json(await UserController.getAllUsersSafe());
   }
@@ -23,4 +24,3 @@ router.post('/update', async (req, res) => {
 });
 
 export default router;
-

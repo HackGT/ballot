@@ -1,4 +1,5 @@
-import User from '../types/User';
+import User, { UserState, roleStringToEnum } from '../types/User';
+import Axios from 'axios';
 
 // Action Types
 export const ADD_USER = 'ADD_USER';
@@ -23,8 +24,28 @@ export function fillUsers(users: UserState) {
   return { type: FILL_USERS, users }
 }
 
-export interface UserState {
-  [id: number]: User
+export function fetchUsers() {
+  return async (dispatch: any) => {
+    try {
+      const result = await Axios.get('/api/users/allUsers');
+      if (result.status) {
+        const payload: UserState = result.data;
+        const toFill: UserState = {};
+        for (const user of Object.values(payload)) {
+          toFill[user.id] = {
+            ...user,
+            role: roleStringToEnum(user.role),
+          };
+        };
+        dispatch(fillUsers(toFill));
+      } else {
+        throw new Error('API Error');
+      }
+    } catch (error) {
+      console.log(error);
+      return Promise.resolve();
+    }
+  };
 }
 
 // Reducer

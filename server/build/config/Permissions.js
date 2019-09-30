@@ -26,6 +26,8 @@ var Action;
     Action["DeleteProject"] = "DeleteProject";
     Action["UpdateProject"] = "UpdateProject";
     Action["ViewProjects"] = "ViewProjects";
+    Action["QueueProject"] = "QueueProject";
+    Action["DequeueProject"] = "DequeueProject";
     Action["ViewBallot"] = "ViewBallot";
     Action["ScoreBallot"] = "ScoreBallot";
     Action["StartProject"] = "StartProject";
@@ -51,7 +53,6 @@ function can(user, action) {
             case Action.UpdateProject:
                 return user.role === User_1.UserRole.Owner
                     || user.role === User_1.UserRole.Admin;
-            case Action.ViewProjects:
             case Action.ViewBallot:
             case Action.ScoreBallot:
             case Action.StartProject:
@@ -63,6 +64,16 @@ function can(user, action) {
             case Action.ViewCategories:
             case Action.ViewTableGroups:
                 return true;
+        }
+    }
+    else {
+        switch (action) {
+            case Action.ViewProjects:
+            case Action.ViewCategories:
+            case Action.ViewTableGroups:
+                return true;
+            default:
+                return false;
         }
     }
     return false;

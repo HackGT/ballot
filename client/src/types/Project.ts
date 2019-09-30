@@ -1,5 +1,3 @@
-import PageAdminProjectsManageTableGroupsModal from "../components/admin/PageAdminProjectsManageTableGroupsModal";
-
 export default interface Project {
   id?: number;
   name: string;

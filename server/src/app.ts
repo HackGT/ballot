@@ -2,9 +2,12 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import session from 'express-session';
-import socketio from 'socket.io';
+import cookieParser from 'cookie-parser';
 import * as http from 'http';
 import passport from 'passport';
+import socketio from 'socket.io';
+import store from 'connect-pg-simple';
+import passportSocketIO from 'passport.socketio';
 import 'reflect-metadata';
 
 import Environment from './config/Environment';
@@ -13,10 +16,11 @@ import Logger from './util/Logger';
 import auth from './routes/auth';
 import api from './routes/api';
 import Authentication from './config/Authentication';
+import socketHandler from './routes/socket';
 
 const app = express();
 const server = http.createServer(app);
-const io = socketio(server);
+export const io = socketio(server);
 
 async function start(): Promise<void> {
     // Verify environment
@@ -37,10 +41,33 @@ async function start(): Promise<void> {
     }
     Logger.success('Database Initialized');
 
-    app.use(session({
-        secret: Environment.getSession(),
+    const pgSessionStore = store(session);
+
+    const sessionMiddleware = session({
+        store: new pgSessionStore({
+            conObject: Database.getConnectionObject(),
+        }),
+        secret: Environment.getSessionSecret(),
         resave: true,
         saveUninitialized: true,
+    });
+
+    app.use(sessionMiddleware).use(cookieParser());
+
+    io.on('connection', socketHandler);
+    io.use(passportSocketIO.authorize({
+        cookieParser: require('cookie-parser'),
+        secret: Environment.getSessionSecret(),
+        store: new pgSessionStore({
+            conObject: Database.getConnectionObject(),
+        }),
+        // success: (data, accept) => {
+        //     console.log(data.user);
+        //     accept()
+        // },
+        // fail: (data, message, error, accept) => {
+        //     accept();
+        // }
     }));
 
     try {

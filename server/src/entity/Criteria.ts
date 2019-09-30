@@ -5,26 +5,26 @@ import { Ballot } from './Ballot';
 @Entity()
 export class Criteria {
     @PrimaryGeneratedColumn()
-    id?: number;
+    public id?: number;
 
     @Column()
-    name: string;
+    public name: string;
 
-    @Column("text")
-    rubric: string;
-
-    @Column()
-    minScore: number;
+    @Column('text')
+    public rubric: string;
 
     @Column()
-    maxScore: number;
+    public minScore: number;
 
-    @OneToMany(() => Ballot, ballot => ballot.user)
-    ballots: Ballot[];
+    @Column()
+    public maxScore: number;
 
-    @ManyToOne(() => Category, category => category.criteria, {
+    @OneToMany(() => Ballot, (ballot) => ballot.user)
+    public ballots: Ballot[];
+
+    @ManyToOne(() => Category, (category) => category.criteria, {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     })
-    category: Category;
+    public category: Category;
 }

@@ -41,11 +41,8 @@ const AppComponent: React.FC<AppProps> = (props) => {
       const result = await Axios.get('/auth/user_data');
 
       props.loginUser({
-        id: result.data.id,
-        name: result.data.name,
-        email: result.data.email,
+        ...result.data,
         role: roleStringToEnum(result.data.role),
-        tags: result.data.tags,
       });
 
       changeLoginFetched(true);

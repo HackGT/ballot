@@ -1,12 +1,10 @@
+import Axios from 'axios';
 import React from 'react';
-import { AppState } from '../../state/Store';
-import User from '../../types/User';
-import { loginUser } from '../../state/Account';
-import { connect } from 'react-redux';
 import { Card, ListGroup, ListGroupItem, ButtonGroup, Button, Badge } from 'react-bootstrap';
+import { connect } from 'react-redux';
+
 import { deleteCategory } from '../../state/Category';
 import Category, { Criteria } from '../../types/Category';
-import Axios from 'axios';
 
 const mapDispatchToProps = (dispatch: any) => {
 	return {
@@ -80,7 +78,7 @@ const PageAdminCategoriesComponent: React.FC<PageAdminCategoriesProps> = (props)
 					<span style={{ margin: '0 5px'}}>{props.category.isDefault ? <Badge variant="primary">Default</Badge>: <></>}{props.category.generated ? <Badge variant="secondary">Generated</Badge> : <></>}</span>
 				</Card.Title>
 				<Card.Text>
-					<p>{props.category.description}</p>
+					{props.category.description}
 				</Card.Text>
       </Card.Body>
       <ListGroup className="list-group-flush">

@@ -39,7 +39,6 @@ router.get('/logout', (req, res) => {
 });
 router.post('/login', postParser, (req, res, next) => {
     passport_1.default.authenticate('local', (error, user) => {
-        console.log(user);
         if (user) {
             req.logIn(user, () => {
                 return res.json({
@@ -61,7 +60,6 @@ router.post('/login', postParser, (req, res, next) => {
 });
 router.post('/signup', postParser, (req, res, next) => {
     passport_1.default.authenticate('local', (error, user) => {
-        console.log('signup', user);
         if (user) {
             return res.status(200).json({
                 status: true,

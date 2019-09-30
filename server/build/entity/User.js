@@ -37,6 +37,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isJudging", void 0);
+__decorate([
     typeorm_1.Column('character varying', { array: true }),
     __metadata("design:type", Array)
 ], User.prototype, "tags", void 0);
@@ -49,7 +53,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "hash", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, (ballot) => ballot.user),
     __metadata("design:type", Array)
 ], User.prototype, "ballots", void 0);
 __decorate([
@@ -62,6 +66,6 @@ __decorate([
 ], User.prototype, "updatedAt", void 0);
 User = __decorate([
     typeorm_1.Entity(),
-    typeorm_1.Unique(["email"])
+    typeorm_1.Unique(['email'])
 ], User);
 exports.User = User;

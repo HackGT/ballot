@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], Criteria.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column("text"),
+    typeorm_1.Column('text'),
     __metadata("design:type", String)
 ], Criteria.prototype, "rubric", void 0);
 __decorate([
@@ -35,11 +35,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Criteria.prototype, "maxScore", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, (ballot) => ballot.user),
     __metadata("design:type", Array)
 ], Criteria.prototype, "ballots", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Category_1.Category, category => category.criteria, {
+    typeorm_1.ManyToOne(() => Category_1.Category, (category) => category.criteria, {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     }),

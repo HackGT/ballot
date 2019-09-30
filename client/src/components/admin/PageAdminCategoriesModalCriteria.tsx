@@ -1,9 +1,7 @@
 import React from 'react';
 import { Form, Col, Button } from 'react-bootstrap';
-import { connect } from 'react-redux';
 
-import Category, { Criteria } from '../../types/Category';
-import { updateCriteria, deleteCriteria } from '../../state/Category';
+import { Criteria } from '../../types/Category';
 
 interface PageAdminCategoriesModalCriteriaProps {
   criteria: Criteria;

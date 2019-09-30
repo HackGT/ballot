@@ -39,4 +39,4 @@ gulp.task('serve', gulp.series('lint', 'build:server', () => {
     });
 }));
 
-gulp.task('default', gulp.parallel('serve', 'watch'));
+gulp.task('default', gulp.parallel('watch', 'serve'));

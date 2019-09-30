@@ -6,15 +6,15 @@ const typeorm_1 = require("typeorm");
 class CategoryController {
     static async getAllCategories() {
         const categoryRepository = typeorm_1.getRepository(Category_1.Category);
-        let allCategories = await categoryRepository.find();
-        return this.convertToClientCategories(allCategories);
+        const allCategories = await categoryRepository.find();
+        return this.convertToClientCategories(allCategories, false);
     }
     static async getAllCategoriesWithCriteria() {
         const categoryRepository = typeorm_1.getRepository(Category_1.Category);
-        let allCategories = await categoryRepository.find({
+        const allCategories = await categoryRepository.find({
             relations: ['criteria'],
         });
-        return this.convertToClientCategories(allCategories);
+        return this.convertToClientCategories(allCategories, true);
     }
     static async updateCategory(categories) {
         const categoryRepository = typeorm_1.getRepository(Category_1.Category);
@@ -30,7 +30,7 @@ class CategoryController {
         });
         if (result) {
             this.updateDictionaries();
-            return this.convertToClientCategories(result);
+            return this.convertToClientCategories(result, true);
         }
         throw new Error('Could not find updated category after database update.');
     }
@@ -55,12 +55,12 @@ class CategoryController {
             return dict;
         }, Category_1.EMPTY_CATEGORY_DICTIONARY);
     }
-    static convertToClientCategories(categories) {
+    static convertToClientCategories(categories, withCriteria) {
         const categoriesToReturn = {};
         for (const category of categories) {
             categoriesToReturn[category.id] = {
                 ...category,
-                criteria: this.convertToClientCriteria(category.criteria),
+                criteria: withCriteria ? this.convertToClientCriteria(category.criteria) : {},
             };
         }
         return categoriesToReturn;

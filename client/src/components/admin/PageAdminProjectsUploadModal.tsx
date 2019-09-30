@@ -8,7 +8,7 @@ import Project, { ProjectState, TableGroupState, TableGroup } from '../../types/
 import Papa from 'papaparse';
 import { AppState } from '../../state/Store';
 import Category, { CategoryState, NameToCategoryMapping } from '../../types/Category';
-import categories, { updateCategory, fillCategories } from '../../state/Category';
+import { updateCategory, fillCategories } from '../../state/Category';
 
 const requiredHeaders = [
   'Submission Title',
@@ -147,6 +147,8 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
   const handleUpload = async () => {
     dispatch({ type: 'request-start' });
 
+    props.fillProjects({});
+
     // Generate a set of all categories for optional prizes.
     const generatedCategories = new Set<string>();
     for (const row of state.csv) {
@@ -221,15 +223,49 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     }, {});
 
     const projectsToSend: Project[] = [];
-    let expoNumber = 1;
-    let tableNumber = 1;
-    // for (const csvRow of state.csv) {
-    //   projectsToSend.push({
-    //     name: csvRow[state.csvHeaderIndicies['Submission Title']],
-    //     devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
-    //     expoNumber:
-    //   })
-    // }
+    let csvRowNumber = 0;
+
+    for (let expoNumber = 1; expoNumber <= state.inputNumberExpos; expoNumber++) {
+      const tableGroups: TableGroup[] = Object.values(props.tableGroups);
+      for (const tableGroup of tableGroups) {
+        for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
+          const csvRow = state.csv[csvRowNumber];
+          if (csvRow) {
+            const categoryIDs: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
+              categoryName = categoryName.trim();
+              console.log(categoryName);
+              if (categoryName) {
+                array.push(nameToCategoryMapping[categoryName.trim()].id!);
+              }
+              return array;
+            }, []);
+
+
+            projectsToSend.push({
+              name: csvRow[state.csvHeaderIndicies['Submission Title']],
+              devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
+              expoNumber,
+              tableGroupID: tableGroup.id!,
+              tableNumber,
+              categoryIDs: categoryIDs.concat(Object.values(onlyNonGenerated).map((category: Category) => category.id!)),
+              tags: [],
+            });
+            csvRowNumber++;
+          }
+        }
+      }
+    }
+    console.log(projectsToSend);
+    const batchUploadResult = await Axios.post('/api/projects/upload', {
+      projects: projectsToSend,
+    });
+    if (batchUploadResult.status) {
+      const data = batchUploadResult.data;
+      console.log(data);
+      props.fillProjects(data);
+      props.closeModal();
+      dispatch({ type: 'request-finish' });
+    }
   };
 
   const getFileUploadForm = () => {

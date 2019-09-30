@@ -14,9 +14,12 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const express_1 = __importDefault(require("express"));
 const express_session_1 = __importDefault(require("express-session"));
-const socket_io_1 = __importDefault(require("socket.io"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http = __importStar(require("http"));
 const passport_1 = __importDefault(require("passport"));
+const socket_io_1 = __importDefault(require("socket.io"));
+const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
+const passport_socketio_1 = __importDefault(require("passport.socketio"));
 require("reflect-metadata");
 const Environment_1 = __importDefault(require("./config/Environment"));
 const Database_1 = __importDefault(require("./config/Database"));
@@ -24,9 +27,10 @@ const Logger_1 = __importDefault(require("./util/Logger"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const api_1 = __importDefault(require("./routes/api"));
 const Authentication_1 = __importDefault(require("./config/Authentication"));
+const socket_1 = __importDefault(require("./routes/socket"));
 const app = express_1.default();
 const server = http.createServer(app);
-const io = socket_io_1.default(server);
+exports.io = socket_io_1.default(server);
 async function start() {
     try {
         await Environment_1.default.verifyEnvironment();
@@ -45,10 +49,23 @@ async function start() {
         throw new Error(error);
     }
     Logger_1.default.success('Database Initialized');
-    app.use(express_session_1.default({
-        secret: Environment_1.default.getSession(),
+    const pgSessionStore = connect_pg_simple_1.default(express_session_1.default);
+    const sessionMiddleware = express_session_1.default({
+        store: new pgSessionStore({
+            conObject: Database_1.default.getConnectionObject(),
+        }),
+        secret: Environment_1.default.getSessionSecret(),
         resave: true,
         saveUninitialized: true,
+    });
+    app.use(sessionMiddleware).use(cookie_parser_1.default());
+    exports.io.on('connection', socket_1.default);
+    exports.io.use(passport_socketio_1.default.authorize({
+        cookieParser: require('cookie-parser'),
+        secret: Environment_1.default.getSessionSecret(),
+        store: new pgSessionStore({
+            conObject: Database_1.default.getConnectionObject(),
+        }),
     }));
     try {
         Logger_1.default.info('Setting up Passport');

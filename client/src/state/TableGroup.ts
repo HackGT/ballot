@@ -1,4 +1,5 @@
 import { TableGroup, TableGroupState } from '../types/Project';
+import Axios from 'axios';
 
 export const UPDATE_TABLE_GROUP = 'UPDATE_TABLE_GROUP';
 export const DELETE_TABLE_GROUP = 'DELETE_TABLE_GROUP';
@@ -14,6 +15,23 @@ export function deleteTableGroup(tableGroupID: number) {
 
 export function fillTableGroups(tableGroups: TableGroupState) {
   return { type: FILL_TABLE_GROUPS, tableGroups };
+}
+
+export function fetchTableGroups() {
+  return async (dispatch: any) => {
+    try {
+      const result = await Axios.get('/api/tableGroups/allTableGroups');
+      if (result.status) {
+        const payload: TableGroupState = result.data;
+        dispatch(fillTableGroups(payload));
+      } else {
+        throw new Error('API Error');
+      }
+    } catch (error) {
+      console.log(error);
+      return Promise.resolve();
+    }
+  };
 }
 
 export default function tableGroups(state: TableGroupState = {}, action: any) {

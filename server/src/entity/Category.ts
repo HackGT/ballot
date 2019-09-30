@@ -4,26 +4,26 @@ import { Criteria } from './Criteria';
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn()
-  id?: number;
+  public id?: number;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column()
-  isDefault: boolean;
+  public isDefault: boolean;
 
   @Column()
-  generated: boolean;
+  public generated: boolean;
 
-  @Column("text")
-  description: string;
+  @Column('text')
+  public description: string;
 
-  @OneToMany(() => Criteria, criteria => criteria.category, {
+  @OneToMany(() => Criteria, (criteria) => criteria.category, {
     cascade: true,
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  criteria: Criteria[];
+  public criteria: Criteria[];
 }
 
 export interface CategoryDictionary {

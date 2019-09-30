@@ -2,42 +2,45 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, UpdateDateColumn, Creat
 import { Ballot } from './Ballot';
 
 export enum UserRole {
-    Owner = 'owner',
-    Admin = 'admin',
-    Judge = 'judge',
-    Pending = 'pending',
+  Owner = 'owner',
+  Admin = 'admin',
+  Judge = 'judge',
+  Pending = 'pending',
 }
 
 @Entity()
-@Unique(["email"])
+@Unique(['email'])
 export class User {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  public id?: number;
 
-    @Column()
-    email: string;
+  @Column()
+  public email: string;
 
-    @Column()
-    name: string;
+  @Column()
+  public name: string;
 
-    @Column('enum')
-    role: UserRole;
+  @Column('enum')
+  public role: UserRole;
 
-    @Column('character varying', { array: true })
-    tags: string[];
+  @Column({ default: false })
+  public isJudging: boolean;
 
-    @Column()
-    salt: string;
+  @Column('character varying', { array: true })
+  public tags: string[];
 
-    @Column()
-    hash: string;
+  @Column()
+  public salt: string;
 
-    @OneToMany(() => Ballot, ballot => ballot.user)
-    ballots?: Ballot[];
+  @Column()
+  public hash: string;
 
-    @CreateDateColumn()
-    createdAt?: number;
+  @OneToMany(() => Ballot, (ballot) => ballot.user)
+  public ballots?: Ballot[];
 
-    @UpdateDateColumn()
-    updatedAt?: number;
+  @CreateDateColumn()
+  public createdAt?: number;
+
+  @UpdateDateColumn()
+  public updatedAt?: number;
 }

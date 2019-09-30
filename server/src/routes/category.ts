@@ -11,7 +11,7 @@ router.get('/allCategories', async (req, res) => {
   }
 
   return res.status(401).send('Not enough permissions to view categories.');
-})
+});
 
 router.get('/allCategoriesCriteria', async (req, res) => {
   if (can(req.user, Action.ViewCategoriesCriteria)) {

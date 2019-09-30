@@ -7,16 +7,16 @@ class CategoryController {
 
   public static async getAllCategories() {
     const categoryRepository = getRepository(Category);
-    let allCategories = await categoryRepository.find();
-    return this.convertToClientCategories(allCategories);
+    const allCategories = await categoryRepository.find();
+    return this.convertToClientCategories(allCategories, false);
   }
 
   public static async getAllCategoriesWithCriteria() {
     const categoryRepository = getRepository(Category);
-    let allCategories = await categoryRepository.find({
+    const allCategories = await categoryRepository.find({
       relations: ['criteria'],
     });
-    return this.convertToClientCategories(allCategories);
+    return this.convertToClientCategories(allCategories, true);
   }
 
   public static async updateCategory(categories: Category[]) {
@@ -33,7 +33,7 @@ class CategoryController {
     });
     if (result) {
       this.updateDictionaries();
-      return this.convertToClientCategories(result);
+      return this.convertToClientCategories(result, true);
     }
 
     throw new Error('Could not find updated category after database update.');
@@ -63,12 +63,12 @@ class CategoryController {
     }, EMPTY_CATEGORY_DICTIONARY);
   }
 
-  private static convertToClientCategories(categories: Category[]) {
+  private static convertToClientCategories(categories: Category[], withCriteria: boolean) {
     const categoriesToReturn: { [categoryID: number]: any } = {};
     for (const category of categories) {
       categoriesToReturn[category.id!] = {
         ...category,
-        criteria: this.convertToClientCriteria(category.criteria),
+        criteria: withCriteria ? this.convertToClientCriteria(category.criteria) : {},
       };
     }
     return categoriesToReturn;

@@ -30,11 +30,11 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Category.prototype, "generated", void 0);
 __decorate([
-    typeorm_1.Column("text"),
+    typeorm_1.Column('text'),
     __metadata("design:type", String)
 ], Category.prototype, "description", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Criteria_1.Criteria, criteria => criteria.category, {
+    typeorm_1.OneToMany(() => Criteria_1.Criteria, (criteria) => criteria.category, {
         cascade: true,
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',

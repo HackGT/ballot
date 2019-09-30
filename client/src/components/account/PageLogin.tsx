@@ -6,7 +6,7 @@ import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 
 import User, { roleStringToEnum } from '../../types/User';
 import { AppState } from '../../state/Store';
-import { loginUser } from '../../state/Account';
+import { loginUser, updateSession } from '../../state/Account';
 import { UIError } from '../../types/Common';
 import { Redirect } from 'react-router';
 
@@ -18,15 +18,15 @@ const mapStateToProps = (state: AppState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    loginUser: (user: User) => {
-      dispatch(loginUser(user));
-    },
+    loginUser: (user: User) => dispatch(loginUser(user)),
+    updateSession: (userID: number) => dispatch(updateSession(userID)),
   };
 };
 
 interface PageLoginProps {
   account: User;
   loginUser: (user: User) => void;
+  updateSession: (userID: number) => void;
 }
 
 interface Inputs {
@@ -121,7 +121,6 @@ const PageLoginComponent: React.FC<PageLoginProps> = (props) => {
       },
     });
     const payload = loginResponse.data;
-    console.log(payload);
     if (
       !loginResponse.status
       || !payload.id
@@ -147,6 +146,7 @@ const PageLoginComponent: React.FC<PageLoginProps> = (props) => {
       role: roleStringToEnum(payload.role),
       tags: payload.tags,
     });
+    props.updateSession(payload.id);
     dispatch({ type: 'request-success' });
   };
 

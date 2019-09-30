@@ -4,8 +4,13 @@
   "description": "",
   "main": "app.ts",
   "dependencies": {
+    "@types/connect-pg-simple": "^4.2.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/passport.socketio": "^3.7.0",
     "body-parser": "^1.18.3",
     "chalk": "^2.4.2",
+    "connect-pg-simple": "^6.0.1",
+    "cookie-parser": "^1.4.4",
     "crypto": "^1.0.1",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
@@ -16,11 +21,13 @@
     "nodemon": "^1.18.11",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "passport.socketio": "^3.7.0",
     "pg": "^7.10.0",
     "react-bootstrap": "^1.0.0-beta.10",
     "socket.io": "^2.2.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.4"
+    "typescript": "^3.4.4",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",

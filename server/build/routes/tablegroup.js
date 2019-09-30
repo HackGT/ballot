@@ -8,7 +8,7 @@ const Permissions_1 = require("../config/Permissions");
 const TableGroupController_1 = __importDefault(require("../controllers/TableGroupController"));
 const router = express_1.Router();
 router.get('/allTableGroups', async (req, res) => {
-    if (Permissions_1.can(req.user, Permissions_1.Action.ManageTableGroups)) {
+    if (Permissions_1.can(req.user, Permissions_1.Action.ViewTableGroups)) {
         return res.status(200).json(await TableGroupController_1.default.getAllTableGroups());
     }
     return res.status(401).send('Not enough permissions to manage table groups.');

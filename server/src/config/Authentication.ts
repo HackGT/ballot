@@ -1,15 +1,12 @@
 import { pbkdf2, randomBytes } from 'crypto';
-import { Strategy, Profile } from 'passport';
+import { Strategy } from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Request } from 'express';
-import { Role } from '../config/Permissions';
 import Logger from '../util/Logger';
 import Database from './Database';
 import { User, UserRole } from '../entity/User';
 
 export default class Authentication {
-    private static strategies: Strategy[] = [];
-
     public static setupStrategies() {
         this.strategies.push(new LocalStrategy({
             usernameField: 'email',
@@ -27,7 +24,7 @@ export default class Authentication {
                 }
                 const { salt, hash } = await this.hashPassword(password);
 
-                const user = await connection.manager.findOne(User, { email: email });
+                const user = await connection.manager.findOne(User, { email });
                 if (!user) {
                     // User does not exist, so create a user.
                     const newUser = new User();
@@ -48,9 +45,15 @@ export default class Authentication {
                 }
             // This is a request to log in.
             } else {
-                const user = await connection.manager.findOne(User, { email: email });
+                const user = await connection.manager.findOne(User, { email });
                 if (user) {
-                    const hash = await this.pbkdf2Async(password, Buffer.from(user.salt as string, 'hex'), 3000, 128, 'sha256');
+                    const hash = await this.pbkdf2Async(
+                        password,
+                        Buffer.from(user.salt as string, 'hex'),
+                        3000,
+                        128,
+                        'sha256',
+                    );
                     if (hash.toString('hex') === user.hash) {
                         done(undefined, user);
                     } else {
@@ -80,15 +83,24 @@ export default class Authentication {
             done(undefined, user ? user : undefined);
         } catch (err) {
             done(err);
-        };
+        }
     }
+
+    public static async hashPassword(password: string): Promise<{ salt: string, hash: string }> {
+        const salt = randomBytes(32);
+        const hash = await this.pbkdf2Async(password, salt, 3000, 128, 'sha256');
+
+        return { salt: salt.toString('hex'), hash: hash.toString('hex') };
+    }
+
+    private static strategies: Strategy[] = [];
 
     private static pbkdf2Async(
         password: string | Buffer,
         salt: string | Buffer,
         iterations: number,
         keyLength: number,
-        digest: string
+        digest: string,
     ): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             pbkdf2(password, salt, iterations, keyLength, digest, (err: Error, derivedKey: Buffer) => {
@@ -100,12 +112,4 @@ export default class Authentication {
             });
         });
     }
-
-    public static async hashPassword(password: string): Promise<{ salt: string, hash: string }> {
-        const salt = randomBytes(32);
-        const hash = await this.pbkdf2Async(password, salt, 3000, 128, 'sha256');
-
-        return { salt: salt.toString('hex'), hash: hash.toString('hex') };
-    }
 }
-

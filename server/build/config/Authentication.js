@@ -23,7 +23,7 @@ class Authentication {
                     return done(undefined, false);
                 }
                 const { salt, hash } = await this.hashPassword(password);
-                const user = await connection.manager.findOne(User_1.User, { email: email });
+                const user = await connection.manager.findOne(User_1.User, { email });
                 if (!user) {
                     const newUser = new User_1.User();
                     newUser.name = name;
@@ -42,7 +42,7 @@ class Authentication {
                 }
             }
             else {
-                const user = await connection.manager.findOne(User_1.User, { email: email });
+                const user = await connection.manager.findOne(User_1.User, { email });
                 if (user) {
                     const hash = await this.pbkdf2Async(password, Buffer.from(user.salt, 'hex'), 3000, 128, 'sha256');
                     if (hash.toString('hex') === user.hash) {
@@ -75,7 +75,11 @@ class Authentication {
         catch (err) {
             done(err);
         }
-        ;
+    }
+    static async hashPassword(password) {
+        const salt = crypto_1.randomBytes(32);
+        const hash = await this.pbkdf2Async(password, salt, 3000, 128, 'sha256');
+        return { salt: salt.toString('hex'), hash: hash.toString('hex') };
     }
     static pbkdf2Async(password, salt, iterations, keyLength, digest) {
         return new Promise((resolve, reject) => {
@@ -87,11 +91,6 @@ class Authentication {
                 resolve(derivedKey);
             });
         });
-    }
-    static async hashPassword(password) {
-        const salt = crypto_1.randomBytes(32);
-        const hash = await this.pbkdf2Async(password, salt, 3000, 128, 'sha256');
-        return { salt: salt.toString('hex'), hash: hash.toString('hex') };
     }
 }
 Authentication.strategies = [];

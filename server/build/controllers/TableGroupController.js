@@ -6,6 +6,7 @@ class TableGroupController {
     static async getAllTableGroups() {
         const tableGroupRepository = typeorm_1.getRepository(TableGroup_1.TableGroup);
         const allTableGroups = await tableGroupRepository.find();
+        await this.updateDictionaries();
         return this.convertToClient(allTableGroups);
     }
     static async updateTableGroups(tableGroups) {
@@ -14,6 +15,7 @@ class TableGroupController {
             id: typeorm_1.Not(typeorm_1.In(tableGroups.map((group) => group.id))),
         });
         const result = await tableGroupRepository.save(tableGroups);
+        await this.updateDictionaries();
         if (result) {
             return this.convertToClient(result);
         }

@@ -9,32 +9,27 @@ const typeorm_1 = require("typeorm");
 class UserController {
     static async getAllUsers() {
         const connection = Database_1.default.getConnection();
-        let allUsers = await connection.manager.find(User_1.User);
+        const allUsers = await connection.manager.find(User_1.User);
         return allUsers;
     }
     static async getAllUsersSafe() {
         const userRepository = typeorm_1.getRepository(User_1.User);
-        let allUsersSafe = await userRepository.find({
+        const allUsersSafe = await userRepository.find({
             select: [
                 'id',
                 'email',
                 'name',
                 'role',
+                'isJudging',
                 'tags',
                 'createdAt',
                 'updatedAt',
-            ]
+            ],
         });
         const usersToReturn = {};
         for (const user of allUsersSafe) {
             usersToReturn[user.id] = {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                tags: user.tags,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
+                ...user,
             };
         }
         return usersToReturn;

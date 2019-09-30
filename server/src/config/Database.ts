@@ -1,16 +1,16 @@
 import Environment, { DatabaseConfig, DatabaseConfigURI } from './Environment';
-import { createConnection, getConnection } from 'typeorm';
+import { createConnection, getConnection, getManager } from 'typeorm';
 
 const commonConnectionOptions = {
     entities: [
-        __dirname + '/../entity/*.js'
+        __dirname + '/../entity/*.js',
     ],
     synchronize: !Environment.isProduction(),
     logging: false,
 };
 
 class Database {
-    private static dbConfig = Environment.getDatabaseConfig();
+    private static connectionObject = {};
 
     public static async connect() {
         if (this.dbConfig === undefined) {
@@ -21,10 +21,18 @@ class Database {
             await createConnection({
                 type: 'postgres',
                 url: (this.dbConfig as DatabaseConfigURI).uri,
-                ...commonConnectionOptions
+                ...commonConnectionOptions,
             });
         } else {
             const config = this.dbConfig as DatabaseConfig;
+            this.connectionObject = {
+                user: config.username,
+                password: config.password,
+                host: config.url,
+                port: config.port,
+                database: config.database,
+            };
+
             await createConnection({
                 type: 'postgres',
                 host: config.url,
@@ -32,14 +40,34 @@ class Database {
                 username: config.username,
                 password: config.password,
                 database: config.database,
-                ...commonConnectionOptions
+                ...commonConnectionOptions,
             });
+        }
+
+        const tableExistsResult = await getManager().query(`SELECT to_regclass('public.session');`);
+        console.log('create result', tableExistsResult);
+
+        if (!tableExistsResult[0].to_regclass) {
+            await getManager().query(`CREATE TABLE "session" (
+                "sid" varchar NOT NULL COLLATE "default",
+                  "sess" json NOT NULL,
+                  "expire" timestamp(6) NOT NULL
+              )
+              WITH (OIDS=FALSE);
+              ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+            `);
         }
     }
 
     public static getConnection() {
         return getConnection();
     }
+
+    public static getConnectionObject() {
+        return this.connectionObject;
+    }
+
+    private static dbConfig = Environment.getDatabaseConfig();
 }
 
 export default Database;

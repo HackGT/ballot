@@ -76,7 +76,7 @@ const PageAdminCategoriesComponent: React.FC<PageAdminCategoriesProps> = (props)
 		} else {
 			// TODO error checking
 		}
-	}
+	};
 
 	const getCategoryCards = () => {
 		const openModal = (event: any, modalCategory: Category) => {

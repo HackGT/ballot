@@ -4,19 +4,22 @@ import { Project } from './Project';
 @Entity()
 export class TableGroup {
   @PrimaryGeneratedColumn()
-  id?: number;
+  public id?: number;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column()
-  shortcode: string;
+  public shortcode: string;
 
   @Column()
-  color: string;
+  public color: string;
 
-  @OneToMany(() => Project, project => project.tableGroup)
-  projects: Project[];
+  @OneToMany(() => Project, (project) => project.tableGroup, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  public projects: Project[];
 }
 
 export interface TableGroupDictionary {

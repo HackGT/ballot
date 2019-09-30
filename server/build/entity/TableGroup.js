@@ -30,7 +30,10 @@ __decorate([
     __metadata("design:type", String)
 ], TableGroup.prototype, "color", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Project_1.Project, project => project.tableGroup),
+    typeorm_1.OneToMany(() => Project_1.Project, (project) => project.tableGroup, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], TableGroup.prototype, "projects", void 0);
 TableGroup = __decorate([

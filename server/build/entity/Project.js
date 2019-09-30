@@ -40,16 +40,22 @@ __decorate([
     __metadata("design:type", Array)
 ], Project.prototype, "tags", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => TableGroup_1.TableGroup, tableGroup => tableGroup.projects),
+    typeorm_1.ManyToOne(() => TableGroup_1.TableGroup, (tableGroup) => tableGroup.projects),
     __metadata("design:type", TableGroup_1.TableGroup)
 ], Project.prototype, "tableGroup", void 0);
 __decorate([
-    typeorm_1.ManyToMany(() => Category_1.Category),
+    typeorm_1.ManyToMany(() => Category_1.Category, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    }),
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], Project.prototype, "categories", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Ballot_1.Ballot, ballot => ballot.user),
+    typeorm_1.OneToMany(() => Ballot_1.Ballot, (ballot) => ballot.project, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Project.prototype, "ballots", void 0);
 Project = __decorate([

@@ -6,30 +6,40 @@ export const LOGIN_USER = 'ACCOUNT_LOGIN_USER';
 export const LOGOUT_USER = 'ACCOUNT_LOGOUT_USER';
 
 const noAccountUser: User = {
-    role: UserRole.None,
+  role: UserRole.None,
 };
 
 // Action Creators
 export function updateUser(updatedUser: User) {
-    return { type: UPDATE_USER, user: updatedUser };
+  return { type: UPDATE_USER, user: updatedUser };
 }
 
 export function loginUser(userToLogin: User) {
-    return { type: LOGIN_USER, user: userToLogin };
+  return { type: LOGIN_USER, user: userToLogin };
 }
 
 export function logoutUser() {
-    return { type: LOGOUT_USER, user: noAccountUser};
+  return { type: LOGOUT_USER, user: noAccountUser};
+}
+
+export function updateSession(userID: number) {
+  return {
+    event: 'update-session',
+    emit: true,
+    payload: {
+      userID,
+    },
+  };
 }
 
 // Reducer
 export default function account(state: User = noAccountUser, action: any) {
-    switch (action.type) {
-        case UPDATE_USER:
-        case LOGIN_USER:
-        case LOGOUT_USER:
-            return action.user;
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case UPDATE_USER:
+    case LOGIN_USER:
+    case LOGOUT_USER:
+      return action.user;
+    default:
+      return state;
+  }
 }

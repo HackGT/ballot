@@ -25,7 +25,7 @@ class Environment {
         return process.env.URL || '127.0.0.1';
     }
 
-    public static getSession(): string {
+    public static getSessionSecret(): string {
         return process.env.SESSION_SECRET || '';
     }
 
@@ -57,7 +57,7 @@ class Environment {
             throw new Error('Missing process.env.URL');
         }
 
-        if (this.getSession() === '') {
+        if (this.getSessionSecret() === '') {
             Logger.error('Session Secret is not defined in environment variables!');
             throw new Error('Missing process.env.SESSION_SECRET');
         }

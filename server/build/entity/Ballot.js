@@ -34,15 +34,18 @@ __decorate([
     __metadata("design:type", String)
 ], Ballot.prototype, "status", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Project_1.Project, project => project.ballots),
+    typeorm_1.ManyToOne(() => Project_1.Project, (project) => project.ballots, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Project_1.Project)
 ], Ballot.prototype, "project", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Criteria_1.Criteria, criteria => criteria.ballots),
+    typeorm_1.ManyToOne(() => Criteria_1.Criteria, (criteria) => criteria.ballots),
     __metadata("design:type", Criteria_1.Criteria)
 ], Ballot.prototype, "criteria", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => User_1.User, user => user.ballots),
+    typeorm_1.ManyToOne(() => User_1.User, (user) => user.ballots),
     __metadata("design:type", User_1.User)
 ], Ballot.prototype, "user", void 0);
 __decorate([
@@ -61,3 +64,20 @@ Ballot = __decorate([
     typeorm_1.Entity()
 ], Ballot);
 exports.Ballot = Ballot;
+exports.convertToClient = (ballots) => {
+    const toReturn = {};
+    for (const ballot of ballots) {
+        const newBallot = {
+            id: ballot.id,
+            status: ballot.status,
+            projectID: ballot.project.id,
+            criteriaID: ballot.criteria.id,
+            userID: ballot.user.id,
+            score: ballot.score,
+            createdAt: ballot.createdAt,
+            updatedAt: ballot.updatedAt,
+        };
+        toReturn[ballot.id] = newBallot;
+    }
+    return toReturn;
+};

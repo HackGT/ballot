@@ -6,7 +6,7 @@ import TableGroupController from '../controllers/TableGroupController';
 const router = Router();
 
 router.get('/allTableGroups', async (req, res) => {
-  if (can(req.user, Action.ManageTableGroups)) {
+  if (can(req.user, Action.ViewTableGroups)) {
     return res.status(200).json(await TableGroupController.getAllTableGroups());
   }
 

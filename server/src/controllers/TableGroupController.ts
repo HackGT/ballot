@@ -1,11 +1,12 @@
-import { getRepository, Not, In } from "typeorm";
-import { TableGroup, EMPTY_TABLE_GROUP_DICTIONARY } from "../entity/TableGroup";
+import { getRepository, Not, In } from 'typeorm';
+import { TableGroup, EMPTY_TABLE_GROUP_DICTIONARY } from '../entity/TableGroup';
 
 class TableGroupController {
   public static tableGroupDictionary = EMPTY_TABLE_GROUP_DICTIONARY;
   public static async getAllTableGroups() {
     const tableGroupRepository = getRepository(TableGroup);
     const allTableGroups = await tableGroupRepository.find();
+    await this.updateDictionaries();
     return this.convertToClient(allTableGroups);
   }
 
@@ -15,6 +16,7 @@ class TableGroupController {
       id: Not(In(tableGroups.map((group) => group.id!))),
     });
     const result = await tableGroupRepository.save(tableGroups);
+    await this.updateDictionaries();
     if (result) {
       return this.convertToClient(result);
     }

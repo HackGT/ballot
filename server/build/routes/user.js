@@ -8,6 +8,7 @@ const UserController_1 = __importDefault(require("../controllers/UserController"
 const Permissions_1 = require("../config/Permissions");
 const router = express_1.Router();
 router.get('/allUsers', async (req, res) => {
+    console.log(req.user);
     if (Permissions_1.can(req.user, Permissions_1.Action.ViewUsers)) {
         return res.status(200).json(await UserController_1.default.getAllUsersSafe());
     }

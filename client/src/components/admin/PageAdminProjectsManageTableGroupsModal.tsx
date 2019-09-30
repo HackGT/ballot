@@ -3,8 +3,7 @@ import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { fillProjects } from '../../state/Project';
-import { ProjectState, TableGroupState, TableGroup, EMPTY_TABLE_GROUP } from '../../types/Project';
+import { TableGroupState, TableGroup, EMPTY_TABLE_GROUP } from '../../types/Project';
 import { AppState } from '../../state/Store';
 
 import PageAdminProjectsManageTableGroupsModalGroupRow from './PageAdminProjectsManageTableGroupsModalGroupRow';

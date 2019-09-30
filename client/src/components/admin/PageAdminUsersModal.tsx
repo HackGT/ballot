@@ -1,13 +1,10 @@
-import React from 'react';
-import { AppState } from '../../state/Store';
-import User, { UserRole, getRoleEnum, serverDataToClientUser, clientUserToServerUser } from '../../types/User';
-import { connect } from 'react-redux';
-import { Modal, ToggleButtonGroup } from 'react-bootstrap';
-import { Button } from 'react-bootstrap';
-import { Form } from 'react-bootstrap';
-import { ButtonToolbar } from 'react-bootstrap';
-import { ToggleButton } from 'react-bootstrap';
 import Axios from 'axios';
+import React from 'react';
+import { Form, ButtonToolbar, ToggleButtonGroup, ToggleButton, Button, Modal } from 'react-bootstrap';
+import { connect } from 'react-redux';
+
+import { AppState } from '../../state/Store';
+import User, { UserRole, serverDataToClientUser, clientUserToServerUser } from '../../types/User';
 import { updateUser } from '../../state/User';
 
 const mapStateToProps = (state: AppState) => {

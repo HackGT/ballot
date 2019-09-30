@@ -1,4 +1,5 @@
 import Project, { ProjectState } from '../types/Project';
+import Axios from 'axios';
 
 export const UPDATE_PROJECT = 'UPDATE_PROJECT';
 export const DELETE_PROJECT = 'DELETE_PROJECT';
@@ -19,6 +20,23 @@ export function fillProjects(projects: ProjectState) {
 
 export function appendFillProjects(projects: ProjectState) {
   return { type: APPEND_FILL_PROJECTS, projects };
+}
+
+export function fetchProjects() {
+  return async (dispatch: any) => {
+    try {
+      const result = await Axios.get('/api/projects/allProjects');
+      if (result.status) {
+        const payload: ProjectState = result.data;
+        dispatch(fillProjects(payload));
+      } else {
+        throw new Error('API Error');
+      }
+    } catch (error) {
+      console.log(error);
+      return Promise.resolve();
+    }
+  };
 }
 
 export default function projects(state: ProjectState = {}, action: any) {

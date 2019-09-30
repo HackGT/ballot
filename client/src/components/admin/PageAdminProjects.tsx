@@ -1,36 +1,52 @@
 import React from 'react';
-import { Button, Modal, } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import { AppState } from '../../state/Store';
-import User from '../../types/User';
-import { loginUser } from '../../state/Account';
+import { TableGroupState, ProjectState } from '../../types/Project';
+import { fetchTableGroups } from '../../state/TableGroup';
+import { fetchProjects } from '../../state/Project';
 
 import PageAdminProjectsUploadModal from './PageAdminProjectsUploadModal';
 import PageAdminProjectsManageTableGroupsModal from './PageAdminProjectsManageTableGroupsModal';
 import PageAdminProjectsAddProjectModal from './PageAdminProjectsAddProjectModal';
-import { ButtonGroup } from 'react-bootstrap';
-import Axios from 'axios';
-import { TableGroupState } from '../../types/Project';
-import { fillTableGroups } from '../../state/TableGroup';
+import PageAdminProjectsEpicenter from './PageAdminProjectsEpicenter';
+import { fetchUsers } from '../../state/User';
+import { requestFinish, requestStart } from '../../state/Request';
+import { UserState } from '../../types/User';
+import { fetchBallots } from '../../state/Ballot';
 
 const mapStateToProps = (state: AppState) => {
 	return {
+		requesting: state.requesting,
 		tableGroups: state.tableGroups,
+		projects: state.projects,
+		users: state.users,
 	};
 };
 
 const mapDispatchToProps = (dispatch: any) => {
 	return {
-		fillTableGroups: (tableGroups: TableGroupState) => {
-			dispatch(fillTableGroups(tableGroups));
-		},
+		fetchBallots: () => dispatch(fetchBallots()),
+		fetchTableGroups: () => dispatch(fetchTableGroups()),
+		fetchProjects: () => dispatch(fetchProjects()),
+		fetchUsers: () => dispatch(fetchUsers()),
+		requestFinish: () => dispatch(requestFinish()),
+		requestStart: () => dispatch(requestStart()),
 	};
 };
 
 interface PageAdminProjectsProps {
+	requesting: boolean;
 	tableGroups: TableGroupState;
-	fillTableGroups: (tableGroups: TableGroupState) => void;
+	projects: ProjectState;
+	users: UserState;
+	fetchBallots: () => void;
+	fetchTableGroups: () => void;
+	fetchProjects: () => void;
+	fetchUsers: () => void;
+	requestFinish: () => void;
+	requestStart: () => void;
 }
 
 enum ModalType {
@@ -42,14 +58,11 @@ enum ModalType {
 
 type State = {
 	modalOpen: ModalType,
-	requesting: boolean;
 }
 
 type Action =
 	| { type: 'modal-close'}
-	| { type: 'modal-open', modal: ModalType}
-	| { type: 'request-start'}
-	| { type: 'request-finish'};
+	| { type: 'modal-open', modal: ModalType};
 
 const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => {
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
@@ -58,84 +71,93 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 				return { ...state, modalOpen: ModalType.None }
 			case 'modal-open':
 				return { ...state, modalOpen: action.modal }
-			case 'request-start':
-				return { ...state, requesting: true };
-			case 'request-finish':
-				return { ...state, requesting: false };
 			default:
 				return state;
 		}
 	}, {
 		modalOpen: ModalType.None,
-		requesting: true,
 	}, undefined);
 	const closeModal = () => dispatch({ type: 'modal-close' });
 
 	React.useEffect(() => {
-		fetchTableGroups();
+		const initialFetch = async () => {
+			props.requestStart();
+			await Promise.all([
+				props.fetchBallots(),
+				props.fetchTableGroups(),
+				props.fetchProjects(),
+				props.fetchUsers(),
+			]);
+			props.requestFinish();
+		};
+
+		if (!(Object.values(props.users).length > 0
+			&& Object.values(props.projects).length > 0
+			&& Object.values(props.tableGroups).length > 0)) {
+			initialFetch();
+		}
 	}, []);
 
-	const fetchTableGroups = async () => {
-		dispatch({ type: 'request-start' });
-		const result = await Axios.get('/api/tableGroups/allTableGroups');
-		if (result.status) {
-			const payload: TableGroupState = result.data;
-			props.fillTableGroups(payload);
-			dispatch({ type: 'request-finish' });
-		} else {
-			// TODO error checking
+	const getInnerContent = () => {
+		if (props.requesting) {
+			return 'Loading';
+			// TODO add real spinner
 		}
+
+		return (
+			<>
+				<div style={{
+					display: 'flex',
+					justifyContent: 'center',
+					flexWrap: 'wrap',
+				}}>
+					<ButtonGroup>
+						<Button
+							onClick={() => dispatch({
+								type: 'modal-open',
+								modal: ModalType.UploadProjects,
+							})}
+							size='sm'>
+							Upload Projects
+						</Button>
+						<Button
+							onClick={() => dispatch({
+								type: 'modal-open',
+								modal: ModalType.ManageTableGroups,
+							})}
+							variant={
+								Object.values(props.tableGroups).length > 0 || props.requesting
+									? 'outline-primary'
+									: 'danger'
+							}
+							size='sm'>
+							Manage Table Groups
+						</Button>
+						<Button
+							onClick={() => dispatch({
+								type: 'modal-open',
+								modal: ModalType.AddProject,
+							})}
+							variant='outline-primary'
+							size='sm'>
+							Add Project
+						</Button>
+					</ButtonGroup>
+				</div>
+				<div style={{
+					maxWidth: 1300,
+					margin: '12px auto 0',
+				}}>
+					<PageAdminProjectsEpicenter />
+				</div>
+			</>
+		)
 	}
 
 	return (
 		<div style={{ margin: '12px' }}>
 			<h1 style={{ textAlign: 'center' }}>Projects</h1>
-			<div style={{
-				display: 'flex',
-				justifyContent: 'center',
-				flexWrap: 'wrap',
-			}}>
-				<ButtonGroup>
-					<Button
-						onClick={() => dispatch({
-							type: 'modal-open',
-							modal: ModalType.UploadProjects,
-						})}
-						size='sm'>
-						Upload Projects
-					</Button>
-					<Button
-						onClick={() => dispatch({
-							type: 'modal-open',
-							modal: ModalType.ManageTableGroups,
-						})}
-						variant={
-							Object.values(props.tableGroups).length > 0 || state.requesting
-								? 'outline-primary'
-								: 'danger'
-						}
-						size='sm'>
-						Manage Table Groups
-					</Button>
-					<Button
-						onClick={() => dispatch({
-							type: 'modal-open',
-							modal: ModalType.AddProject,
-						})}
-						variant='outline-primary'
-						size='sm'>
-						Add Project
-					</Button>
-				</ButtonGroup>
-			</div>
-			<div style={{
-				display: 'flex',
-				justifyContent: 'center',
-				flexWrap: 'wrap',
-				maxWidth: 1300,
-				margin: '12px auto 0',
-			}}>
-			</div>
+			{getInnerContent()}
 			<PageAdminProjectsUploadModal
 				modalOpen={state.modalOpen === ModalType.UploadProjects}
 				closeModal={closeModal} />

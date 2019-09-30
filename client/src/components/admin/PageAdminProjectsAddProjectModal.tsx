@@ -1,4 +1,3 @@
-import Axios from 'axios';
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
