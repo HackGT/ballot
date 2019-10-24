@@ -29,6 +29,11 @@ export class User {
   @Column('character varying', { array: true })
   public tags: string[];
 
+  @Column({
+    default: '',
+  })
+  public company: string;
+
   @Column()
   public salt: string;
 

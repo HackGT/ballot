@@ -27,6 +27,7 @@ router.get('/user_data', (req, res) => {
             name: req.user.name,
             email: req.user.email,
             role: req.user.role,
+            company: req.user.company,
             tags: req.user.tags,
         });
     }
@@ -46,6 +47,7 @@ router.post('/login', postParser, (req, res, next) => {
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    company: user.company,
                     tags: user.tags,
                 });
             });

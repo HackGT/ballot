@@ -88,6 +88,7 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 				props.fetchProjects(),
 				props.fetchUsers(),
 			]);
+			console.log('fetch');
 			props.requestFinish();
 		};
 
@@ -99,7 +100,10 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 	}, []);
 
 	const getInnerContent = () => {
-		if (props.requesting) {
+		if (props.requesting
+			|| Object.values(props.users).length === 0
+			|| Object.values(props.projects).length === 0
+			|| Object.values(props.tableGroups).length === 0) {
 			return 'Loading';
 			// TODO add real spinner
 		}

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Project, { ProjectState, TableGroupState } from '../../types/Project';
 import { fetchProjects } from '../../state/Project';
-import { CategoryState } from '../../types/Category';
+import { CategoryState, CategoryCriteriaState } from '../../types/Category';
 import { fillCategories } from '../../state/Category';
 import { AppState } from '../../state/Store';
 import { fetchTableGroups } from '../../state/TableGroup';
@@ -33,7 +33,7 @@ const mapDispatchToProps = (dispatch: any) => {
 };
 
 interface PageProjectsProps {
-	categories: CategoryState;
+	categories: CategoryCriteriaState;
 	projects: ProjectState;
 	tableGroups: TableGroupState;
 	fillCategories: (categories: CategoryState) => void;
@@ -89,7 +89,7 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 
 	const getProjectCards = () => {
 		if (
-			Object.values(props.categories).length > 0
+			Object.values(props.categories.categories).length > 0
 			&& Object.values(props.projects).length > 0
 			&& Object.values(props.tableGroups).length > 0
 		) {
@@ -100,7 +100,7 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 							key={categoryID}
 							variant='secondary'
 							style={{ margin: '0 2px' }}>
-							{props.categories[categoryID].name}
+							{props.categories.categories[categoryID].name}
 						</Badge>
 					);
 				});

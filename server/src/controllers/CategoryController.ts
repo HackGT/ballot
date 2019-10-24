@@ -55,6 +55,16 @@ class CategoryController {
     return result;
   }
 
+  public static async getCategoryCompanies() {
+    const categoryRepository = getRepository(Category);
+    const result = await categoryRepository
+      .createQueryBuilder('categories')
+      .select('DISTINCT company', 'company')
+      .getRawMany();
+
+    return result.map((value: any) => value.company).sort();
+  }
+
   private static async updateDictionaries() {
     const allCategories = await getRepository(Category).find();
     this.categoryDictionary = allCategories.reduce((dict, category) => {

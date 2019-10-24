@@ -38,4 +38,10 @@ router.delete('/deleteGenerated', async (req, res) => {
     }
     return res.status(401).send('Not enough permissions to delete categories.');
 });
+router.get('/companies', async (req, res) => {
+    if (Permissions_1.can(req.user, Permissions_1.Action.ViewCategories)) {
+        return res.status(200).json(await CategoryController_1.default.getCategoryCompanies());
+    }
+    return res.status(401).send('Not enough permissions to get company categories.');
+});
 exports.default = router;

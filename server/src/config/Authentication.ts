@@ -18,6 +18,7 @@ export default class Authentication {
             // Check the request is a request to register.
             if (req.path.match(/\/signup$/i)) {
                 const name = req.body.name.trim();
+                const company = req.body.company.trim();
                 if (!name || !email || !password) {
                     Logger.error('Attempted local account signup - Fields left blank');
                     return done(undefined, false);
@@ -34,6 +35,7 @@ export default class Authentication {
                         ? UserRole.Owner
                         : UserRole.Pending;
                     newUser.tags = [];
+                    newUser.company = company;
                     newUser.salt = salt;
                     newUser.hash = hash;
 

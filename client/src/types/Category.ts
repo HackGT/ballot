@@ -4,6 +4,7 @@ export default interface Category {
   isDefault: boolean;
   generated: boolean;
   description: string;
+  company: string;
   criteria: CriteriaState;
 }
 
@@ -14,6 +15,11 @@ export interface Criteria {
   minScore: number;
   maxScore: number;
   categoryID: number;
+}
+
+export interface CategoryCriteriaState {
+  categories: CategoryState;
+  criteria: CriteriaState;
 }
 
 export interface CategoryState {
@@ -39,6 +45,7 @@ export const EMPTY_CATEGORY = {
   isDefault: false,
   generated: false,
   description: '',
+  company: '',
   criteria: createPlaceholderCriteria(),
 };
 

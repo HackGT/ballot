@@ -20,6 +20,7 @@ const passport_1 = __importDefault(require("passport"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
 const passport_socketio_1 = __importDefault(require("passport.socketio"));
+const pg_1 = __importDefault(require("pg"));
 require("reflect-metadata");
 const Environment_1 = __importDefault(require("./config/Environment"));
 const Database_1 = __importDefault(require("./config/Database"));
@@ -50,23 +51,20 @@ async function start() {
     }
     Logger_1.default.success('Database Initialized');
     const pgSessionStore = connect_pg_simple_1.default(express_session_1.default);
+    const pgPool = new pg_1.default.Pool({
+        max: 200,
+        idleTimeoutMillis: 30000,
+        ...Database_1.default.getConnectionObject(),
+    });
     const sessionMiddleware = express_session_1.default({
         store: new pgSessionStore({
-            conObject: Database_1.default.getConnectionObject(),
+            pool: pgPool,
         }),
         secret: Environment_1.default.getSessionSecret(),
         resave: true,
         saveUninitialized: true,
     });
     app.use(sessionMiddleware).use(cookie_parser_1.default());
-    exports.io.on('connection', socket_1.default);
-    exports.io.use(passport_socketio_1.default.authorize({
-        cookieParser: require('cookie-parser'),
-        secret: Environment_1.default.getSessionSecret(),
-        store: new pgSessionStore({
-            conObject: Database_1.default.getConnectionObject(),
-        }),
-    }));
     try {
         Logger_1.default.info('Setting up Passport');
         Authentication_1.default.setupStrategies();
@@ -82,6 +80,17 @@ async function start() {
         Logger_1.default.error('Server startup canceled due to an error with Passport');
         throw new Error(error);
     }
+    exports.io.on('connection', socket_1.default);
+    exports.io.use((socket, next) => {
+        console.log('wowowowow');
+        passport_socketio_1.default.authorize({
+            cookieParser: require('cookie-parser'),
+            secret: Environment_1.default.getSessionSecret(),
+            store: new pgSessionStore({
+                conObject: Database_1.default.getConnectionObject(),
+            }),
+        })(socket, next);
+    });
     app.use(express_1.default.json());
     app.use('/auth', auth_1.default);
     app.use('/api', api_1.default);

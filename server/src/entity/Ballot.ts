@@ -27,7 +27,10 @@ export class Ballot {
   })
   public project: Project;
 
-  @ManyToOne(() => Criteria, (criteria) => criteria.ballots)
+  @ManyToOne(() => Criteria, (criteria) => criteria.ballots, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   public criteria: Criteria;
 
   @ManyToOne(() => User, (user) => user.ballots)
@@ -55,19 +58,20 @@ export interface BallotClient {
 }
 
 export const convertToClient = (ballots: Ballot[]) => {
+  console.log(ballots);
   const toReturn: { [ballotID: number]: BallotClient } = {};
   for (const ballot of ballots) {
-    const newBallot = {
-      id: ballot.id!,
-      status: ballot.status,
-      projectID: ballot.project.id!,
-      criteriaID: ballot.criteria.id!,
-      userID: ballot.user.id!,
-      score: ballot.score,
-      createdAt: ballot.createdAt!,
-      updatedAt: ballot.updatedAt!,
-    };
-    toReturn[ballot.id!] = newBallot;
+    if (ballot.project && ballot.criteria && ballot.user) {
+      toReturn[ballot.id!] = {
+        ...ballot,
+        id: ballot.id!,
+        projectID: ballot.project.id!,
+        criteriaID: ballot.criteria.id!,
+        userID: ballot.user.id!,
+        createdAt: ballot.createdAt!,
+        updatedAt: ballot.updatedAt!,
+      };
+    }
   }
   return toReturn;
 };

@@ -111,13 +111,14 @@ const PageAdminUserCardComponent: React.FC<PageAdminUserCardProps> = (props) => 
         margin: '12px',
       }}>
       <Card.Body>
-        <Card.Title>{props.user.id}: {props.user.name}</Card.Title>
+        <Card.Title>{props.user.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">
           {getRoleString(props.user.role)}
           <Badge variant={props.user.isJudging ? 'success' : 'light'} style={{ margin: 5 }}>{props.user.isJudging ? 'Included In Judging' : 'Excluded From Judging'}</Badge>
         </Card.Subtitle>
         <Card.Text>
           {props.user.email}<br />
+          {props.user.company}<br />
           {props.user.tags && props.user.tags.length > 0 ? <span>{props.user.tags}</span> : <span>No tags</span>}
         </Card.Text>
         <ButtonGroup>

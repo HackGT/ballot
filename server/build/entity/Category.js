@@ -34,6 +34,12 @@ __decorate([
     __metadata("design:type", String)
 ], Category.prototype, "description", void 0);
 __decorate([
+    typeorm_1.Column({
+        default: '',
+    }),
+    __metadata("design:type", String)
+], Category.prototype, "company", void 0);
+__decorate([
     typeorm_1.OneToMany(() => Criteria_1.Criteria, (criteria) => criteria.category, {
         cascade: true,
         onUpdate: 'CASCADE',

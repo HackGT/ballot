@@ -4,68 +4,79 @@ import BallotController from '../controllers/BallotController';
 import ProjectController from '../controllers/ProjectController';
 import { io } from '../app';
 import { convertToClient } from '../entity/Ballot';
+import { can, Action } from '../config/Permissions';
 
 const connectedClients: { [socketID: string]: User | undefined } = {};
 
-enum Strings {
+export enum SocketStrings {
   Authenticated = 'authenticated',
   Disconnect = 'disconnect',
   ProjectQueue = 'project-queue',
   ProjectQueued = 'project-queued',
+  ProjectGot = 'project-got',
+  ProjectScore = 'project-score',
+  ProjectSkip = 'project-skip',
+  ProjectBusy = 'project-busy',
+  ProjectMissing = 'project-missing',
+  ProjectStart = 'project-start',
   UpdateSession = 'update-session',
 }
 
 const socketHandler = (client: SocketIO.Socket) => {
   console.log(client.id, 'connected');
   const updateRooms = async () => {
-    console.log(client.request.user);
-    if (client.request.user.logged_in) {
-      client.join(Strings.Authenticated);
-    } else {
-      client.leave(Strings.Authenticated);
+    console.log('updaterooms', client.request.user);
+    console.log('updateroomscan', can(client.request.user, Action.QueueProject));
+    if (client.request.user.logged_in && can(client.request.user, Action.QueueProject)) {
+      client.join(SocketStrings.Authenticated);
+      return true;
     }
+
+    client.leave(SocketStrings.Authenticated);
+    return false;
   };
 
   updateRooms();
 
-  client.on(Strings.Disconnect, () => {
+  client.on(SocketStrings.Disconnect, () => {
     updateRooms();
     console.log(client.id, 'disconnected');
     delete connectedClients[client.id];
   });
 
-  client.on(Strings.ProjectQueue, async (data: {
+  client.on(SocketStrings.ProjectQueue, async (data: {
     eventID: string;
     userID: number;
     projectID: number;
   }) => {
-    updateRooms();
     console.log(data);
-    const { eventID, userID, projectID } = data;
-    io.to(Strings.Authenticated).emit(Strings.ProjectQueued, {
-      eventID,
-      userID,
-      projectID,
-      done: false,
-    });
+    console.log(client.request.user);
+    if (updateRooms()) {
+      const { eventID, userID, projectID } = data;
+      client.broadcast.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueue, {
+        eventID,
+        userID,
+        projectID,
+      });
 
-    const {
-      newBallots,
-      removedBallotIDs
-    } = await ProjectController.queueProject(projectID, userID);
-    console.log('in sockets', {
-      newBallots,
-      removedBallotIDs,
-    });
+      const {
+        newBallots,
+        removedBallotIDs
+      } = await ProjectController.queueProject(projectID, userID);
+      console.log('in sockets', {
+        newBallots,
+        removedBallotIDs,
+      });
 
-    io.to(Strings.Authenticated).emit(Strings.ProjectQueued, {
-      eventID,
-      userID,
-      projectID,
-      newBallots: convertToClient(newBallots),
-      removedBallotIDs,
-      done: true,
-    });
+      io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueued, {
+        eventID,
+        userID,
+        projectID,
+        newBallots: convertToClient(newBallots),
+        removedBallotIDs,
+        done: true,
+      });
+    }
   });
 };
 

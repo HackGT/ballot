@@ -21,6 +21,7 @@ class UserController {
                 'name',
                 'role',
                 'isJudging',
+                'company',
                 'tags',
                 'createdAt',
                 'updatedAt',

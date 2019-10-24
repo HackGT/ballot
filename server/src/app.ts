@@ -8,6 +8,7 @@ import passport from 'passport';
 import socketio from 'socket.io';
 import store from 'connect-pg-simple';
 import passportSocketIO from 'passport.socketio';
+import pg from 'pg';
 import 'reflect-metadata';
 
 import Environment from './config/Environment';
@@ -43,9 +44,16 @@ async function start(): Promise<void> {
 
     const pgSessionStore = store(session);
 
+    const pgPool = new pg.Pool({
+        max: 200,
+        idleTimeoutMillis: 30000,
+        ...Database.getConnectionObject(),
+    })
+
     const sessionMiddleware = session({
         store: new pgSessionStore({
-            conObject: Database.getConnectionObject(),
+            pool: pgPool,
+            // conObject: Database.getConnectionObject(),
         }),
         secret: Environment.getSessionSecret(),
         resave: true,
@@ -53,22 +61,6 @@ async function start(): Promise<void> {
     });
 
     app.use(sessionMiddleware).use(cookieParser());
-
-    io.on('connection', socketHandler);
-    io.use(passportSocketIO.authorize({
-        cookieParser: require('cookie-parser'),
-        secret: Environment.getSessionSecret(),
-        store: new pgSessionStore({
-            conObject: Database.getConnectionObject(),
-        }),
-        // success: (data, accept) => {
-        //     console.log(data.user);
-        //     accept()
-        // },
-        // fail: (data, message, error, accept) => {
-        //     accept();
-        // }
-    }));
 
     try {
         Logger.info('Setting up Passport');
@@ -85,6 +77,18 @@ async function start(): Promise<void> {
         Logger.error('Server startup canceled due to an error with Passport');
         throw new Error(error);
     }
+
+    io.on('connection', socketHandler);
+    io.use((socket, next) => {
+        console.log('wowowowow');
+        passportSocketIO.authorize({
+            cookieParser: require('cookie-parser'),
+            secret: Environment.getSessionSecret(),
+            store: new pgSessionStore({
+                conObject: Database.getConnectionObject(),
+            }),
+        })(socket, next);
+    });
 
     app.use(express.json());
     app.use('/auth', auth);

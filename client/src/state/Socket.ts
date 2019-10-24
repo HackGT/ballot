@@ -2,7 +2,11 @@ import io from 'socket.io-client';
 
 // From http://nmajor.com/posts/using-socket-io-with-redux-websocket-redux-middleware
 export default function socketMiddleware() {
-  const socket = io();
+  let socket = io();
+
+  function refreshSocket() {
+    socket = io({'forceNew': true });
+  }
 
   return ({ dispatch }: { dispatch: any }) => (next: any) => (action: any) => {
     if (typeof action === 'function') {
@@ -15,15 +19,23 @@ export default function socketMiddleware() {
       emit,
       payload,
       handle,
+      update,
       ...rest
     } = action;
+
+    console.log(action);
+
+    if (update) {
+      refreshSocket();
+      return;
+    }
 
     if (!event) {
       return next(action);
     }
 
     if (leave) {
-      socket.removeListener(event);
+      socket.removeAllListeners();
     }
 
     if (emit) {
@@ -32,11 +44,10 @@ export default function socketMiddleware() {
     }
 
     let handleEvent = handle;
-    console.log('wow');
     if (typeof handleEvent === 'string') {
-      console.log('handleEvent');
       handleEvent = (result: any) => dispatch({ type: handle, result, ...rest });
     }
+
     return socket.on(event, handleEvent);
   }
 };

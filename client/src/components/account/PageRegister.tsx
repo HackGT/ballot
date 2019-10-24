@@ -9,15 +9,20 @@ import { loginUser } from '../../state/Account';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { UIError } from '../../types/Common';
 import { Redirect } from 'react-router';
+import { fetchCompanies } from '../../state/Company';
 
 const mapStateToProps = (state: AppState) => {
   return {
     account: state.account,
+    companies: state.companies,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    fetchCompanies: () => {
+      dispatch(fetchCompanies());
+    },
     loginUser: (user: User) => {
       dispatch(loginUser(user));
     },
@@ -26,7 +31,9 @@ const mapDispatchToProps = (dispatch: any) => {
 
 interface PageRegisterProps {
   account: User;
+  companies: string[];
   loginUser: (user: User) => void;
+  fetchCompanies: () => void;
 }
 
 interface Inputs {
@@ -34,6 +41,7 @@ interface Inputs {
   email: string;
   password: string;
   passwordConfirm: string;
+  company: string;
 }
 
 type State = {
@@ -58,6 +66,7 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
       email: '',
       password: '',
       passwordConfirm: '',
+      company: '',
     },
     error: {
       name: '',
@@ -92,6 +101,10 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
         return state;
     }
   }, initialState, undefined);
+
+  React.useEffect(() => {
+    props.fetchCompanies();
+  }, []);
 
   const handleRegister = async (event: any) => {
     event.preventDefault();
@@ -135,6 +148,7 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
       'name': state.inputs.name,
       'email': state.inputs.email,
       'password': state.inputs.password,
+      'company': state.inputs.company,
     }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -168,6 +182,14 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
     return <Redirect to='/login' />;
   }
 
+  const _getCompanyList = () => {
+    return props.companies.map((company: string) => {
+      return (
+        <option key={company}>{company}</option>
+      );
+    });
+  };
+
   return (
     <div style={{
       margin: '0 auto',
@@ -179,6 +201,7 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
       }}>Register</h1>
       <Form>
         <Form.Group>
+          <Form.Label>Name</Form.Label>
           <Form.Control
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
@@ -189,9 +212,10 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
             })}
             value={state.inputs.name}
             type="text"
-            placeholder="Name" />
+            placeholder="George P. Beardell" />
         </Form.Group>
         <Form.Group>
+          <Form.Label>Email</Form.Label>
           <Form.Control
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
@@ -202,9 +226,10 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
             })}
             value={state.inputs.email}
             type="email"
-            placeholder="Email" />
+            placeholder="beardell@hack.gt" />
         </Form.Group>
         <Form.Group>
+          <Form.Label>Password</Form.Label>
           <Form.Control
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
@@ -215,9 +240,10 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
             })}
             value={state.inputs.password}
             type="password"
-            placeholder="Password" />
+            placeholder="******" />
         </Form.Group>
         <Form.Group>
+          <Form.Label>Password (confirm)</Form.Label>
           <Form.Control
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
@@ -228,7 +254,24 @@ const PageRegisterComponent: React.FC<PageRegisterProps> = (props) => {
             })}
             value={state.inputs.passwordConfirm}
             type="password"
-            placeholder="Password (confirm)" />
+            placeholder="******" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Company/Group Name</Form.Label>
+          <Form.Control
+            as='select'
+            disabled={state.requesting}
+            onChange={(event: any) => dispatch({
+              type: 'change-inputs',
+              inputs: {
+                company: event.target.value,
+              },
+            })}
+            value={state.inputs.company}
+            type="text"
+            placeholder="Company">
+            {_getCompanyList()}
+          </Form.Control>
         </Form.Group>
         <Button
           variant="primary"

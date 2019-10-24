@@ -41,7 +41,10 @@ __decorate([
     __metadata("design:type", Project_1.Project)
 ], Ballot.prototype, "project", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => Criteria_1.Criteria, (criteria) => criteria.ballots),
+    typeorm_1.ManyToOne(() => Criteria_1.Criteria, (criteria) => criteria.ballots, {
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+    }),
     __metadata("design:type", Criteria_1.Criteria)
 ], Ballot.prototype, "criteria", void 0);
 __decorate([
@@ -65,19 +68,20 @@ Ballot = __decorate([
 ], Ballot);
 exports.Ballot = Ballot;
 exports.convertToClient = (ballots) => {
+    console.log(ballots);
     const toReturn = {};
     for (const ballot of ballots) {
-        const newBallot = {
-            id: ballot.id,
-            status: ballot.status,
-            projectID: ballot.project.id,
-            criteriaID: ballot.criteria.id,
-            userID: ballot.user.id,
-            score: ballot.score,
-            createdAt: ballot.createdAt,
-            updatedAt: ballot.updatedAt,
-        };
-        toReturn[ballot.id] = newBallot;
+        if (ballot.project && ballot.criteria && ballot.user) {
+            toReturn[ballot.id] = {
+                ...ballot,
+                id: ballot.id,
+                projectID: ballot.project.id,
+                criteriaID: ballot.criteria.id,
+                userID: ballot.user.id,
+                createdAt: ballot.createdAt,
+                updatedAt: ballot.updatedAt,
+            };
+        }
     }
     return toReturn;
 };

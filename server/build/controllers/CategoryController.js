@@ -48,6 +48,14 @@ class CategoryController {
         this.updateDictionaries();
         return result;
     }
+    static async getCategoryCompanies() {
+        const categoryRepository = typeorm_1.getRepository(Category_1.Category);
+        const result = await categoryRepository
+            .createQueryBuilder('categories')
+            .select('DISTINCT company', 'company')
+            .getRawMany();
+        return result.map((value) => value.company).sort();
+    }
     static async updateDictionaries() {
         const allCategories = await typeorm_1.getRepository(Category_1.Category).find();
         this.categoryDictionary = allCategories.reduce((dict, category) => {

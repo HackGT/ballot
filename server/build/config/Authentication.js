@@ -18,6 +18,7 @@ class Authentication {
             const connection = Database_1.default.getConnection();
             if (req.path.match(/\/signup$/i)) {
                 const name = req.body.name.trim();
+                const company = req.body.company.trim();
                 if (!name || !email || !password) {
                     Logger_1.default.error('Attempted local account signup - Fields left blank');
                     return done(undefined, false);
@@ -32,6 +33,7 @@ class Authentication {
                         ? User_1.UserRole.Owner
                         : User_1.UserRole.Pending;
                     newUser.tags = [];
+                    newUser.company = company;
                     newUser.salt = salt;
                     newUser.hash = hash;
                     return done(undefined, await connection.manager.save(newUser));

@@ -7,9 +7,11 @@ interface PageAdminProjectsEpicenterEmptyDotProps {
 const PageAdminProjectsEpicenterEmptyDot: React.FC<PageAdminProjectsEpicenterEmptyDotProps> = (props) => {
   return (
     <div
+      className='dot'
       style={{
         display: 'inline-block',
         margin: 2,
+        minWidth: 40,
         width: 40,
         height: 40,
         borderRadius: '50%',

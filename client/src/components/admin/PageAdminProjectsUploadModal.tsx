@@ -7,8 +7,9 @@ import { fillProjects } from '../../state/Project';
 import Project, { ProjectState, TableGroupState, TableGroup } from '../../types/Project';
 import Papa from 'papaparse';
 import { AppState } from '../../state/Store';
-import Category, { CategoryState, NameToCategoryMapping } from '../../types/Category';
+import Category, { CategoryState, NameToCategoryMapping, CategoryCriteriaState } from '../../types/Category';
 import { updateCategory, fillCategories } from '../../state/Category';
+import { clearBallots } from '../../state/Ballot';
 
 const requiredHeaders = [
   'Submission Title',
@@ -35,15 +36,19 @@ const mapDispatchToProps = (dispatch: any) => {
 		},
 		fillProjects: (projects: ProjectState) => {
 			dispatch(fillProjects(projects));
-		},
+    },
+    clearBallots: () => {
+      dispatch(clearBallots());
+    },
 	};
 };
 
 interface PageAdminProjectsUploadModalProps {
-  categories: CategoryState;
+  categories: CategoryCriteriaState;
   modalOpen: boolean;
   tableGroups: TableGroupState;
   closeModal: () => void;
+  clearBallots: () => void;
   updateCategory: (categories: CategoryState) => void;
   fillProjects: (projects: ProjectState) => void;
   fillCategories: (categories: CategoryState) => void;
@@ -162,7 +167,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     }
 
     // Check if the any of the generated categories is a preexisting nongenerated category.
-    const existingCategoriesArray = Object.values(props.categories).reduce((array: string[], category: Category) => {
+    const existingCategoriesArray = Object.values(props.categories.categories).reduce((array: string[], category: Category) => {
       if (!category.generated) {
         array.push(category.name);
       }
@@ -190,6 +195,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         isDefault: false,
         generated: true,
         description: `Sponsor prize generated when projects were uploaded. Do not remove. - ${categoryName}`,
+        company: '',
         criteria: [],
       };
     });
@@ -201,12 +207,13 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
       // TODO throw error couldn't generate new categories.
     }
     const payload: CategoryState = addGeneratedCategoriesResult.data;
-    const onlyNonGenerated: CategoryState = Object.values(props.categories).reduce((dict: CategoryState, currentCategory: Category) => {
+    const onlyNonGenerated: CategoryState = Object.values(props.categories.categories).reduce((dict: CategoryState, currentCategory: Category) => {
       if (!currentCategory.generated) {
         dict[currentCategory.id!] = currentCategory;
       }
       return dict;
     }, {});
+    console.log('nongenerated', onlyNonGenerated, payload);
     const newCategories = {
       ...onlyNonGenerated,
       ...payload,
@@ -221,6 +228,12 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
       dict[currentCategory.name] = currentCategory;
       return dict;
     }, {});
+    const defaultCategoryIDs: number[] = Object.values(newCategories).reduce((array: number[], category: Category) => {
+      if (category.isDefault) {
+        array.push(category.id!);
+      }
+      return array;
+    }, []);
 
     const projectsToSend: Project[] = [];
     let csvRowNumber = 0;
@@ -231,15 +244,13 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
           const csvRow = state.csv[csvRowNumber];
           if (csvRow) {
-            const categoryIDs: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
+            const devpostDesiredCategories: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
               categoryName = categoryName.trim();
-              console.log(categoryName);
               if (categoryName) {
                 array.push(nameToCategoryMapping[categoryName.trim()].id!);
               }
               return array;
             }, []);
-
 
             projectsToSend.push({
               name: csvRow[state.csvHeaderIndicies['Submission Title']],
@@ -247,7 +258,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
               expoNumber,
               tableGroupID: tableGroup.id!,
               tableNumber,
-              categoryIDs: categoryIDs.concat(Object.values(onlyNonGenerated).map((category: Category) => category.id!)),
+              categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
               tags: [],
             });
             csvRowNumber++;
@@ -263,6 +274,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
       const data = batchUploadResult.data;
       console.log(data);
       props.fillProjects(data);
+      props.clearBallots();
       props.closeModal();
       dispatch({ type: 'request-finish' });
     }

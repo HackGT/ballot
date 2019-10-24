@@ -6,12 +6,19 @@ import Category, { Criteria, createEmptyCriteria, CategoryState } from '../../ty
 import { updateCategory } from '../../state/Category';
 import PageAdminCategoriesModalCriteria from './PageAdminCategoriesModalCriteria';
 import Axios from 'axios';
+import { requestFinish, requestStart } from '../../state/Request';
 
 const mapDispatchToProps = (dispatch: any) => {
 	return {
 		updateCategory: (categories: CategoryState) => {
 			dispatch(updateCategory(categories));
-		},
+    },
+    requestFinish: () => {
+      dispatch(requestFinish());
+    },
+    requestStart: () => {
+      dispatch(requestStart());
+    },
 	};
 };
 
@@ -19,7 +26,9 @@ interface PageAdminCategoriesModalProps {
   modalOpen: boolean;
   category: Category;
   closeModal: () => void;
-	updateCategory: (category: CategoryState) => void;
+  updateCategory: (category: CategoryState) => void;
+  requestFinish: () => void;
+  requestStart: () => void;
 }
 
 type State = {
@@ -30,8 +39,6 @@ type State = {
 
 type Action =
   | { type: 'increase-new-category-id' }
-	| { type: 'request-start'}
-  | { type: 'request-finish'}
   | { type: 'update-category', category: Category };
 
 const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps> = (props) => {
@@ -39,10 +46,6 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
 		switch (action.type) {
       case 'increase-new-category-id':
         return { ...state, currentNewCategoryID: state.currentNewCategoryID - 1}
-			case 'request-start':
-				return { ...state, requesting: true };
-			case 'request-finish':
-        return { ...state, requesting: false };
       case 'update-category':
         return { ...state, category: action.category };
 			default:
@@ -61,7 +64,7 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
   }, [category]);
 
   const handleSaveChanges = async () => {
-    dispatch({ type: 'request-start' });
+    props.requestStart();
     const result = await Axios.post('/api/categories/update', {
       categories: [{
         ...state.category,
@@ -76,7 +79,7 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
       console.log(data);
       props.updateCategory(data);
       props.closeModal();
-      dispatch({ type: 'request-finish' });
+      props.requestFinish();
     } else {
       // TODO add error checking.
     }
@@ -166,6 +169,21 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
           <Form.Text className="text-muted">
             Check this box if all submissions are eligible for this category.
           </Form.Text>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Company</Form.Label>
+          <Form.Control
+            disabled={state.requesting}
+            name='company'
+            onChange={(event: any) => dispatch({
+              type: 'update-category',
+              category: {
+                ...state.category,
+                company: event.target.value,
+              }
+            })}
+            value={state.category.company}
+            placeholder='Company' />
         </Form.Group>
         <Form.Group>
           <Form.Label>Category Description</Form.Label>

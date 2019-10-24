@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import { AppState } from '../../state/Store';
-import Category, { CategoryState, EMPTY_CATEGORY } from '../../types/Category';
+import Category, { CategoryState, EMPTY_CATEGORY, CategoryCriteriaState } from '../../types/Category';
 import { fillCategories } from '../../state/Category';
 
 import PageAdminCategoriesModal from './PageAdminCategoriesModal';
@@ -25,7 +25,7 @@ const mapDispatchToProps = (dispatch: any) => {
 };
 
 interface PageAdminCategoriesProps {
-	categories: CategoryState;
+	categories: CategoryCriteriaState;
 	fillCategories: (categories: CategoryState) => void;
 }
 
@@ -87,7 +87,7 @@ const PageAdminCategoriesComponent: React.FC<PageAdminCategoriesProps> = (props)
 		const createdCategories = [];
 		const generatedCategories = [];
 
-		for (const category of Object.values(props.categories)) {
+		for (const category of Object.values(props.categories.categories)) {
 			if (category.generated) {
 				generatedCategories.push(
 					<PageAdminCategoriesCard

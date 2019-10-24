@@ -42,11 +42,12 @@ function can(user, action) {
             case Action.EditUser:
             case Action.DeleteUser:
             case Action.ViewUsers:
-            case Action.ViewCategoriesCriteria:
             case Action.AddCategory:
             case Action.DeleteCategory:
             case Action.UpdateCategory:
             case Action.ManageTableGroups:
+            case Action.QueueProject:
+            case Action.DequeueProject:
             case Action.BatchUploadProjects:
             case Action.AddProject:
             case Action.DeleteProject:
@@ -57,6 +58,7 @@ function can(user, action) {
             case Action.ScoreBallot:
             case Action.StartProject:
             case Action.SkipProject:
+            case Action.ViewCategoriesCriteria:
                 return user.role === User_1.UserRole.Owner
                     || user.role === User_1.UserRole.Admin
                     || user.role === User_1.UserRole.Judge;

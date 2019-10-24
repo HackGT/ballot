@@ -6,10 +6,13 @@ import { connect } from 'react-redux';
 import { AppState } from '../../state/Store';
 import User, { UserRole, serverDataToClientUser, clientUserToServerUser } from '../../types/User';
 import { updateUser } from '../../state/User';
+import { requestFinish, requestStart } from '../../state/Request';
+import { fetchCompanies } from '../../state/Company';
 
 const mapStateToProps = (state: AppState) => {
 	return {
-		account: state.account,
+    account: state.account,
+    companies: state.companies,
 	};
 };
 
@@ -17,16 +20,25 @@ const mapDispatchToProps = (dispatch: any) => {
 	return {
 		updateUser: (user: User) => {
 			dispatch(updateUser(user));
-		},
+    },
+    requestFinish: () => {
+      dispatch(requestFinish());
+    },
+    requestStart: () => {
+      dispatch(requestStart());
+    },
 	};
 };
 
 interface PageAdminUsersModalProps {
   account: User;
+  companies: string[];
   modalOpen: boolean;
   user: User;
   closeModal: () => void;
-	updateUser: (user: User) => void;
+  updateUser: (user: User) => void;
+  requestFinish: () => void;
+  requestStart: () => void;
 }
 
 type State = {
@@ -35,17 +47,11 @@ type State = {
 }
 
 type Action =
-	| { type: 'request-start'}
-  | { type: 'request-finish'}
   | { type: 'update-user', user: User };
 
 const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props) => {
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
 		switch (action.type) {
-			case 'request-start':
-				return { ...state, requesting: true };
-			case 'request-finish':
-        return { ...state, requesting: false };
       case 'update-user':
         return { ...state, user: action.user };
 			default:
@@ -62,14 +68,14 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
     dispatch({ type: 'update-user', user: props.user });
   }, [user]);
 
-  const handleSaveChanges = async () => {
-    dispatch({ type: 'request-start' });
+  const _handleSaveChanges = async () => {
+    props.requestStart();
     const result = await Axios.post('/api/users/update', {
       user: clientUserToServerUser(state.user),
     });
     if (result.status) {
       const data = result.data;
-      dispatch({ type: 'request-finish' });
+      props.requestFinish();
       props.closeModal();
       props.updateUser(serverDataToClientUser(data));
     } else {
@@ -77,10 +83,19 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
     }
   };
 
-  const getForm = () => {
+  const _getCompanyList = () => {
+    return props.companies.map((company: string) => {
+      return (
+        <option key={company}>{company}</option>
+      );
+    });
+  };
+
+  const _getForm = () => {
     return (
       <Form>
         <Form.Group>
+          <Form.Label>Name</Form.Label>
           <Form.Control
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
@@ -95,6 +110,7 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
             placeholder="Name" />
         </Form.Group>
         <Form.Group>
+        <Form.Label>Permission Level</Form.Label>
           <ButtonToolbar>
             <ToggleButtonGroup
               name='role'
@@ -131,18 +147,24 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
           </ButtonToolbar>
         </Form.Group>
         <Form.Group>
+          <Form.Label>Company/Group Name</Form.Label>
           <Form.Control
+            as='select'
             disabled={state.requesting}
             onChange={(event: any) => dispatch({
               type: 'update-user',
               user: {
                 ...state.user,
-                name: event.target.value,
+                company: event.target.value,
               },
             })}
-            value={state.user.name}
+            value={state.user.company}
             type="text"
-            placeholder="Name" />
+            placeholder="Company">
+            {_getCompanyList()}
+          </Form.Control>
+        </Form.Group>
+        <Form.Group>
           <Button variant='outline-danger'>Reset Password</Button>
         </Form.Group>
       </Form>
@@ -152,16 +174,16 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
 	return (
 		<Modal show={props.modalOpen} onHide={props.closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Edit User</Modal.Title>
+        <Modal.Title>Edit User {props.user.id}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {getForm()}
+        {_getForm()}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={props.closeModal}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleSaveChanges}>
+        <Button variant="primary" onClick={_handleSaveChanges}>
           Save Changes
         </Button>
       </Modal.Footer>

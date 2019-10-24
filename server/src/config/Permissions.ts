@@ -48,11 +48,12 @@ export function can(user: User, action: Action): boolean {
       case Action.EditUser:
       case Action.DeleteUser:
       case Action.ViewUsers:
-      case Action.ViewCategoriesCriteria:
       case Action.AddCategory:
       case Action.DeleteCategory:
       case Action.UpdateCategory:
       case Action.ManageTableGroups:
+      case Action.QueueProject:
+      case Action.DequeueProject:
       case Action.BatchUploadProjects:
       case Action.AddProject:
       case Action.DeleteProject:
@@ -63,6 +64,7 @@ export function can(user: User, action: Action): boolean {
       case Action.ScoreBallot:
       case Action.StartProject:
       case Action.SkipProject:
+      case Action.ViewCategoriesCriteria:
         return user.role === UserRole.Owner
           || user.role === UserRole.Admin
           || user.role === UserRole.Judge;

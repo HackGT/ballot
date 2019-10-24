@@ -22,14 +22,8 @@ export function logoutUser() {
   return { type: LOGOUT_USER, user: noAccountUser};
 }
 
-export function updateSession(userID: number) {
-  return {
-    event: 'update-session',
-    emit: true,
-    payload: {
-      userID,
-    },
-  };
+export function updateSocket() {
+  return { update: true };
 }
 
 // Reducer

@@ -3,6 +3,7 @@ export default interface User {
   name?: string;
   email?: string;
   role: UserRole;
+  company?: string;
   isJudging?: boolean;
   tags?: string[];
 }
@@ -23,6 +24,7 @@ export const EMPTY_USER: User = {
   id: -1,
   name: '',
   email: '',
+  company: '',
   role: UserRole.Pending,
   isJudging: false,
   tags: [],
@@ -31,6 +33,7 @@ export const EMPTY_USER: User = {
 export function clientUserToServerUser(user: User) {
   return {
     ...user,
+    isJudging: user.role === UserRole.Pending ? false : user.isJudging,
     role: getRoleEnum(user.role),
   };
 }

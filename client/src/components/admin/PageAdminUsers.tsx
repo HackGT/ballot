@@ -8,6 +8,7 @@ import { fetchUsers } from '../../state/User';
 import PageAdminUsersModal from './PageAdminUsersModal';
 import PageAdminUserCard from './PageAdminUserCard';
 import { requestFinish, requestStart } from '../../state/Request';
+import { fetchCompanies } from '../../state/Company';
 
 const mapStateToProps = (state: AppState) => {
   return {
@@ -19,6 +20,9 @@ const mapStateToProps = (state: AppState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    fetchCompanies: () => {
+      dispatch(fetchCompanies());
+    },
     fetchUsers: () => {
       dispatch(fetchUsers());
     },
@@ -35,6 +39,7 @@ interface PageAdminUsersProps {
   account: User;
   requesting: boolean;
   users: UserState;
+  fetchCompanies: () => void;
   requestFinish: () => void;
   requestStart: () => void;
   fetchUsers: () => void;
@@ -78,6 +83,7 @@ const PageAdminUsersComponent: React.FC<PageAdminUsersProps> = (props) => {
 
   React.useEffect(() => {
     fetchUsers();
+    props.fetchCompanies();
   }, []);
 
   const fetchUsers = async () => {

@@ -9,6 +9,10 @@ export default interface Project {
   tags: string[];
 }
 
+export interface ProjectWithHealth extends Project {
+  health: number;
+}
+
 export interface TableGroup {
   id?: number;
   name: string;
@@ -22,6 +26,17 @@ export interface ProjectState {
 
 export interface TableGroupState {
   [ id: number ]: TableGroup;
+}
+
+export const EMPTY_PROJECT = {
+  id: 0,
+  name: '',
+  devpostURL: '',
+  expoNumber: 0,
+  tableGroupID: 0,
+  tableNumber: 0,
+  categoryIDs: [],
+  tags: [],
 }
 
 export const EMPTY_TABLE_GROUP = {

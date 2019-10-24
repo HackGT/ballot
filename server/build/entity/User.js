@@ -45,6 +45,12 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "tags", void 0);
 __decorate([
+    typeorm_1.Column({
+        default: '',
+    }),
+    __metadata("design:type", String)
+], User.prototype, "company", void 0);
+__decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], User.prototype, "salt", void 0);

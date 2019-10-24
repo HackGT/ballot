@@ -18,6 +18,11 @@ export class Category {
   @Column('text')
   public description: string;
 
+  @Column({
+    default: '',
+  })
+  public company: string;
+
   @OneToMany(() => Criteria, (criteria) => criteria.category, {
     cascade: true,
     onUpdate: 'CASCADE',

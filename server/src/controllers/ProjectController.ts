@@ -4,7 +4,9 @@ import CategoryController from './CategoryController';
 import { Project, ProjectClient, ProjectClientState } from '../entity/Project';
 import TableGroupController from './TableGroupController';
 import { User } from '../entity/User';
-import { Ballot, BallotStatus } from '../entity/Ballot';
+import { Ballot, BallotStatus, convertToClient } from '../entity/Ballot';
+import { io } from '../app';
+import { SocketStrings } from '../routes/socket';
 
 class ProjectController {
   public static async getAllProjects() {
@@ -38,9 +40,9 @@ class ProjectController {
     const projectRepository = getRepository(Project);
     const userRepository = getRepository(User);
 
-    const [project, user, submittedBallots, assignedBallots] = await Promise.all([
+    const [project, user, submittedBallots, pendingBallots] = await Promise.all([
       await projectRepository.findOne(projectID, {
-        relations: ['categories', 'categories.criteria',],
+        relations: ['categories', 'categories.criteria'],
       }),
       await userRepository.findOne(userID),
       await ballotRepository.find({
@@ -56,12 +58,16 @@ class ProjectController {
           user: { id: userID },
           project: { id: projectID },
           status: BallotStatus.Submitted,
-        }]
+        }, {
+          user: { id: userID },
+          project: { id: projectID },
+          status: BallotStatus.Assigned,
+        }],
       }),
       await ballotRepository.find({
         where: {
           user: { id: userID },
-          status: BallotStatus.Assigned,
+          status: BallotStatus.Pending,
         },
         relations: ['criteria', 'user', 'project'],
       }),
@@ -74,29 +80,29 @@ class ProjectController {
     console.log(submittedBallots);
 
     if (submittedBallots.length > 0) {
-      throw new Error('Project was already submitted, started, or skipped');
+      throw new Error('Project was already submitted, skipped, assigned, or started');
     }
 
-    const removedBallotIDs: number[] = assignedBallots.map((ballot: Ballot) => {
+    const removedBallotIDs: number[] = pendingBallots.map((ballot: Ballot) => {
       return ballot.id!;
     });
 
-    if (assignedBallots.length > 0) {
-      await ballotRepository.remove(assignedBallots);
+    if (pendingBallots.length > 0) {
+      await ballotRepository.remove(pendingBallots);
     }
 
     const newBallots: Ballot[] = [];
     for (const category of project.categories) {
       console.log(category);
-      if (!category.generated) {
+      if (!category.generated && category.company === user.company) {
         const criteria = category.criteria;
         for (const criterion of criteria) {
           const newBallot = new Ballot();
-          newBallot.status = BallotStatus.Assigned;
+          newBallot.status = BallotStatus.Pending;
           newBallot.project = project;
           newBallot.criteria = criterion;
           newBallot.user = user;
-          newBallot.score = 0;
+          newBallot.score = criterion.minScore;
           newBallots.push(newBallot);
         }
       }
@@ -107,7 +113,7 @@ class ProjectController {
 
     return {
       newBallots,
-      removedBallotIDs
+      removedBallotIDs,
     };
   }
 
@@ -115,6 +121,7 @@ class ProjectController {
     const ballotRepository = getRepository(Ballot);
 
     const ballotsToRemove = await ballotRepository.find({
+      relations: ['project'],
       where: {
         user: { id: userID },
         project: { id: projectID },
@@ -129,6 +136,170 @@ class ProjectController {
     ballotRepository.remove(ballotsToRemove);
 
     return ballotsToRemove.map((ballot: Ballot) => ballot.id);
+  }
+
+  public static async getNextProject(userID: number) {
+    const ballotRepository = getRepository(Ballot);
+
+    const projectBallots = await ballotRepository.find({
+      relations: ['criteria', 'user', 'project', 'project.tableGroup'],
+      where: [{
+        user: { id: userID },
+        status: BallotStatus.Assigned,
+      }, {
+        user: { id: userID },
+        status: BallotStatus.Started,
+      }, {
+        user: { id: userID },
+        status: BallotStatus.Pending,
+      }],
+    });
+
+    const pendingBallots = [];
+    const assignedBallots = [];
+    const startedBallots = [];
+
+    for (const ballot of projectBallots) {
+      if (ballot.status === BallotStatus.Pending) {
+        pendingBallots.push(ballot);
+      } else if (ballot.status === BallotStatus.Assigned) {
+        assignedBallots.push(ballot);
+      } else if (ballot.status === BallotStatus.Started) {
+        startedBallots.push(ballot);
+      }
+    }
+
+    // A project has already been started. Give user that project.
+    if (startedBallots.length > 0) {
+      return {
+        project: this.serverToClient([startedBallots[0].project]),
+        ballots: convertToClient(startedBallots),
+      };
+    }
+
+    // A project has already been shown to the user.
+    if (assignedBallots.length > 0) {
+      return {
+        project: this.serverToClient([assignedBallots[0].project]),
+        ballots: convertToClient(assignedBallots),
+      };
+    }
+
+    // A project is in the pending queue. Mark it assigned and show that project.
+    if (pendingBallots.length > 0) {
+      const newBallots = pendingBallots.map((ballot: Ballot) => {
+        return {
+          ...ballot,
+          status: BallotStatus.Assigned,
+        };
+      });
+      await ballotRepository.save(newBallots);
+      io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectGot, {
+        newBallots: convertToClient(newBallots),
+      });
+      return {
+        project: this.serverToClient([pendingBallots[0].project]),
+        ballots: convertToClient(newBallots),
+      };
+    }
+
+    return {
+      project: null,
+      ballots: {},
+    };
+  }
+
+  public static async scoreProject(ballots: { [ballotID: string]: number }) {
+    console.log(ballots);
+    const ballotRepository = getRepository(Ballot);
+
+    const repoBallots = await ballotRepository.findByIds(Object.keys(ballots), {
+      relations: ['criteria', 'user', 'project'],
+    });
+
+    const ballotsToSave = repoBallots.map((ballot: Ballot) => {
+      return {
+        ...ballot,
+        score: ballots[ballot.id!],
+        status: BallotStatus.Submitted,
+      };
+    });
+
+    await ballotRepository.save(ballotsToSave);
+
+    io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectScore, {
+      newBallots: convertToClient(ballotsToSave),
+    });
+
+    return true;
+  }
+
+  public static async startProject(userID: number, projectID: number) {
+    return this.setBallotStatus(
+      userID,
+      projectID,
+      BallotStatus.Started,
+      SocketStrings.ProjectStart,
+    );
+  }
+
+  public static async skipProject(userID: number, projectID: number) {
+    return this.setBallotStatus(
+      userID,
+      projectID,
+      BallotStatus.Skipped,
+      SocketStrings.ProjectSkip,
+    );
+  }
+
+  public static async projectBusy(userID: number, projectID: number) {
+    return this.setBallotStatus(
+      userID,
+      projectID,
+      BallotStatus.Busy,
+      SocketStrings.ProjectBusy,
+    );
+  }
+
+  public static async projectMissing(userID: number, projectID: number) {
+    return this.setBallotStatus(
+      userID,
+      projectID,
+      BallotStatus.Missing,
+      SocketStrings.ProjectMissing,
+    );
+  }
+
+  private static async setBallotStatus(
+    userID: number,
+    projectID: number,
+    ballotStatus: BallotStatus,
+    socketEmit: SocketStrings,
+  ) {
+    const ballotRepository = getRepository(Ballot);
+
+    const repoBallots = await ballotRepository.find({
+      relations: ['criteria', 'user', 'project'],
+      where: {
+        user: { id: userID },
+        project: { id: projectID },
+      },
+    });
+
+    const ballotsToSave = repoBallots.map((ballot: Ballot) => {
+      return {
+        ...ballot,
+        status: ballotStatus,
+      };
+    });
+
+    await ballotRepository.save(ballotsToSave);
+
+    io.to(SocketStrings.Authenticated).emit(socketEmit, {
+      newBallots: convertToClient(ballotsToSave),
+    });
+
+    return convertToClient(ballotsToSave);
   }
 
   private static clientToServer(projects: ProjectClient[]): Array<Partial<Project>> {
@@ -166,7 +337,7 @@ class ProjectController {
       dict[id!] = {
         id, name, devpostURL, expoNumber, tableNumber, tags,
         tableGroupID: tableGroup.id!,
-        categoryIDs: categories.map((category) => category.id!),
+        categoryIDs: categories ? categories.map((category) => category.id!) : [],
       };
       return dict;
     }, {});
