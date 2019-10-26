@@ -9,6 +9,7 @@ import Category, { CategoryState, CategoryCriteriaState } from '../../types/Cate
 import { fillCategories } from '../../state/Category';
 import { AppState } from '../../state/Store';
 import { fetchTableGroups } from '../../state/TableGroup';
+import { InputGroup } from 'react-bootstrap';
 
 const mapStateToProps = (state: AppState) => {
 	return {
@@ -45,13 +46,15 @@ type State = {
 	requesting: boolean;
 	filterBy: number;
 	modalOpen: boolean;
+	searchText: string;
 }
 
 type Action =
 	| { type: 'change-filterBy', categoryID: number }
 	| { type: 'toggle-modal' }
 	| { type: 'request-start'}
-	| { type: 'request-finish'};
+	| { type: 'request-finish'}
+	| { type: 'change-search', search: string };
 
 const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
@@ -64,6 +67,8 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 				return { ...state, requesting: true };
 			case 'request-finish':
 				return { ...state, requesting: false };
+			case 'change-search':
+				return { ...state, searchText: action.search };
 			default:
 				return state;
 		}
@@ -71,6 +76,7 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 		requesting: false,
 		filterBy: 0,
 		modalOpen: false,
+		searchText: '',
 	}, undefined);
 
 	React.useEffect(() => {
@@ -105,6 +111,7 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 		) {
 			return Object.values(props.projects)
 				.filter((project: Project) => !state.filterBy || project.categoryIDs.includes(state.filterBy))
+				.filter((project: Project) => project.name.toLowerCase().includes(state.searchText.toLowerCase()))
 				.map((project: Project) => {
 				const categories = project.categoryIDs.map((categoryID: number) => {
 					return (
@@ -161,10 +168,28 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 
 	return (
 		<>
-			<div style={{ margin: '12px' }}>
-				<h1 style={{ textAlign: 'center' }}>Projects</h1>
-				<div style={{ textAlign: 'center' }}>
-					<Button onClick={() => dispatch({ type: 'toggle-modal' })}>Filter Projects</Button>
+			<div style={{ width: '100%' }}>
+				<div style={{
+					margin: '0 auto',
+					maxWidth: 1300,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					flexWrap: 'wrap', }}>
+					<h1>Projects</h1>
+					<div style={{ flexGrow: 2 }}></div>
+					<Button
+						style={{ width: 130 }}
+						variant='outline-dark'
+						onClick={() => dispatch({ type: 'toggle-modal' })}>
+						Categories
+					</Button>
+					<Form.Control
+						style={{ maxWidth: 300, margin: '0 12px' }}
+						value={state.searchText}
+						onChange={(event: any) => dispatch({ type: 'change-search', search: event.target.value})}
+						type='text'
+						placeholder='Search for projects' />
 				</div>
 				<div style={{
 					display: 'flex',

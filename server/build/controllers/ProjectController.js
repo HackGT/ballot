@@ -96,7 +96,6 @@ class ProjectController {
                 }
             }
         }
-        console.log('ballots', newBallots);
         await ballotRepository.save(newBallots);
         return {
             newBallots,
@@ -207,7 +206,28 @@ class ProjectController {
         return this.setBallotStatus(userID, projectID, Ballot_1.BallotStatus.Skipped, socket_1.SocketStrings.ProjectSkip);
     }
     static async projectBusy(userID, projectID) {
-        return this.setBallotStatus(userID, projectID, Ballot_1.BallotStatus.Busy, socket_1.SocketStrings.ProjectBusy);
+        const ballotRepository = typeorm_1.getRepository(Ballot_1.Ballot);
+        const ballotsToRemove = await ballotRepository.find({
+            relations: ['project'],
+            where: [{
+                    user: { id: userID },
+                    project: { id: projectID },
+                    status: Ballot_1.BallotStatus.Started,
+                }, {
+                    user: { id: userID },
+                    project: { id: projectID },
+                    status: Ballot_1.BallotStatus.Assigned,
+                }],
+        });
+        if (!ballotsToRemove) {
+            return 'Ballots do not exist';
+        }
+        ballotRepository.remove(ballotsToRemove);
+        const ballotIDsToRemove = ballotsToRemove.map((ballot) => ballot.id);
+        app_1.io.to(socket_1.SocketStrings.Authenticated).emit(socket_1.SocketStrings.ProjectGot, {
+            ballotsToRemove: ballotIDsToRemove,
+        });
+        return ballotIDsToRemove;
     }
     static async projectMissing(userID, projectID) {
         return this.setBallotStatus(userID, projectID, Ballot_1.BallotStatus.Missing, socket_1.SocketStrings.ProjectMissing);
