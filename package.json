@@ -1,0 +1,31 @@
+{
+    "dependencies": {
+      "gulp": "^4.0.0",
+      "gulp-install": "^1.1.0",
+      "gulp-shell": "^0.7.0",
+      "gulp-util": "^3.0.8",
+      "path": "^0.12.7"
+    },
+    "devDependencies": {},
+    "name": "ballot",
+    "description": "Hackathon judging made a little better",
+    "version": "1.0.0",
+    "main": "server/app.js",
+    "scripts": {
+      "postinstall": "gulp postinstall",
+      "start": "gulp",
+      "install-dependencies": "gulp dependencies",
+      "serve": "node ./server/build/app.js",
+      "build": "gulp build"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/hackgt/ballot.git"
+    },
+    "author": "James Lu",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/hackgt/ballot/issues"
+    },
+    "homepage": "https://github.com/hackgt/ballot#readme"
+  }
