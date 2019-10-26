@@ -31,8 +31,13 @@ class Environment {
 
     public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI | undefined {
         if (process.env.POSTGRES_URL) {
+            // assume k8 url of form postgres://expo-2019@postgres-postgresql/expo-2019?sslmode=disable
+            // strip query params
+            const urlRootIndex = process.env.POSTGRES_URL.lastIndexOf('?');
+            const urlRoot = urlRootIndex === -1 ?
+                process.env.POSTGRES_URL : process.env.POSTGRES_URL.substring(0, urlRootIndex);
             return {
-                uri: process.env.POSTGRES_URL,
+                uri: urlRoot,
             };
         }
 
