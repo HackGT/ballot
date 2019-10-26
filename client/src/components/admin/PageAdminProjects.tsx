@@ -100,9 +100,11 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 	}, []);
 
 	const getInnerContent = () => {
-		if (props.requesting
-			|| Object.values(props.users).length === 0
-			|| Object.values(props.projects).length === 0
+		if (props.requesting) {
+			return 'Loading';
+		}
+
+		if (Object.values(props.users).length === 0
 			|| Object.values(props.tableGroups).length === 0) {
 			return 'Loading';
 			// TODO add real spinner
@@ -152,7 +154,7 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 					maxWidth: 1300,
 					margin: '12px auto 0',
 				}}>
-					<PageAdminProjectsEpicenter />
+					{Object.values(props.projects).length !== 0 ? <PageAdminProjectsEpicenter /> : null}
 				</div>
 			</>
 		)

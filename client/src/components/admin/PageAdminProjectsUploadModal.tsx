@@ -17,7 +17,6 @@ const requiredHeaders = [
   'Plain Description',
   'Built With',
   'Desired Prizes',
-  'Table Number',
 ];
 
 const mapStateToProps = (state: AppState) => {
@@ -270,6 +269,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
           const csvRow = state.csv[csvRowNumber];
           if (csvRow) {
             const finalTableGroupName = `${expoNumber} ${tableGroup.name} ${tableNumber}`;
+            console.log('flkjsdflkjsdf', finalTableGroupName);
             if (allocatedTables[finalTableGroupName]) {
               tableNumber++;
             } else {
