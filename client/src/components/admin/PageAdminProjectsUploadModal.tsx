@@ -10,6 +10,7 @@ import { AppState } from '../../state/Store';
 import Category, { CategoryState, NameToCategoryMapping, CategoryCriteriaState } from '../../types/Category';
 import { updateCategory, fillCategories } from '../../state/Category';
 import { clearBallots } from '../../state/Ballot';
+import { string } from 'prop-types';
 
 const requiredHeaders = [
   'Submission Title',
@@ -238,65 +239,90 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     const projectsToSend: Project[] = [];
     const tableGroups: TableGroup[] = Object.values(props.tableGroups);
     const tableGroupNameMapping = tableGroups.map((tableGroup) => tableGroup.name);
-    let csvRowNumber = 0;
-
-    const allocatedTables: { [table: string]: string } = {};
+    const allocatedTables: { [table: string]: number } = {};
 
     if (state.useSelfAssign) {
-      for (const csvRow of state.csv) {
+      for (let i = 0; i < state.csv.length; i++) {
+        const csvRow = state.csv[i];
         const tableNumber = csvRow[state.csvHeaderIndicies['Table Number']];
-        const tableParts = tableNumber.split(' ');
-        if (tableParts.length !== 3) {
-          throw new Error('Need 3 parts: expo, group, number');
-        }
+        if (tableNumber) {
+          const tableParts = tableNumber.split(' ');
+          console.log('wowowow', tableParts);
+          if (tableParts.length !== 3) {
+            throw new Error('Need 3 parts: expo, group, number');
+          }
 
-        if (allocatedTables[tableNumber]) {
-          throw new Error('Duplicate table');
-        }
+          if (allocatedTables[tableNumber]) {
+            throw new Error('Duplicate table');
+          }
 
-        if (!tableGroupNameMapping.includes(tableParts[1])) {
-          throw new Error('Invalid table group name');
-        }
+          if (!tableGroupNameMapping.includes(tableParts[1])) {
+            throw new Error('Invalid table group name');
+          }
 
-        allocatedTables[tableNumber] = csvRow[state.csvHeaderIndicies['Submission Url']];
+          allocatedTables[tableNumber] = i;
+        }
       }
     }
 
-    // Pass 3 allocate rest.
+    console.log(allocatedTables);
+
+    const allocatedRows = Object.values(allocatedTables);
+    let csvRowNumber = 0;
+
+    // Pass 2 allocate rest.
     for (let expoNumber = 1; expoNumber <= state.inputNumberExpos; expoNumber++) {
       for (const tableGroup of tableGroups) {
         for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
-          const csvRow = state.csv[csvRowNumber];
-          if (csvRow) {
-            const finalTableGroupName = `${expoNumber} ${tableGroup.name} ${tableNumber}`;
-            console.log('flkjsdflkjsdf', finalTableGroupName);
-            if (allocatedTables[finalTableGroupName]) {
-              tableNumber++;
-            } else {
-              const devpostDesiredCategories: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
-                categoryName = categoryName.trim();
-                if (categoryName) {
-                  array.push(nameToCategoryMapping[categoryName.trim()].id!);
-                }
-                return array;
-              }, []);
-
-              projectsToSend.push({
-                name: csvRow[state.csvHeaderIndicies['Submission Title']],
-                devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
-                expoNumber,
-                tableGroupID: tableGroup.id!,
-                tableNumber,
-                categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
-                tags: [],
-              });
+          const finalTableGroupName = `${expoNumber} ${tableGroup.name} ${tableNumber}`;
+          if (allocatedTables[finalTableGroupName] === undefined) {
+            while (allocatedRows.includes(csvRowNumber)) {
               csvRowNumber++;
             }
+
+            let csvRow = state.csv[csvRowNumber];
+            // console.log(csvRow);
+            if (csvRow) {
+              allocatedTables[finalTableGroupName] = csvRowNumber;
+              allocatedRows.push(csvRowNumber);
+              csvRowNumber++;
+            }
+          } else {
+            console.log('thegame', finalTableGroupName);
           }
         }
       }
     }
+
+    console.log(allocatedTables, allocatedRows.sort((a: number, b: number) => a - b));
+    const tableGroupNameToObject: { [name: string]: TableGroup } = Object.values(props.tableGroups).reduce((dict, tableGroup: TableGroup) => {
+      dict[tableGroup.name] = tableGroup;
+      return dict;
+    }, {});
+
+    for (const tableKey of Object.keys(allocatedTables)) {
+      const csvRow = state.csv[allocatedTables[tableKey]];
+      const parts = tableKey.split(' ');
+      const devpostDesiredCategories: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
+        categoryName = categoryName.trim();
+        if (categoryName) {
+          array.push(nameToCategoryMapping[categoryName.trim()].id!);
+        }
+        return array;
+      }, []);
+      projectsToSend.push({
+        name: csvRow[state.csvHeaderIndicies['Submission Title']],
+        devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
+        expoNumber: parseInt(parts[0]),
+        tableGroupID: tableGroupNameToObject[parts[1]].id!,
+        tableNumber: parseInt(parts[2]),
+        categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
+        tags: [],
+      });
+    }
+
     console.log(projectsToSend);
+
     const batchUploadResult = await Axios.post('/api/projects/upload', {
       projects: projectsToSend,
     });
@@ -335,6 +361,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         }
         csvHeaderIndicies[header] = headerIndex;
       }
+      csvHeaderIndicies['Table Number'] = csvHeaders.indexOf('Table Number');
       csvData.splice(0, 1)
       dispatch({ type: 'update-csv', csv: csvData, csvHeaderIndicies });
     };

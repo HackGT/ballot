@@ -85,12 +85,12 @@ const Navigation: React.FC<NavigationProps> = (props) => {
     if (role >= UserRole.Pending) {
       return (
         <Nav>
-          <Nav.Link
+          {/* <Nav.Link
             active={PATH_PROFILE === curPage}
             eventKey={'profile'}
             onSelect={() => navTo(PATH_PROFILE)}>
             Profile
-          </Nav.Link>
+          </Nav.Link> */}
           <Nav.Link
             active={PATH_LOGOUT === curPage}
             eventKey={'logout'}

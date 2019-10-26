@@ -15,9 +15,11 @@ import { fetchUsers } from '../../state/User';
 import { requestFinish, requestStart } from '../../state/Request';
 import { UserState } from '../../types/User';
 import { fetchBallots } from '../../state/Ballot';
+import { CategoryCriteriaState } from '../../types/Category';
 
 const mapStateToProps = (state: AppState) => {
 	return {
+		categories: state.categories,
 		requesting: state.requesting,
 		tableGroups: state.tableGroups,
 		projects: state.projects,
@@ -37,6 +39,7 @@ const mapDispatchToProps = (dispatch: any) => {
 };
 
 interface PageAdminProjectsProps {
+	categories: CategoryCriteriaState;
 	requesting: boolean;
 	tableGroups: TableGroupState;
 	projects: ProjectState;
@@ -153,7 +156,11 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 					maxWidth: 1300,
 					margin: '12px auto 0',
 				}}>
-					{Object.values(props.projects).length !== 0 || Object.values(props.tableGroups).length !== 0 ? <PageAdminProjectsEpicenter /> : null}
+					{Object.values(props.projects).length !== 0
+						&& Object.values(props.tableGroups).length !== 0
+						&& Object.values(props.categories.criteria).length !==0
+							? <PageAdminProjectsEpicenter />
+							: null}
 				</div>
 			</>
 		)
