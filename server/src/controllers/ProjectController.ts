@@ -275,7 +275,7 @@ class ProjectController {
 
     const ballotIDsToRemove = ballotsToRemove.map((ballot: Ballot) => ballot.id!)
 
-    io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectGot, {
+    io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectBusy, {
       ballotsToRemove: ballotIDsToRemove,
     });
 

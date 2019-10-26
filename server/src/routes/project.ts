@@ -46,7 +46,7 @@ router.post('/scoreProject', async (req, res) => {
 
 router.post('/skip', async (req, res) => {
   if (can(req.user, Action.ScoreBallot)) {
-    return res.status(200).json(await ProjectController.skipProject(req.body.userID, req.body.proejctID));
+    return res.status(200).json(await ProjectController.skipProject(req.body.userID, req.body.projectID));
   }
 
   return res.status(401).send('Not enough permissions to skip project');
@@ -54,7 +54,7 @@ router.post('/skip', async (req, res) => {
 
 router.post('/busy', async (req, res) => {
   if (can(req.user, Action.ScoreBallot)) {
-    return res.status(200).json(await ProjectController.projectBusy(req.body.userID, req.body.proejctID));
+    return res.status(200).json(await ProjectController.projectBusy(req.body.userID, req.body.projectID));
   }
 
   return res.status(401).send('Not enough permissions to mark project as busy');

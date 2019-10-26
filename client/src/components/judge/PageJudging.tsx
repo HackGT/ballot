@@ -177,22 +177,22 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		return (
 			<div style={{ marginTop: 20 }}>
 				<ButtonGroup>
-					<Button
+					{/* <Button
 						onClick={() => {
 							props.missingBallots(props.account.id!, state.currentProject!.id!);
 							reset();
 						}}
 						variant='outline-danger'>
 						Missing
-					</Button>
-					<Button
+					</Button> */}
+					{/* <Button
 						onClick={() => {
 							props.busyBallots(props.account.id!, state.currentProject!.id!);
 							reset();
 						}}
 						variant='outline-danger'>
 						Busy
-					</Button>
+					</Button> */}
 					<Button
 						onClick={() => {
 							props.skipBallots(props.account.id!, state.currentProject!.id!);

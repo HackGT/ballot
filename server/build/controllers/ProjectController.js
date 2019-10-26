@@ -224,7 +224,7 @@ class ProjectController {
         }
         ballotRepository.remove(ballotsToRemove);
         const ballotIDsToRemove = ballotsToRemove.map((ballot) => ballot.id);
-        app_1.io.to(socket_1.SocketStrings.Authenticated).emit(socket_1.SocketStrings.ProjectGot, {
+        app_1.io.to(socket_1.SocketStrings.Authenticated).emit(socket_1.SocketStrings.ProjectBusy, {
             ballotsToRemove: ballotIDsToRemove,
         });
         return ballotIDsToRemove;

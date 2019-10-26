@@ -9,7 +9,7 @@ import User from '../../types/User';
 import { AppState } from '../../state/Store';
 import Ballot, { BallotState, BallotStatus } from '../../types/Ballot';
 import Category, { CategoryState, CategoryCriteriaState } from '../../types/Category';
-import { queueProjectEmit, subscribeQueuedProject, subscribeQueueProject, queueProject, subscribeGetProject, subscribeScoreProject, unsubscribeAll } from '../../state/Ballot';
+import { queueProjectEmit, subscribeQueuedProject, subscribeQueueProject, queueProject, subscribeGetProject, subscribeScoreProject, unsubscribeAll, subscribeSkipProject, subscribeMissingProject, subscribeBusyProject } from '../../state/Ballot';
 import { requestStart, requestFinish } from '../../state/Request';
 import { UserState } from '../../types/User';
 import { Button } from 'react-bootstrap';
@@ -45,6 +45,15 @@ const mapDispatchToProps = (dispatch: any) => {
     subscribeScoreProject: () => {
       dispatch(subscribeScoreProject());
     },
+    subscribeSkipProject: () => {
+      dispatch(subscribeSkipProject());
+    },
+    subscribeMissingProject: () => {
+      dispatch(subscribeMissingProject());
+    },
+    subscribeBusyProject: () => {
+      dispatch(subscribeBusyProject());
+    },
     unsubscribeAll: () => {
       dispatch(unsubscribeAll());
     },
@@ -70,6 +79,9 @@ interface PageAdminProjectsEpicenterProps {
   subscribeQueuedProject: () => void;
   subscribeGotProject: () => void;
   subscribeScoreProject: () => void;
+  subscribeMissingProject: () => void;
+  subscribeBusyProject: () => void;
+  subscribeSkipProject: () => void;
   unsubscribeAll: () => void;
   requestFinish: () => void;
   requestStart: () => void;
@@ -263,6 +275,9 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
     props.subscribeQueuedProject();
     props.subscribeGotProject();
     props.subscribeScoreProject();
+    props.subscribeBusyProject();
+    props.subscribeMissingProject();
+    props.subscribeSkipProject();
 
     return () => {
       document.removeEventListener('mousedown', onClick);

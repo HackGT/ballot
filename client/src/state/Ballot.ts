@@ -201,7 +201,6 @@ export function busyBallots(userID: number, projectID: number) {
         projectID,
       });
       if (result.status) {
-        const payload: BallotObject = result.data
         dispatch(clearBallots());
       }
     } catch (error) {
@@ -448,6 +447,85 @@ export default function ballots(state: BallotState = initialBallotState, action:
         },
         dProjectScores: newDProjectScores,
       };
+    case SKIP_PROJECT:
+        console.log(action.result);
+        const firstKey3 = Object.keys(action.result.newBallots)[0];
+        const ballotsArray1: Ballot[] = Object.values(action.result.newBallots);
+        const firstBallot3 = action.result.newBallots[firstKey3];
+        const userID3 = firstBallot3.userID;
+        const projectID3 = firstBallot3.projectID;
+        const otherProjectIDs1 = state.dJudgeQueues[userID3].otherProjectIDs;
+        if (!otherProjectIDs1.includes(projectID3)) {
+          otherProjectIDs1.push(projectID3);
+        }
+
+        let newDProjectScores1 = state.dProjectScores;
+
+        if (!state.dProjectScores[projectID3]) {
+          newDProjectScores1[projectID3] = {};
+        }
+
+        if (!state.dProjectScores[projectID3][userID3]) {
+          newDProjectScores1[projectID3][userID3] = [];
+        }
+
+        newDProjectScores1[projectID3][userID3].push(...ballotsArray1);
+
+        return {
+          ...state,
+          ...action.result.newBallots,
+          dJudgeProjectBallotsMap: {
+            ...state.dJudgeProjectBallotsMap,
+            [userID3]: {
+              ...state.dJudgeProjectBallotsMap[userID3],
+              [projectID3]: {
+                ...state.dJudgeProjectBallotsMap[userID3][projectID3],
+                ...action.result.newBallots,
+              },
+            },
+          },
+          dJudgeQueues: {
+            ...state.dJudgeQueues,
+            [userID3]: {
+              ...state.dJudgeQueues[userID3],
+              activeProjectID: 0,
+              otherProjectIDs1,
+            },
+          },
+          dProjectScores: newDProjectScores1,
+        };
+    case BUSY_PROJECT:
+      console.log(action.result.ballotsToRemove, state);
+      const betterState = state;
+      action.result.ballotsToRemove.forEach((ballotID: number) => {
+        delete state.dJudgeProjectBallotsMap[state[ballotID].userID][state[ballotID].projectID][ballotID];
+        state.dJudgeQueues[state[ballotID].userID].activeProjectID = 0;
+        delete betterState[ballotID];
+      });
+      return {
+        ...betterState,
+        dJudgeProjectBallotsMap: state.dJudgeProjectBallotsMap,
+        dJudgeQueues: state.dJudgeQueues,
+      };
+    case MISSING_PROJECT:
+      const ballots1: BallotObject = action.result.newBallots;
+      const ballotIDs = Object.keys(ballots1).map((id) => parseInt(id));
+      for (const ballotID of ballotIDs) {
+        const userID = ballots1[ballotID].userID;
+        const projectID = ballots1[ballotID].projectID;
+        state.dJudgeProjectBallotsMap[userID][projectID] = Object.values(ballots1);
+        state.dJudgeQueues[userID].activeProjectID = 0;
+        state.dJudgeQueues[userID].otherProjectIDs.push(ballotID);
+      }
+      return {
+        ...state,
+        ...ballots1,
+        dJudgeProjectBallotsMap: state.dJudgeProjectBallotsMap,
+        dJudgeQueues: state.dJudgeQueues,
+      }
+    case SKIP_PROJECT:
+      console.log('implement state chage');
+      return state;
     case CLEAR_BALLOTS:
       return initialBallotState;
     default:
