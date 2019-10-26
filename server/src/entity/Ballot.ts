@@ -18,7 +18,12 @@ export class Ballot {
   @PrimaryGeneratedColumn()
   public id?: number;
 
-  @Column('enum', { enum: BallotStatus })
+  @Column({
+    name: 'ballot_status',
+    type: 'enum',
+    enum: BallotStatus,
+    default: BallotStatus.Pending,
+  })
   public status: BallotStatus;
 
   @ManyToOne(() => Project, (project) => project.ballots, {

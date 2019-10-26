@@ -26,6 +26,7 @@
     "react-bootstrap": "^1.0.0-beta.10",
     "socket.io": "^2.2.0",
     "tslint": "^5.16.0",
+    "typeorm": "^0.2.20",
     "typescript": "^3.4.4",
     "uuid": "^3.3.3"
   },

@@ -30,7 +30,12 @@ __decorate([
     __metadata("design:type", Number)
 ], Ballot.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column('enum', { enum: BallotStatus }),
+    typeorm_1.Column({
+        name: 'ballot_status',
+        type: 'enum',
+        enum: BallotStatus,
+        default: BallotStatus.Pending,
+    }),
     __metadata("design:type", String)
 ], Ballot.prototype, "status", void 0);
 __decorate([
