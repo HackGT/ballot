@@ -17,6 +17,7 @@ const requiredHeaders = [
   'Plain Description',
   'Built With',
   'Desired Prizes',
+  'Table Number',
 ];
 
 const mapStateToProps = (state: AppState) => {
@@ -236,32 +237,61 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     }, []);
 
     const projectsToSend: Project[] = [];
+    const tableGroups: TableGroup[] = Object.values(props.tableGroups);
+    const tableGroupNameMapping = tableGroups.map((tableGroup) => tableGroup.name);
     let csvRowNumber = 0;
 
+    const allocatedTables: { [table: string]: string } = {};
+
+    if (state.useSelfAssign) {
+      for (const csvRow of state.csv) {
+        const tableNumber = csvRow[state.csvHeaderIndicies['Table Number']];
+        const tableParts = tableNumber.split(' ');
+        if (tableParts.length !== 3) {
+          throw new Error('Need 3 parts: expo, group, number');
+        }
+
+        if (allocatedTables[tableNumber]) {
+          throw new Error('Duplicate table');
+        }
+
+        if (!tableGroupNameMapping.includes(tableParts[1])) {
+          throw new Error('Invalid table group name');
+        }
+
+        allocatedTables[tableNumber] = csvRow[state.csvHeaderIndicies['Submission Url']];
+      }
+    }
+
+    // Pass 3 allocate rest.
     for (let expoNumber = 1; expoNumber <= state.inputNumberExpos; expoNumber++) {
-      const tableGroups: TableGroup[] = Object.values(props.tableGroups);
       for (const tableGroup of tableGroups) {
         for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
           const csvRow = state.csv[csvRowNumber];
           if (csvRow) {
-            const devpostDesiredCategories: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
-              categoryName = categoryName.trim();
-              if (categoryName) {
-                array.push(nameToCategoryMapping[categoryName.trim()].id!);
-              }
-              return array;
-            }, []);
+            const finalTableGroupName = `${expoNumber} ${tableGroup.name} ${tableNumber}`;
+            if (allocatedTables[finalTableGroupName]) {
+              tableNumber++;
+            } else {
+              const devpostDesiredCategories: number[] = csvRow[state.csvHeaderIndicies['Desired Prizes']].split(',').reduce((array: number[], categoryName: string) => {
+                categoryName = categoryName.trim();
+                if (categoryName) {
+                  array.push(nameToCategoryMapping[categoryName.trim()].id!);
+                }
+                return array;
+              }, []);
 
-            projectsToSend.push({
-              name: csvRow[state.csvHeaderIndicies['Submission Title']],
-              devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
-              expoNumber,
-              tableGroupID: tableGroup.id!,
-              tableNumber,
-              categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
-              tags: [],
-            });
-            csvRowNumber++;
+              projectsToSend.push({
+                name: csvRow[state.csvHeaderIndicies['Submission Title']],
+                devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
+                expoNumber,
+                tableGroupID: tableGroup.id!,
+                tableNumber,
+                categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
+                tags: [],
+              });
+              csvRowNumber++;
+            }
           }
         }
       }
