@@ -1,11 +1,11 @@
 import Axios from 'axios';
 import React from 'react';
-import { Badge, Card } from 'react-bootstrap';
+import { Badge, Card, DropdownButton, Dropdown, Button, Modal, Form } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import Project, { ProjectState, TableGroupState } from '../../types/Project';
 import { fetchProjects } from '../../state/Project';
-import { CategoryState, CategoryCriteriaState } from '../../types/Category';
+import Category, { CategoryState, CategoryCriteriaState } from '../../types/Category';
 import { fillCategories } from '../../state/Category';
 import { AppState } from '../../state/Store';
 import { fetchTableGroups } from '../../state/TableGroup';
@@ -43,15 +43,23 @@ interface PageProjectsProps {
 
 type State = {
 	requesting: boolean;
+	filterBy: number;
+	modalOpen: boolean;
 }
 
 type Action =
+	| { type: 'change-filterBy', categoryID: number }
+	| { type: 'toggle-modal' }
 	| { type: 'request-start'}
 	| { type: 'request-finish'};
 
 const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
 		switch (action.type) {
+			case 'toggle-modal':
+				return { ...state, modalOpen: !state.modalOpen };
+			case 'change-filterBy':
+				return { ...state, filterBy: action.categoryID };
 			case 'request-start':
 				return { ...state, requesting: true };
 			case 'request-finish':
@@ -61,6 +69,8 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 		}
 	}, {
 		requesting: false,
+		filterBy: 0,
+		modalOpen: false,
 	}, undefined);
 
 	React.useEffect(() => {
@@ -93,7 +103,9 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 			&& Object.values(props.projects).length > 0
 			&& Object.values(props.tableGroups).length > 0
 		) {
-			return Object.values(props.projects).map((project: Project) => {
+			return Object.values(props.projects)
+				.filter((project: Project) => !state.filterBy || project.categoryIDs.includes(state.filterBy))
+				.map((project: Project) => {
 				const categories = project.categoryIDs.map((categoryID: number) => {
 					return (
 						<Badge
@@ -132,19 +144,57 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 		}
 	};
 
+	const getCategoriesRadios = () => {
+		return Object.values(props.categories.categories).map((category: Category) => {
+			return (
+				<Form.Check
+				checked={state.filterBy === category.id!}
+					key={category.id!}
+					type='radio'
+					name='prizeName'
+					label={category.name}
+					onChange={() => dispatch({ type: 'change-filterBy', categoryID: category.id! })}
+					/>
+			);
+		});
+	};
+
 	return (
-		<div style={{ margin: '12px' }}>
-			<h1 style={{ textAlign: 'center' }}>Projects</h1>
-			<div style={{
-				display: 'flex',
-				justifyContent: 'center',
-				flexWrap: 'wrap',
-				maxWidth: 1300,
-				margin: '12px auto 0',
-			}}>
-				{getProjectCards()}
+		<>
+			<div style={{ margin: '12px' }}>
+				<h1 style={{ textAlign: 'center' }}>Projects</h1>
+				<div style={{ textAlign: 'center' }}>
+					<Button onClick={() => dispatch({ type: 'toggle-modal' })}>Filter Projects</Button>
+				</div>
+				<div style={{
+					display: 'flex',
+					justifyContent: 'center',
+					flexWrap: 'wrap',
+					maxWidth: 1300,
+					margin: '12px auto 0',
+				}}>
+					{getProjectCards()}
+				</div>
 			</div>
-		</div>
+			<Modal show={state.modalOpen} onHide={() => dispatch({ type: 'toggle-modal'})}>
+				<Modal.Header closeButton>
+					Filter Projects
+				</Modal.Header>
+				<Modal.Body>
+					<Form.Group>
+						<Form.Check
+							checked={state.filterBy === 0}
+							name='prizeName'
+							type='radio'
+							label={'All Projects'}
+							onChange={() => dispatch({ type: 'change-filterBy', categoryID: 0 })}
+							/>
+						{getCategoriesRadios()}
+
+					</Form.Group>
+				</Modal.Body>
+			</Modal>
+		</>
 	);
 };
 
