@@ -19,6 +19,7 @@ const http = __importStar(require("http"));
 const passport_1 = __importDefault(require("passport"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
+const path = __importStar(require("path"));
 const passport_socketio_1 = __importDefault(require("passport.socketio"));
 const pg_1 = __importDefault(require("pg"));
 require("reflect-metadata");
@@ -94,6 +95,10 @@ async function start() {
     app.use(express_1.default.json());
     app.use('/auth', auth_1.default);
     app.use('/api', api_1.default);
+    app.use('/', express_1.default.static(path.resolve(__dirname, '../build/public')));
+    app.use('/*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, './public/client/index.html'));
+    });
     server.listen(Environment_1.default.getPort());
     Logger_1.default.success('Server started');
 }
