@@ -84,7 +84,7 @@ const PageHomeComponent: React.FC<PageHomeProps> = (props) => {
       {mobileBlurb}
       {projectsBlurb}
       {judgingBlurb}
-      {profileBlurb}
+      {/* {profileBlurb} */}
     </div>
   );
   const pendingBody = (
@@ -94,7 +94,7 @@ const PageHomeComponent: React.FC<PageHomeProps> = (props) => {
       {mobileBlurb}
       {projectsBlurb}
       {pendingBlurb}
-      {profileBlurb}
+      {/* {profileBlurb} */}
     </div>
   );
 
