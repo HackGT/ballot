@@ -1,0 +1,15 @@
+git:
+  branch: master
+
+wants:
+  postgres: true
+
+secrets:
+  - SESSION_SECRET
+
+env:
+  PRODUCTION: true
+  TYPEORM_SYNCHRONIZE: true
+  TYPEORM_LOGGING: true
+  TYPEORM_ENTITIES: "entity/.*ts,modules/**/entity/.*ts"
+  PORT: 3000

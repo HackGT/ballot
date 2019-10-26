@@ -24,6 +24,7 @@ class Database {
                 ...commonConnectionOptions,
             });
         } else {
+            console.log(1);
             const config = this.dbConfig as DatabaseConfig;
             this.connectionObject = {
                 user: config.username,
@@ -32,18 +33,21 @@ class Database {
                 port: config.port,
                 database: config.database,
             };
-
-            await createConnection({
-                type: 'postgres',
-                host: config.url,
-                port: config.port,
-                username: config.username,
-                password: config.password,
-                database: config.database,
-                ...commonConnectionOptions,
-            });
+            try {
+                await createConnection({
+                    type: 'postgres',
+                    host: config.url,
+                    port: config.port,
+                    username: config.username,
+                    password: config.password,
+                    database: config.database,
+                    ...commonConnectionOptions,
+                });
+            } catch (err) {
+                throw new Error(err);
+            }
         }
-
+        console.log('here');
         const tableExistsResult = await getManager().query(`SELECT to_regclass('public.session');`);
         console.log('create result', tableExistsResult);
 
