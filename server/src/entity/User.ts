@@ -20,7 +20,12 @@ export class User {
   @Column()
   public name: string;
 
-  @Column('enum')
+  @Column({
+    name: 'role',
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.Pending,
+  })
   public role: UserRole;
 
   @Column({ default: false })

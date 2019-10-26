@@ -33,7 +33,12 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column('enum'),
+    typeorm_1.Column({
+        name: 'role',
+        type: 'enum',
+        enum: UserRole,
+        default: UserRole.Pending,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
