@@ -26,7 +26,6 @@ router.post('/update', async (req, res) => {
     return res.status(401).send('Not enough permissions to edit or create categories.');
 });
 router.post('/delete', async (req, res) => {
-    console.log(req.body);
     if (Permissions_1.can(req.user, Permissions_1.Action.DeleteCategory)) {
         return res.status(200).json(await CategoryController_1.default.deleteCategory(req.body.categoryID));
     }

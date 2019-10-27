@@ -73,7 +73,6 @@ Ballot = __decorate([
 ], Ballot);
 exports.Ballot = Ballot;
 exports.convertToClient = (ballots) => {
-    console.log(ballots);
     const toReturn = {};
     for (const ballot of ballots) {
         if (ballot.project && ballot.criteria && ballot.user) {

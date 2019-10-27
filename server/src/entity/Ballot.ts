@@ -63,7 +63,7 @@ export interface BallotClient {
 }
 
 export const convertToClient = (ballots: Ballot[]) => {
-  console.log(ballots);
+  // console.log(ballots);
   const toReturn: { [ballotID: number]: BallotClient } = {};
   for (const ballot of ballots) {
     if (ballot.project && ballot.criteria && ballot.user) {

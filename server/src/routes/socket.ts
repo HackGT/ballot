@@ -23,10 +23,10 @@ export enum SocketStrings {
 }
 
 const socketHandler = (client: SocketIO.Socket) => {
-  console.log(client.id, 'connected');
+  // console.log(client.id, 'connected');
   const updateRooms = async () => {
-    console.log('updaterooms', client.request.user);
-    console.log('updateroomscan', can(client.request.user, Action.QueueProject));
+    // console.log('updaterooms', client.request.user);
+    // console.log('updateroomscan', can(client.request.user, Action.QueueProject));
     if (client.request.user.logged_in && can(client.request.user, Action.QueueProject)) {
       client.join(SocketStrings.Authenticated);
       return true;
@@ -40,7 +40,7 @@ const socketHandler = (client: SocketIO.Socket) => {
 
   client.on(SocketStrings.Disconnect, () => {
     updateRooms();
-    console.log(client.id, 'disconnected');
+    // console.log(client.id, 'disconnected');
     delete connectedClients[client.id];
   });
 
@@ -49,8 +49,8 @@ const socketHandler = (client: SocketIO.Socket) => {
     userID: number;
     projectID: number;
   }) => {
-    console.log(data);
-    console.log(client.request.user);
+    // console.log(data);
+    // console.log(client.request.user);
     if (updateRooms()) {
       const { eventID, userID, projectID } = data;
       client.broadcast.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueue, {
@@ -61,12 +61,12 @@ const socketHandler = (client: SocketIO.Socket) => {
 
       const {
         newBallots,
-        removedBallotIDs
-      } = await ProjectController.queueProject(projectID, userID);
-      console.log('in sockets', {
-        newBallots,
         removedBallotIDs,
-      });
+      } = await ProjectController.queueProject(projectID, userID);
+      // console.log('in sockets', {
+      //   newBallots,
+      //   removedBallotIDs,
+      // });
 
       io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueued, {
         eventID,

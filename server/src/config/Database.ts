@@ -28,7 +28,7 @@ class Database {
                 ...commonConnectionOptions,
             });
         } else {
-            console.log(1);
+            // console.log(1);
             const config = this.dbConfig as DatabaseConfig;
             this.connectionObject = {
                 user: config.username,
@@ -51,9 +51,9 @@ class Database {
                 throw new Error(err);
             }
         }
-        console.log('here');
+        // console.log('here');
         const tableExistsResult = await getManager().query(`SELECT to_regclass('public.session');`);
-        console.log('create result', tableExistsResult);
+        // console.log('create result', tableExistsResult);
 
         if (!tableExistsResult[0].to_regclass) {
             await getManager().query(`CREATE TABLE "session" (

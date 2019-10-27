@@ -30,7 +30,7 @@ router.post('/update', async (req, res) => {
 });
 
 router.post('/delete', async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   if (can(req.user, Action.DeleteCategory)) {
     return res.status(200).json(await CategoryController.deleteCategory(req.body.categoryID));
   }

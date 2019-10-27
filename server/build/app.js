@@ -51,12 +51,10 @@ async function start() {
     }
     Logger_1.default.success('Database Initialized');
     const pgSessionStore = connect_pg_simple_1.default(express_session_1.default);
-    console.log(Environment_1.default.getDatabaseConfig().uri);
     const pgStore = new pgSessionStore({
         pruneSessionInterval: false,
         conString: process.env.POSTGRES_URL,
     });
-    console.log(Environment_1.default.getDatabaseConfig().uri);
     const sessionMiddleware = express_session_1.default({
         store: pgStore,
         secret: Environment_1.default.getSessionSecret(),
@@ -81,7 +79,6 @@ async function start() {
     }
     exports.io.on('connection', socket_1.default);
     exports.io.use((socket, next) => {
-        console.log('wowowowow');
         passport_socketio_1.default.authorize({
             cookieParser: require('cookie-parser'),
             secret: Environment_1.default.getSessionSecret(),

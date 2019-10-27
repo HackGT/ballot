@@ -196,7 +196,7 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		};
 
 		if (state.currentProject && state.currentProject.id !== 0) {
-			const slug = `${props.tableGroups[state.currentProject!.tableGroupID].name}_${state.currentProject!.tableNumber}`
+			const slug = `${props.tableGroups[state.currentProject!.tableGroupID].name.toLowerCase()}_${state.currentProject!.tableNumber}`
 			console.log(slug + " > path");
 			return (
 				<div style={{

@@ -23,10 +23,7 @@ var SocketStrings;
     SocketStrings["UpdateSession"] = "update-session";
 })(SocketStrings = exports.SocketStrings || (exports.SocketStrings = {}));
 const socketHandler = (client) => {
-    console.log(client.id, 'connected');
     const updateRooms = async () => {
-        console.log('updaterooms', client.request.user);
-        console.log('updateroomscan', Permissions_1.can(client.request.user, Permissions_1.Action.QueueProject));
         if (client.request.user.logged_in && Permissions_1.can(client.request.user, Permissions_1.Action.QueueProject)) {
             client.join(SocketStrings.Authenticated);
             return true;
@@ -37,12 +34,9 @@ const socketHandler = (client) => {
     updateRooms();
     client.on(SocketStrings.Disconnect, () => {
         updateRooms();
-        console.log(client.id, 'disconnected');
         delete connectedClients[client.id];
     });
     client.on(SocketStrings.ProjectQueue, async (data) => {
-        console.log(data);
-        console.log(client.request.user);
         if (updateRooms()) {
             const { eventID, userID, projectID } = data;
             client.broadcast.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueue, {
@@ -50,11 +44,7 @@ const socketHandler = (client) => {
                 userID,
                 projectID,
             });
-            const { newBallots, removedBallotIDs } = await ProjectController_1.default.queueProject(projectID, userID);
-            console.log('in sockets', {
-                newBallots,
-                removedBallotIDs,
-            });
+            const { newBallots, removedBallotIDs, } = await ProjectController_1.default.queueProject(projectID, userID);
             app_1.io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectQueued, {
                 eventID,
                 userID,

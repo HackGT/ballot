@@ -45,7 +45,7 @@ async function start(): Promise<void> {
 
     const pgSessionStore = store(session);
 
-    console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
+    // console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
 
     // const pgPool = new pg.Pool({
     //     max: 1000,
@@ -60,7 +60,7 @@ async function start(): Promise<void> {
         conString: process.env.POSTGRES_URL,
     });
 
-    console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
+    // console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
     const sessionMiddleware = session({
         store: pgStore,
         secret: Environment.getSessionSecret(),
@@ -88,7 +88,7 @@ async function start(): Promise<void> {
 
     io.on('connection', socketHandler);
     io.use((socket, next) => {
-        console.log('wowowowow');
+        // console.log('wowowowow');
         passportSocketIO.authorize({
             cookieParser: require('cookie-parser'),
             secret: Environment.getSessionSecret(),

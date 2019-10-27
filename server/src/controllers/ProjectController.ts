@@ -77,7 +77,7 @@ class ProjectController {
       throw new Error('Project or User does not exist');
     }
 
-    console.log(submittedBallots);
+    // console.log(submittedBallots);
 
     if (submittedBallots.length > 0) {
       throw new Error('Project was already submitted, skipped, assigned, or started');
@@ -93,7 +93,7 @@ class ProjectController {
 
     const newBallots: Ballot[] = [];
     for (const category of project.categories) {
-      console.log(category);
+      // console.log(category);
       if (!category.generated && category.company === user.company) {
         const criteria = category.criteria;
         for (const criterion of criteria) {
@@ -209,7 +209,7 @@ class ProjectController {
   }
 
   public static async scoreProject(ballots: { [ballotID: string]: number }) {
-    console.log(ballots);
+    // console.log(ballots);
     const ballotRepository = getRepository(Ballot);
 
     const repoBallots = await ballotRepository.findByIds(Object.keys(ballots), {
@@ -273,7 +273,7 @@ class ProjectController {
 
     ballotRepository.remove(ballotsToRemove);
 
-    const ballotIDsToRemove = ballotsToRemove.map((ballot: Ballot) => ballot.id!)
+    const ballotIDsToRemove = ballotsToRemove.map((ballot: Ballot) => ballot.id!);
 
     io.to(SocketStrings.Authenticated).emit(SocketStrings.ProjectBusy, {
       ballotsToRemove: ballotIDsToRemove,

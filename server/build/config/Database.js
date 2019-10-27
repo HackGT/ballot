@@ -29,7 +29,6 @@ class Database {
             });
         }
         else {
-            console.log(1);
             const config = this.dbConfig;
             this.connectionObject = {
                 user: config.username,
@@ -53,9 +52,7 @@ class Database {
                 throw new Error(err);
             }
         }
-        console.log('here');
         const tableExistsResult = await typeorm_1.getManager().query(`SELECT to_regclass('public.session');`);
-        console.log('create result', tableExistsResult);
         if (!tableExistsResult[0].to_regclass) {
             await typeorm_1.getManager().query(`CREATE TABLE "session" (
                 "sid" varchar NOT NULL COLLATE "default",
