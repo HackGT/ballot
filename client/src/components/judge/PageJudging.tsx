@@ -12,6 +12,8 @@ import { fetchCategories } from '../../state/Category';
 import { fetchTableGroups } from '../../state/TableGroup';
 import { requestStart, requestFinish } from '../../state/Request';
 import { updateBallots, startBallots, scoreBallots, clearBallots, missingBallots, busyBallots, skipBallots } from '../../state/Ballot';
+// @ts-ignore
+import { SvgLoader, SvgProxy } from 'react-svgmt';
 
 import './PageJudging.css';
 
@@ -212,9 +214,14 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		};
 
 		if (state.currentProject && state.currentProject.id !== 0) {
+			const slug = `${props.tableGroups[state.currentProject!.tableGroupID].name}_${state.currentProject!.tableNumber}`
+			console.log(slug + " > path");
 			return (
 				<div style={{
 					textAlign: 'center',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center'
 				}}>
 					<h6>Next Project</h6>
 					<h1>{state.currentProject!.name}</h1>
@@ -228,6 +235,9 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 						I'm Here
 					</Button>
 					{_getSkipButtons()}
+					<SvgLoader width="350" path={"judging_map.svg"}>
+						<SvgProxy selector={"#" + slug + " > path"} fill={props.tableGroups[state.currentProject!.tableGroupID].color} />
+					</SvgLoader>
 				</div>
 			);
 		}

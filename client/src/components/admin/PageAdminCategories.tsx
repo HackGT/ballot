@@ -84,8 +84,8 @@ const PageAdminCategoriesComponent: React.FC<PageAdminCategoriesProps> = (props)
 			dispatch({ type: 'modal-open', modalCategory });
 		};
 
-		const createdCategories = [];
-		const generatedCategories = [];
+		const createdCategories:any[] = [];
+		const generatedCategories:any[] = [];
 
 		for (const category of Object.values(props.categories.categories)) {
 			if (category.generated) {
