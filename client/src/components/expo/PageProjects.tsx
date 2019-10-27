@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import React from 'react';
-import { Badge, Card, DropdownButton, Dropdown, Button, Modal, Form } from 'react-bootstrap';
+import { Badge, Card, Button, Modal, Form } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import Project, { ProjectState, TableGroupState } from '../../types/Project';
@@ -9,7 +9,6 @@ import Category, { CategoryState, CategoryCriteriaState } from '../../types/Cate
 import { fillCategories } from '../../state/Category';
 import { AppState } from '../../state/Store';
 import { fetchTableGroups } from '../../state/TableGroup';
-import { InputGroup } from 'react-bootstrap';
 
 const mapStateToProps = (state: AppState) => {
 	return {

@@ -76,7 +76,6 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
     });
     if (result.status) {
       const data = result.data;
-      console.log(data);
       props.updateCategory(data);
       props.closeModal();
       props.requestFinish();

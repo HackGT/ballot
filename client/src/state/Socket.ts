@@ -23,7 +23,7 @@ export default function socketMiddleware() {
       ...rest
     } = action;
 
-    console.log(action);
+    // console.log(action);
 
     if (update) {
       refreshSocket();

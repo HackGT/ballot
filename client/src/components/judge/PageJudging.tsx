@@ -131,8 +131,6 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 			userID,
 		});
 
-		console.log(result.data);
-
 		if (Object.values(result.data.ballots).length > 0) {
 			const ballots: BallotObject = result.data.ballots;
 			const projects: ProjectState = result.data.project;
@@ -148,22 +146,6 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		props.fetchCategories();
 		fetchNextProject(props.account.id!);
 	}, []);
-
-	// React.useEffect(() => {
-	// 	let result: CriteriaState = {};
-	// 	for (const cat of Object.values(props.categories.categories)) {
-	// 		const category: Category = cat;
-	// 		for (const cri of Object.values(category.criteria)) {
-	// 			const criteria: Criteria = cri;
-	// 			result[criteria.id!] = {
-	// 				...criteria,
-	// 				categoryID: category.id!,
-	// 			};
-	// 		}
-	// 	}
-	// 	console.log('result', result);
-	// 	dispatch({ type: 'update-criteria', criteria: result });
-	// }, [props.categories]);
 
 	React.useEffect(() => {
 		updateBallotState(props.ballots);
@@ -217,7 +199,7 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 					textAlign: 'center',
 				}}>
 					<h6>Next Project</h6>
-					<h1>{state.currentProject!.name}</h1>
+					<h1><a href={state.currentProject!.devpostURL} style={{ color: 'black', textDecoration: 'underline' }} target='_blank'>{state.currentProject!.name}</a></h1>
 					<h3>
 						At <span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}
 					</h3>
@@ -236,7 +218,6 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 	};
 
 	const _renderJudgeProject = () => {
-		console.log(props.categories.criteria, props.ballots);
 		const _renderScoreRange = (ballotID: number, min: number, max: number) => {
 			return (
 				<>
@@ -312,7 +293,7 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		if (state.currentProject && state.currentProject.id !== 0) {
 			return (
 				<div style={{ maxWidth: 560, textAlign: 'center', margin: '0 auto' }}>
-					<h1>{state.currentProject!.name}</h1>
+					<h1><a href={state.currentProject!.devpostURL} style={{ color: 'black', textDecoration: 'underline' }} target='_blank'>{state.currentProject!.name}</a></h1>
 					<h6><span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}</h6>
 					{_renderBallots()}
 					<Button
@@ -360,7 +341,6 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		Object.values(props.tableGroups).length === 0
 		|| !state.currentProject
 		|| Object.values(props.categories.criteria).length === 0) {
-		console.log('wow');
 		return null;
 		// TODO loading
 	}

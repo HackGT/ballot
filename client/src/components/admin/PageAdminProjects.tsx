@@ -91,7 +91,6 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 				props.fetchProjects(),
 				props.fetchUsers(),
 			]);
-			console.log('fetch');
 			props.requestFinish();
 		};
 
@@ -153,7 +152,6 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 					</ButtonGroup>
 				</div>
 				<div style={{
-					maxWidth: 1300,
 					margin: '12px auto 0',
 				}}>
 					{Object.values(props.projects).length !== 0

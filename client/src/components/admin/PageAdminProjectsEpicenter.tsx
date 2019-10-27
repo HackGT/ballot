@@ -569,7 +569,8 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         </Card>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey='1'>
-            Expo {state.currentExpo} | Goodness {state.powerGoodness} | Variance {state.powerVariance} | Skip {state.powerSkip}
+            Expo {state.currentExpo}
+             {/* | Goodness {state.powerGoodness} | Variance {state.powerVariance} | Skip {state.powerSkip} */}
           </Accordion.Toggle>
           <Accordion.Collapse eventKey='1'>
             <Card.Body>
@@ -583,7 +584,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                   type='number'
                   value={"" + state.currentExpo} />
               </InputGroup>
-              <InputGroup className="mb-3" style={{
+              {/* <InputGroup className="mb-3" style={{
                 maxWidth: 350,
                 marginRight: 10,
               }}>
@@ -633,7 +634,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                   type='number'
                   value={"" + state.powerSkip} />
               </InputGroup>
-              <p>Twice-skipped projects have lower health. Multiplier is (# skipped) to the skipPower. 0 to disable.</p>
+              <p>Twice-skipped projects have lower health. Multiplier is (# skipped) to the skipPower. 0 to disable.</p> */}
             </Card.Body>
           </Accordion.Collapse>
         </Card>
@@ -642,7 +643,6 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         display: 'flex',
         justifyContent: 'center',
         flexWrap: 'wrap',
-        maxWidth: 1300,
         margin: '12px auto 0',
       }}>
         {_getProjects()}
@@ -651,7 +651,6 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         display: 'flex',
         justifyContent: 'center',
         flexWrap: 'wrap',
-        maxWidth: 1300,
         margin: '12px auto 0',
       }}>
         {_getJudges()}

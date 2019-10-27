@@ -247,7 +247,6 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         const tableNumber = csvRow[state.csvHeaderIndicies['Table Number']];
         if (tableNumber) {
           const tableParts = tableNumber.split(' ');
-          console.log('wowowow', tableParts);
           if (tableParts.length !== 3) {
             throw new Error('Need 3 parts: expo, group, number');
           }
@@ -264,8 +263,6 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         }
       }
     }
-
-    console.log(allocatedTables);
 
     const allocatedRows = Object.values(allocatedTables);
     let csvRowNumber = 0;
@@ -321,14 +318,14 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
       });
     }
 
-    console.log(projectsToSend);
+    // console.log(projectsToSend);
 
     const batchUploadResult = await Axios.post('/api/projects/upload', {
       projects: projectsToSend,
     });
     if (batchUploadResult.status) {
       const data = batchUploadResult.data;
-      console.log(data);
+      // console.log(data);
       props.fillProjects(data);
       props.clearBallots();
       props.closeModal();
@@ -339,7 +336,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
   const getFileUploadForm = () => {
     const throwError = (message: string) => {
       dispatch({ type: 'update-csv', csv: [], csvHeaderIndicies: {}});
-      console.log(message);
+      // console.log(message);
       // TODO throw real error.
       return;
     };
