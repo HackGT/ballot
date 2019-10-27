@@ -21,6 +21,7 @@ class Database {
             await createConnection({
                 type: 'postgres',
                 url: (this.dbConfig as DatabaseConfigURI).uri,
+                ssl: false,
                 ...commonConnectionOptions,
             });
         } else {
