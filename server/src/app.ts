@@ -7,6 +7,7 @@ import * as http from 'http';
 import passport from 'passport';
 import socketio from 'socket.io';
 import store from 'connect-pg-simple';
+import * as path from 'path';
 import passportSocketIO from 'passport.socketio';
 import pg from 'pg';
 import 'reflect-metadata';
@@ -93,6 +94,10 @@ async function start(): Promise<void> {
     app.use(express.json());
     app.use('/auth', auth);
     app.use('/api', api);
+    app.use('/', express.static(path.resolve(__dirname, '../build/public')));
+    app.use('/*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, './public/client/index.html'));
+    });
 
     server.listen(Environment.getPort());
     Logger.success('Server started');

@@ -19,8 +19,11 @@ class Environment {
     }
     static getDatabaseConfig() {
         if (process.env.POSTGRES_URL) {
+            const urlRootIndex = process.env.POSTGRES_URL.lastIndexOf('?');
+            const urlRoot = urlRootIndex === -1 ?
+                process.env.POSTGRES_URL : process.env.POSTGRES_URL.substring(0, urlRootIndex);
             return {
-                uri: process.env.POSTGRES_URL,
+                uri: urlRoot,
             };
         }
         if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {
