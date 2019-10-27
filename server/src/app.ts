@@ -12,7 +12,7 @@ import passportSocketIO from 'passport.socketio';
 import pg from 'pg';
 import 'reflect-metadata';
 
-import Environment from './config/Environment';
+import Environment, { DatabaseConfigURI } from './config/Environment';
 import Database from './config/Database';
 import Logger from './util/Logger';
 import auth from './routes/auth';
@@ -45,16 +45,19 @@ async function start(): Promise<void> {
 
     const pgSessionStore = store(session);
 
-    const pgPool = new pg.Pool({
-        max: 200,
-        idleTimeoutMillis: 30000,
-        ...Database.getConnectionObject(),
-    })
+    console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
+
+    // const pgPool = new pg.Pool({
+    //     max: 1000,
+    //     idleTimeoutMillis: 30000,
+    //     connectionString: (Environment.getDatabaseConfig() as DatabaseConfigURI).uri,
+    //     ssl: false,
+    //     // ...Database.getConnectionObject(),
+    // })
 
     const sessionMiddleware = session({
         store: new pgSessionStore({
-            pool: pgPool,
-            // conObject: Database.getConnectionObject(),
+            conString: (Environment.getDatabaseConfig() as DatabaseConfigURI).uri,
         }),
         secret: Environment.getSessionSecret(),
         resave: true,

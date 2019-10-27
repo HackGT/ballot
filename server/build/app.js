@@ -21,7 +21,6 @@ const socket_io_1 = __importDefault(require("socket.io"));
 const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
 const path = __importStar(require("path"));
 const passport_socketio_1 = __importDefault(require("passport.socketio"));
-const pg_1 = __importDefault(require("pg"));
 require("reflect-metadata");
 const Environment_1 = __importDefault(require("./config/Environment"));
 const Database_1 = __importDefault(require("./config/Database"));
@@ -52,14 +51,10 @@ async function start() {
     }
     Logger_1.default.success('Database Initialized');
     const pgSessionStore = connect_pg_simple_1.default(express_session_1.default);
-    const pgPool = new pg_1.default.Pool({
-        max: 200,
-        idleTimeoutMillis: 30000,
-        ...Database_1.default.getConnectionObject(),
-    });
+    console.log(Environment_1.default.getDatabaseConfig().uri);
     const sessionMiddleware = express_session_1.default({
         store: new pgSessionStore({
-            pool: pgPool,
+            conString: Environment_1.default.getDatabaseConfig().uri,
         }),
         secret: Environment_1.default.getSessionSecret(),
         resave: true,

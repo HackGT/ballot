@@ -39,6 +39,9 @@ class Environment {
             return {
                 uri: urlRoot,
             };
+            // return {
+            //     uri: process.env.POSTGRES_URL,
+            // };
         }
 
         if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {

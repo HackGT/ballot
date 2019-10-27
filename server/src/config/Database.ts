@@ -7,6 +7,7 @@ const commonConnectionOptions = {
     ],
     synchronize: !Environment.isProduction(),
     logging: false,
+    ssl: false,
 };
 
 class Database {
@@ -14,7 +15,7 @@ class Database {
 
     public static async connect() {
         if (this.dbConfig === undefined) {
-            throw new Error('Expected PostgreSQL configuration in Environemnt Variables');
+            throw new Error('Expected PostgreSQL configuration in Environment Variables');
         }
 
         if ((this.dbConfig as DatabaseConfigURI).uri !== undefined) {

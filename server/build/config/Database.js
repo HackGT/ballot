@@ -11,16 +11,20 @@ const commonConnectionOptions = {
     ],
     synchronize: !Environment_1.default.isProduction(),
     logging: false,
+    ssl: false,
 };
 class Database {
     static async connect() {
         if (this.dbConfig === undefined) {
-            throw new Error('Expected PostgreSQL configuration in Environemnt Variables');
+            throw new Error('Expected PostgreSQL configuration in Environment Variables');
         }
         if (this.dbConfig.uri !== undefined) {
             await typeorm_1.createConnection({
                 type: 'postgres',
                 url: this.dbConfig.uri,
+                extra: {
+                    ssl: false,
+                },
                 ...commonConnectionOptions,
             });
         }
