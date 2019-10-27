@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 
 // From http://nmajor.com/posts/using-socket-io-with-redux-websocket-redux-middleware
 export default function socketMiddleware() {
-  let socket = io();
+  let socket = io(window.location.origin);
 
   function refreshSocket() {
     socket = io({'forceNew': true });

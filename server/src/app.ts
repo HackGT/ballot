@@ -55,10 +55,14 @@ async function start(): Promise<void> {
     //     // ...Database.getConnectionObject(),
     // })
 
+    const pgStore = new pgSessionStore({
+        pruneSessionInterval: false,
+        conString: process.env.POSTGRES_URL,
+    });
+
+    console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
     const sessionMiddleware = session({
-        store: new pgSessionStore({
-            conString: (Environment.getDatabaseConfig() as DatabaseConfigURI).uri,
-        }),
+        store: pgStore,
         secret: Environment.getSessionSecret(),
         resave: true,
         saveUninitialized: true,
@@ -88,18 +92,16 @@ async function start(): Promise<void> {
         passportSocketIO.authorize({
             cookieParser: require('cookie-parser'),
             secret: Environment.getSessionSecret(),
-            store: new pgSessionStore({
-                conObject: Database.getConnectionObject(),
-            }),
+            store: pgStore,
         })(socket, next);
     });
 
+    app.use(express.static(path.join(__dirname, '../build/public')));
     app.use(express.json());
     app.use('/auth', auth);
     app.use('/api', api);
-    app.use('/', express.static(path.resolve(__dirname, '../build/public')));
     app.use('/*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, './public/client/index.html'));
+        res.sendFile(path.resolve(__dirname, './public/index.html'));
     });
 
     server.listen(Environment.getPort());

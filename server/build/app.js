@@ -52,10 +52,13 @@ async function start() {
     Logger_1.default.success('Database Initialized');
     const pgSessionStore = connect_pg_simple_1.default(express_session_1.default);
     console.log(Environment_1.default.getDatabaseConfig().uri);
+    const pgStore = new pgSessionStore({
+        pruneSessionInterval: false,
+        conString: process.env.POSTGRES_URL,
+    });
+    console.log(Environment_1.default.getDatabaseConfig().uri);
     const sessionMiddleware = express_session_1.default({
-        store: new pgSessionStore({
-            conString: Environment_1.default.getDatabaseConfig().uri,
-        }),
+        store: pgStore,
         secret: Environment_1.default.getSessionSecret(),
         resave: true,
         saveUninitialized: true,
@@ -82,17 +85,15 @@ async function start() {
         passport_socketio_1.default.authorize({
             cookieParser: require('cookie-parser'),
             secret: Environment_1.default.getSessionSecret(),
-            store: new pgSessionStore({
-                conObject: Database_1.default.getConnectionObject(),
-            }),
+            store: pgStore,
         })(socket, next);
     });
+    app.use(express_1.default.static(path.join(__dirname, '../build/public')));
     app.use(express_1.default.json());
     app.use('/auth', auth_1.default);
     app.use('/api', api_1.default);
-    app.use('/', express_1.default.static(path.resolve(__dirname, '../build/public')));
     app.use('/*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, './public/client/index.html'));
+        res.sendFile(path.resolve(__dirname, './public/index.html'));
     });
     server.listen(Environment_1.default.getPort());
     Logger_1.default.success('Server started');
