@@ -1,8 +1,17 @@
 {
+  "dependencies": {
+    "gulp": "^4.0.0",
+    "gulp-install": "^1.1.0",
+    "gulp-shell": "^0.7.0",
+    "gulp-util": "^3.0.8",
+    "path": "^0.12.7",
+    "react-svgmt": "^1.1.9"
+  },
+  "devDependencies": {},
   "name": "ballot",
-  "version": "0.1.0",
-  "description": "Stack ranking solution for judge assignment, management, and scoring.",
-  "main": "index.js",
+  "description": "Hackathon judging made a little better",
+  "version": "1.0.0",
+  "main": "server/app.js",
   "scripts": {
     "postinstall": "gulp postinstall",
     "start": "gulp",
@@ -12,21 +21,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HackGT/ballot.git"
+    "url": "git+https://github.com/hackgt/ballot.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "James Lu",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/HackGT/ballot/issues"
+    "url": "https://github.com/hackgt/ballot/issues"
   },
-  "homepage": "https://github.com/HackGT/ballot#readme",
-  "dependencies": {
-    "gulp": "^4.0.0",
-    "gulp-install": "^1.1.0",
-    "gulp-shell": "^0.6.5",
-    "gulp-util": "^3.0.8",
-    "imports-loader": "^0.8.0",
-    "react-responsive": "^6.1.1",
-    "snapsvg": "^0.5.1"
-  }
+  "homepage": "https://github.com/hackgt/ballot#readme"
 }

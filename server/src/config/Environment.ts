@@ -1,23 +1,7 @@
-interface GithubConfig {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-}
-
-interface FacebookConfig {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-}
-
-interface GoogleConfig {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-}
+import Logger from '../util/Logger';
 
 export interface DatabaseConfig {
-    host: string;
+    url: string;
     database: string;
     username: string;
     password: string;
@@ -28,7 +12,7 @@ export interface DatabaseConfigURI {
     uri: string;
 }
 
-export class Environment {
+class Environment {
     public static getPort(): string {
         return process.env.PORT || '3000';
     }
@@ -37,30 +21,33 @@ export class Environment {
         return process.env.NODE_ENV === 'production';
     }
 
-    public static getUrl(): string {
-        return process.env.ROOT_URL || '127.0.0.1';
+    public static getURL(): string {
+        return process.env.URL || '127.0.0.1';
     }
 
-    public static getSession(): string {
+    public static getSessionSecret(): string {
         return process.env.SESSION_SECRET || '';
     }
 
-    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI
-        | undefined {
+    public static getDatabaseConfig(): DatabaseConfig | DatabaseConfigURI | undefined {
         if (process.env.POSTGRES_URL) {
+            // assume k8 url of form postgres://expo-2019@postgres-postgresql/expo-2019?sslmode=disable
+            // strip query params
+            const urlRootIndex = process.env.POSTGRES_URL.lastIndexOf('?');
+            const urlRoot = urlRootIndex === -1 ?
+                process.env.POSTGRES_URL : process.env.POSTGRES_URL.substring(0, urlRootIndex);
             return {
-                uri: process.env.POSTGRES_URL,
+                uri: urlRoot,
             };
+            // return {
+            //     uri: process.env.POSTGRES_URL,
+            // };
         }
 
-        if (process.env.PGURL &&
-            process.env.PGUSERNAME &&
-            process.env.PGDATABASE &&
-            process.env.PGPASSWORD) {
+        if (process.env.PGURL && process.env.PGUSERNAME && process.env.PGDATABASE && process.env.PGPASSWORD) {
             return {
-                host: process.env.PGURL,
-                port: process.env.PGPORT ?
-                    parseInt((process.env.PGPORT) as string, 10) : undefined,
+                url: process.env.PGURL,
+                port: process.env.PGPORT ? parseInt((process.env.PGPORT) as string, 10) : undefined,
                 database: process.env.PGDATABASE,
                 username: process.env.PGUSERNAME,
                 password: process.env.PGPASSWORD,
@@ -70,52 +57,26 @@ export class Environment {
         return undefined;
     }
 
-    public static getGithubAuth(): GithubConfig | undefined {
-        if (process.env.AUTH_GITHUB_ID &&
-            process.env.AUTH_GITHUB_SECRET &&
-            process.env.AUTH_ALLOW_GITHUB) {
-            return {
-                clientID: process.env.AUTH_GITHUB_ID,
-                clientSecret: process.env.AUTH_GITHUB_SECRET,
-                callbackURL: '/auth/github/callback',
-            } as GithubConfig;
+    public static verifyEnvironment(): boolean {
+        Logger.info('Verifying Environment');
+
+        if (this.getURL() === '') {
+            Logger.error('URL is not defined in environment variables!');
+            throw new Error('Missing process.env.URL');
         }
 
-        return undefined;
-    }
-
-    public static getFacebookAuth(): FacebookConfig | undefined {
-        if (process.env.AUTH_FACEBOOK_ID &&
-            process.env.AUTH_FACEBOOK_SECRET &&
-            process.env.AUTH_ALLOW_FACEBOOK) {
-            return {
-                clientID: process.env.AUTH_FACEBOOK_ID,
-                clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-                callbackURL: '/auth/facebook/callback',
-                profileFields: ['id', 'name', 'email', 'displayName'],
-            } as FacebookConfig;
+        if (this.getSessionSecret() === '') {
+            Logger.error('Session Secret is not defined in environment variables!');
+            throw new Error('Missing process.env.SESSION_SECRET');
         }
 
-        return undefined;
-    }
-
-    public static getGoogleAuth(): GoogleConfig | undefined {
-        if (process.env.AUTH_GOOGLE_ID &&
-            process.env.AUTH_GOOGLE_SECRET &&
-            process.env.AUTH_ALLOW_GOOGLE) {
-            return {
-                clientID: process.env.AUTH_GOOGLE_ID,
-                clientSecret: process.env.AUTH_GOOGLE_SECRET,
-                callbackURL: '/auth/google/callback',
-            } as GoogleConfig;
+        if (this.getDatabaseConfig() === undefined) {
+            Logger.error('The database configuration in environment variables is not complete!');
+            throw new Error('Missing database environment variables');
         }
 
-        return undefined;
-    }
-
-    public static allowLocalAuth(): boolean {
-        return !!process.env.AUTH_ALLOW_LOCAL &&
-            (process.env.AUTH_ALLOW_LOCAL as string)!
-                .toLowerCase().trim() === 'true';
+        return true;
     }
 }
+
+export default Environment;

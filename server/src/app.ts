@@ -1,135 +1,111 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-
-import * as helmet from 'helmet';
-import * as morgan from 'morgan';
-import * as cors from 'cors';
-import * as express from 'express';
-import * as session from 'express-session';
+import express from 'express';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import * as http from 'http';
-import * as passport from 'passport';
-import * as bodyParser from 'body-parser';
-import * as socketio from 'socket.io';
+import passport from 'passport';
+import socketio from 'socket.io';
+import store from 'connect-pg-simple';
 import * as path from 'path';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { normalizePort, verifyEnvironment } from './util/server';
-import { Environment } from './config/Environment';
-import healthcheck from './routes/healthcheck';
+import passportSocketIO from 'passport.socketio';
+import pg from 'pg';
+import 'reflect-metadata';
+
+import Environment, { DatabaseConfigURI } from './config/Environment';
+import Database from './config/Database';
+import Logger from './util/Logger';
 import auth from './routes/auth';
-import { Logger } from './util/Logger';
-import { strategies, serialize, deserialize } from './config/auth';
-import schema from './api';
-import { sync } from './models';
+import api from './routes/api';
+import Authentication from './config/Authentication';
 import socketHandler from './routes/socket';
-import { createDataStore, dataStore } from './store/DataStore';
 
 const app = express();
 const server = http.createServer(app);
 export const io = socketio(server);
 
-let backupsEnabled = false;
-let backupsInterval: NodeJS.Timer;
-
 async function start(): Promise<void> {
-    // Throw any errors if missing configurations
+    // Verify environment
     try {
-        await verifyEnvironment();
+        await Environment.verifyEnvironment();
+    } catch (error) {
+        Logger.error('Server startup canceled due to an error with the environment.');
+        throw new Error(error);
+    }
+    Logger.success('Environment verified');
 
-        // Sync database
-        await sync();
+    try {
+        Logger.info('Setting up database');
+        await Database.connect();
+    } catch (error) {
+        Logger.error('Server startup canceled due to an error with the database.');
+        throw new Error(error);
+    }
+    Logger.success('Database Initialized');
 
-        await createDataStore();
+    const pgSessionStore = store(session);
 
-        // Integrate Helmet
-        app.use(helmet());
-        app.use(helmet.noCache());
-        app.use(helmet.hsts({
-            maxAge: 31536000,
-            includeSubdomains: true,
-        }));
+    // console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
 
-        // Integrate Cors
-        app.use(cors());
+    // const pgPool = new pg.Pool({
+    //     max: 1000,
+    //     idleTimeoutMillis: 30000,
+    //     connectionString: (Environment.getDatabaseConfig() as DatabaseConfigURI).uri,
+    //     ssl: false,
+    //     // ...Database.getConnectionObject(),
+    // })
 
-        // Integrate Logging
-        app.use(morgan('dev'));
+    const pgStore = new pgSessionStore({
+        pruneSessionInterval: false,
+        conString: process.env.POSTGRES_URL,
+    });
 
-        // Integrate Authentication
-        app.use(session({
-            secret: Environment.getSession(),
-            resave: true,
-            saveUninitialized: true,
-        }));
+    // console.log((Environment.getDatabaseConfig() as DatabaseConfigURI).uri);
+    const sessionMiddleware = session({
+        store: pgStore,
+        secret: Environment.getSessionSecret(),
+        resave: true,
+        saveUninitialized: true,
+    });
 
-        for (const strategy of strategies) {
+    app.use(sessionMiddleware).use(cookieParser());
+
+    try {
+        Logger.info('Setting up Passport');
+        Authentication.setupStrategies();
+        for (const strategy of Authentication.getStrategies()) {
             passport.use(strategy);
         }
-        passport.serializeUser(serialize);
-        passport.deserializeUser(deserialize);
+        passport.serializeUser(Authentication.serialize);
+        passport.deserializeUser(Authentication.deserialize);
 
         app.use(passport.initialize());
         app.use(passport.session());
-
-        // Activate Routes
-        app.use('/graphql', bodyParser.json({
-            limit: '10mb',
-        }),
-            graphqlExpress((req?: express.Request, res?: express.Response) => {
-                return {
-                    schema,
-                    context: {
-                        user: req!.user,
-                    },
-                };
-            })
-        );
-
-        app.use('/backups', (req, res) => {
-            if (backupsEnabled) {
-                backupsEnabled = false;
-                res.send('Backups disabled');
-                clearInterval(backupsInterval);
-            } else {
-                backupsEnabled = true;
-                backupsInterval = setInterval(() => {
-                    dataStore.backup();
-                }, 60000);
-                res.send('Backups enabled');
-            }
-        });
-
-        app.use('/auth', auth);
-
-        app.use('/healthcheck', healthcheck);
-        app.use('/graphiql/*', graphiqlExpress({ endpointURL: '/graphql' }));
-
-        app.use('/', express.static(path.resolve(__dirname, '../build/public/client')));
-        app.use('/', express.static(path.resolve(__dirname, '../build/public/epicenter')));
-
-        app.use('/epicenter/*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './public/epicenter/index.html'));
-        });
-
-        app.use('/*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './public/client/index.html'));
-        });
-
-        // app.use('*', index);
-
-        // Activate sockets
-        io.on('connection', socketHandler);
-
-        // Start Server
-        const port = Environment.getPort();
-        server.listen(normalizePort(port));
-
-        // app.listen(normalizePort(port), () => {
-        //     Logger('app').info(`Listening on port ${port}`);
-        // });
     } catch (error) {
-        Logger('app').error('Server startup canceled due to missing dependencies');
-        Logger('app').error(error);
+        Logger.error('Server startup canceled due to an error with Passport');
+        throw new Error(error);
     }
+
+    io.on('connection', socketHandler);
+    io.use((socket, next) => {
+        // console.log('wowowowow');
+        passportSocketIO.authorize({
+            cookieParser: require('cookie-parser'),
+            secret: Environment.getSessionSecret(),
+            store: pgStore,
+        })(socket, next);
+    });
+
+    app.use(express.static(path.join(__dirname, '../build/public')));
+    app.use(express.json());
+    app.use('/auth', auth);
+    app.use('/api', api);
+    app.use('/*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, './public/index.html'));
+    });
+
+    server.listen(Environment.getPort());
+    Logger.success('Server started');
 }
 
 start();

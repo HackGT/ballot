@@ -1,126 +1,133 @@
-import * as React from 'react';
-import { NavLink, match, Link, withRouter } from 'react-router-dom';
-import MediaQuery from 'react-responsive';
-import { Popover, Button, Position, Menu, MenuItem, Navbar, Alignment, H1, NavbarDivider, ButtonGroup } from '@blueprintjs/core';
+import React from 'react';
+import User, { UserRole } from '../types/User';
+import { Nav, Navbar } from 'react-bootstrap';
+import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
+
+const PATH_PROFILE = '/profile';
+const PATH_LOGIN = '/login';
+const PATH_LOGOUT = '/logout';
 
 interface NavigationProps {
-    linkNames: string[];
-    linkDests: string[];
-    hasSession: boolean;
-    match: any;
-    history: any;
-    location: any;
+  account: User;
+  match: any;
+  location: any;
+  history: any;
 }
 
-interface NavigationElementProps {
-    mobile: boolean;
-    location: any;
-    history: any;
-    linkName: string;
-    linkDest: string;
-}
+const Navigation: React.FC<NavigationProps> = (props) => {
+  const actualPage = () => {
+    const pageString = props.location.pathname.split('/')[1];
+    return pageString === '' ? '/' : `/${pageString}`;
+  };
 
-const Navigation: React.SFC<NavigationProps> = (props) => {
-    const navLinks = [];
-    const navLinksMobile = [];
-    for (let i = 0; i < props.linkNames.length; i++) {
-        navLinks.push(<NavigationElement
-            key={i}
-            location={props.location}
-            history={props.history}
-            mobile={false}
-            linkName={props.linkNames[i]}
-            linkDest={props.linkDests[i]}/>);
+  const [curPage, changeCurPage] = React.useState(actualPage());
 
-        navLinksMobile.push(<NavigationElement
-            key={i}
-            location={props.location}
-            history={props.history}
-            mobile={true}
-            linkName={props.linkNames[i]}
-            linkDest={props.linkDests[i]}/>);
+  React.useEffect(() => {
+    changeCurPage(actualPage());
+  }, [props.location]);
+
+  const navTo = (route: string) => {
+    props.history.push(route);
+    changeCurPage(actualPage());
+  };
+
+  const genLeftNav = (role: UserRole) => {
+    let leftNav: [string, string][] = [];
+    switch (role) {
+      case UserRole.Owner:
+      case UserRole.Admin:
+        leftNav = [
+          ['Home', '/'],
+          ['Judging', '/judging'],
+          ['Projects', '/projects'],
+          ['Admin', '/admin'],
+        ];
+        break;
+      case UserRole.Judge:
+        leftNav = [
+          ['Home', '/'],
+          ['Judging', '/judging'],
+          ['Projects', '/projects'],
+        ];
+        break;
+      case UserRole.Pending:
+        leftNav = [
+          ['Home', '/'],
+          ['Projects', '/projects'],
+        ];
+        break;
+      default:
+        leftNav = [
+          ['Projects', '/'],
+        ]
+        break;
     }
-
-    if (props.hasSession) {
-        navLinks.push(
-            <NavigationElement
-                key={props.linkNames.length}
-                location={props.location}
-                history={props.history}
-                mobile={false}
-                linkName={'Logout'}
-                linkDest={'/logout'}
-            />
-        );
-
-        navLinksMobile.push(
-            <NavigationElement
-                key={props.linkNames.length}
-                location={props.location}
-                history={props.history}
-                mobile={true}
-                linkName={'Logout'}
-                linkDest={'/logout'}
-            />
-        );
-    }
-
 
     return (
-        <div>
-            <MediaQuery query='(min-width: 441px)'>
-                <Navbar style={{ maxWidth: 960 }}>
-                    <Navbar.Group align={Alignment.LEFT}>
-                        <Navbar.Heading><strong><h2>Ballot</h2></strong></Navbar.Heading>
-                    </Navbar.Group>
-                    <Navbar.Group align={Alignment.RIGHT}>
-                        <ButtonGroup>
-                            {navLinks}
-                        </ButtonGroup>
-                    </Navbar.Group>
-                </Navbar>
-            </MediaQuery>
-
-            <MediaQuery query='(max-width: 440px)'>
-                <Navbar>
-                    <Navbar.Group>
-                        <Navbar.Heading><strong><h2>Ballot</h2></strong></Navbar.Heading>
-                        <NavbarDivider />
-                    </Navbar.Group>
-                    <Navbar.Group align={Alignment.RIGHT}>
-                        <Popover
-                            content={<Menu>{navLinksMobile}</Menu>}
-                            position={Position.BOTTOM_RIGHT}>
-                            <Button icon="menu" large={true} text='Menu' minimal={true} />
-                        </Popover>
-                    </Navbar.Group>
-                </Navbar>
-            </MediaQuery>
-        </div>
-    );
-};
-
-const NavigationElement: React.SFC<NavigationElementProps> = (props) => {
-    if (props.mobile) {
+      <Nav className="mr-auto">
+      {leftNav.map((navItem) => {
         return (
-            <MenuItem
-                onClick={() => {
-                    props.history.push(props.linkDest);
-                }}
-                text={props.linkName}
-                active={props.location.pathname === props.linkDest} />
-        )
-    } else {
-        return (
-            <Button
-                onClick={() => {
-                    props.history.push(props.linkDest);
-                }}
-                style={{ outline: 'none' }}
-                active={props.location.pathname === props.linkDest}
-                text={props.linkName} />
+          <Nav.Link
+            key={navItem[0]}
+            eventKey={navItem[0]}
+            active={navItem[1] === curPage}
+            onSelect={() => navTo(navItem[1])}>
+            {navItem[0]}
+          </Nav.Link>
         );
+      })}
+      </Nav>
+    )
+  };
+
+  let genRightNav = (role: UserRole) => {
+    if (role >= UserRole.Pending) {
+      return (
+        <Nav>
+          {/* <Nav.Link
+            active={PATH_PROFILE === curPage}
+            eventKey={'profile'}
+            onSelect={() => navTo(PATH_PROFILE)}>
+            Profile
+          </Nav.Link> */}
+          <Nav.Link
+            active={PATH_LOGOUT === curPage}
+            eventKey={'logout'}
+            onSelect={() => navTo(PATH_LOGOUT)}>
+            Logout
+          </Nav.Link>
+        </Nav>
+      );
+    } else {
+      return (
+        <Nav>
+          <Nav.Link
+            active={PATH_LOGIN === curPage}
+            eventKey={'login'}
+            onSelect={() => navTo(PATH_LOGIN)}>
+            Login
+          </Nav.Link>
+        </Nav>
+      );
     }
-};
+  }
+
+  return (
+    <Navbar collapseOnSelect bg='dark' variant='dark' expand="sm" >
+      <Link
+        to={'/'}
+        style={{ textDecoration: 'none' }}
+        onClick={() => navTo('/')}>
+        <Navbar.Brand>HackGT Expo</Navbar.Brand>
+      </Link>
+      <Navbar.Toggle aria-controls="navigation" />
+      <Navbar.Collapse>
+        {genLeftNav(props.account.role)}
+        {genRightNav(props.account.role)}
+      </Navbar.Collapse>
+    </Navbar>
+  );
+}
 
 export default withRouter(Navigation);
