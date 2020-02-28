@@ -217,9 +217,9 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 						I'm Here
 					</Button>
 					{_getSkipButtons()}
-					<SvgLoader width="350" path={"judging_map.svg"}>
+					{/* <SvgLoader width="350" path={"judging_map.svg"}>
 						<SvgProxy selector={"#" + slug + " > path"} fill={props.tableGroups[state.currentProject!.tableGroupID].color} />
-					</SvgLoader>
+					</SvgLoader> */}
 				</div>
 			);
 		}
