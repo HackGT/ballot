@@ -96,12 +96,12 @@ async function start(): Promise<void> {
         })(socket, next);
     });
 
-    app.use(express.static(path.join(__dirname, '../build/public')));
+    app.use(express.static(path.join(__dirname, '../../client/build')));
     app.use(express.json());
     app.use('/auth', auth);
     app.use('/api', api);
     app.use('/*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, './public/index.html'));
+        res.sendFile(path.resolve(__dirname, '../../client/build/index.html'));
     });
 
     server.listen(Environment.getPort());
