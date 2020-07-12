@@ -206,8 +206,13 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
   }
 
   const autoAssign = () => {
+    // get users who are judges
     const userIDs = Object.keys(props.users).map((value) => parseInt(value)).reduce((judgingUsers: number[], userID) => {
+      // check that user ID is an approved judge
       if (props.users[userID].isJudging!) {
+        // check that judge's user ID is not in judge queues
+        // or does not have a queued project
+        // or has a queued project with ID = 0
         if (!props.ballots.dJudgeQueues[userID]
           || props.ballots.dJudgeQueues[userID].queuedProject === undefined
           || props.ballots.dJudgeQueues[userID].queuedProject.id === 0) {
@@ -217,34 +222,43 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       return judgingUsers;
     }, []);
     console.log(userIDs);
+    // check that there is at least one judge that we can assign the project to
     if (userIDs.length > 0) {
+      // pick a random judge
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
       console.log(randomUserID);
+      // get projects that can be assigned to a judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
+        // check that project is in current expo
         if (project.expoNumber !== state.currentExpo) {
           return false;
         }
-
+        // check that project is not currently assigned to the judge or in the judge's queue
         if (props.ballots.dJudgeQueues[randomUserID]) {
           if (project.id! === props.ballots.dJudgeQueues[randomUserID].activeProjectID
             || props.ballots.dJudgeQueues[randomUserID].otherProjectIDs.includes(project.id!)) {
             return false;
           }
         }
+        // map projects to companies
         const projectCompanyList = project.categoryIDs.map((categoryID: number) => {
           return props.categories.categories[categoryID].company;
         });
+        // return projects that match the judge's company
         return projectCompanyList.includes(props.users[randomUserID].company!);
+        // sort projects by health
       }).sort((a: ProjectWithHealth, b: ProjectWithHealth) => {
         return a.health - b.health;
       });
       console.log(canAssignProjects);
-
+      // get lowest health value
       const lowestHealth = canAssignProjects[0].health;
+      // get projects with health = lowest health value
       const sameLowestHealthProjects = canAssignProjects.filter((project: ProjectWithHealth) => {
         return project.health === lowestHealth;
       });
-
+      // randomly pick project to assign from among projects with health = lowest health value
+      // assign project to judge
       queueProject(sameLowestHealthProjects[Math.floor(Math.random() * sameLowestHealthProjects.length)].id!, randomUserID);
     }
   };
@@ -549,6 +563,9 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
               <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.AverageScore})}>By Average Score</Button>
               <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.ProjectHealth})}>By Project Health</Button>
               <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.TimesJudged})}>By Times Judged (Includes Pending/Assigned)</Button>
+              <p style={{whiteSpace: 'pre-wrap'}}>
+                  Currently sorting <strong>By {SortType[state.sortBy]}</strong>
+              </p>
               <h2>Filter</h2>
               {Object.values(props.categories.categories).reduce((buttons: ReactElement[], category: Category) => {
                 if (!category.generated) {
@@ -564,6 +581,12 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                 }
                 return buttons;
               }, [])}
+              {state.filterBy &&
+              <p style={{whiteSpace: 'pre-wrap'}}>
+                Currently filtering <strong>By {Object.values(props.categories.categories)
+                  .find((category: Category) => {return category.id === state.filterBy}).name}</strong>
+              </p>
+              }
             </Card.Body>
           </Accordion.Collapse>
         </Card>
