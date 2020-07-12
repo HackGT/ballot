@@ -233,6 +233,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         if (project.expoNumber !== state.currentExpo) {
           return false;
         }
+
         // check that project is not currently assigned to the judge or in the judge's queue
         if (props.ballots.dJudgeQueues[randomUserID]) {
           if (project.id! === props.ballots.dJudgeQueues[randomUserID].activeProjectID
@@ -251,12 +252,14 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         return a.health - b.health;
       });
       console.log(canAssignProjects);
+
       // get lowest health value
       const lowestHealth = canAssignProjects[0].health;
       // get projects with health = lowest health value
       const sameLowestHealthProjects = canAssignProjects.filter((project: ProjectWithHealth) => {
         return project.health === lowestHealth;
       });
+
       // randomly pick project to assign from among projects with health = lowest health value
       // assign project to judge
       queueProject(sameLowestHealthProjects[Math.floor(Math.random() * sameLowestHealthProjects.length)].id!, randomUserID);
