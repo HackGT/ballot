@@ -87,7 +87,6 @@ const PageAdminProjectsManageTableGroupsModalComponent: React.FC<PageAdminProjec
       alert('Server error. Please try again.');
       window.location.reload();
     }
-
   };
 
   const getForm = () => {
