@@ -39,33 +39,45 @@ interface PageAdminUserCardProps {
 
 const PageAdminUserCardComponent: React.FC<PageAdminUserCardProps> = (props) => {
   const approve = async (event: any, user: User) => {
-    event.preventDefault();
-    props.requestStart();
-    user.role = UserRole.Judge;
-    user.isJudging = true;
-    const result = await Axios.post('/api/users/update', {
-      user: clientUserToServerUser(user),
-    });
-    if (result.status) {
-      props.updateUser(serverDataToClientUser(result.data));
-      props.requestFinish();
-    } else {
-      // TODO add error checking.
+    try {
+      event.preventDefault();
+      props.requestStart();
+      user.role = UserRole.Judge;
+      user.isJudging = true;
+      const result = await Axios.post('/api/users/update', {
+        user: clientUserToServerUser(user),
+      });
+      if (result.status) {
+        props.updateUser(serverDataToClientUser(result.data));
+        props.requestFinish();
+      } else {
+        // TODO add error checking.
+      }
+    } catch(error) {
+      // TODO improve error handling.
+      alert('Server error. Please try again.');
+      window.location.reload();
     }
   };
 
   const includeExclude = async (event: any, user: User, include: boolean) => {
-    event.preventDefault();
-    props.requestStart();
-    user.isJudging = include;
-    const result = await Axios.post('/api/users/update', {
-      user: clientUserToServerUser(user),
-    });
-    if (result.status) {
-      props.updateUser(serverDataToClientUser(result.data));
-      props.requestFinish();
-    } else {
-      // TODO add error checking.
+    try {
+      event.preventDefault();
+      props.requestStart();
+      user.isJudging = include;
+      const result = await Axios.post('/api/users/update', {
+        user: clientUserToServerUser(user),
+      });
+      if (result.status) {
+        props.updateUser(serverDataToClientUser(result.data));
+        props.requestFinish();
+      } else {
+        // TODO add error checking.
+      }
+    } catch(error) {
+      // TODO improve error handling.
+      alert('Server error. Please try again.');
+      window.location.reload();
     }
   };
 

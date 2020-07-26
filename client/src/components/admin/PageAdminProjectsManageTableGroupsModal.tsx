@@ -69,18 +69,25 @@ const PageAdminProjectsManageTableGroupsModalComponent: React.FC<PageAdminProjec
   }, [tableGroupsEffect]);
 
   const handleSaveChanges = async () => {
-    dispatch({ type: 'request-start' });
-    const result = await Axios.post('/api/tableGroups/update', {
-      tableGroups: Object.values(state.tableGroups),
-    });
-    if (result.status) {
-      const data = result.data;
-      props.fillTableGroups(data);
-      props.closeModal();
-      dispatch({ type: 'request-finish' });
-    } else {
-      // TODO add error checking.
+    try {
+      dispatch({ type: 'request-start' });
+      const result = await Axios.post('/api/tableGroups/update', {
+        tableGroups: Object.values(state.tableGroups),
+      });
+      if (result.status) {
+        const data = result.data;
+        props.fillTableGroups(data);
+        props.closeModal();
+        dispatch({ type: 'request-finish' });
+      } else {
+        // TODO add error checking.
+      }
+    } catch(error) {
+      // TODO improve error handling.
+      alert('Server error. Please try again.');
+      window.location.reload();
     }
+
   };
 
   const getForm = () => {
