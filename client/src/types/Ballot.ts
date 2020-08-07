@@ -15,6 +15,7 @@ export default interface Ballot {
   criteriaID: number;
   userID: number;
   score: number;
+  roundNumber: number;
   createdAt: number;
   updatedAt: number;
   pending?: boolean;

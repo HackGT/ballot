@@ -1,5 +1,7 @@
 import Project, { ProjectState } from '../types/Project';
 import Axios from 'axios';
+import { BallotObject } from "../types/Ballot";
+import { fillBallots } from "./Ballot";
 
 export const UPDATE_PROJECT = 'UPDATE_PROJECT';
 export const DELETE_PROJECT = 'DELETE_PROJECT';
@@ -37,6 +39,24 @@ export function fetchProjects() {
       return Promise.resolve();
     }
   };
+}
+
+export function changeProjectRound(project: Project, newRoundNumber: number) {
+  return async (dispatch: any) => {
+    try {
+      const result = await Axios.post('/api/projects/changeProjectRound', {
+        project,
+        newRoundNumber
+      });
+      if (result.status) {
+        const payload: Project = result.data;
+        dispatch(updateProject(payload));
+      }
+    } catch (error) {
+      console.log(error);
+      return Promise.resolve();
+    }
+  }
 }
 
 export default function projects(state: ProjectState = {}, action: any) {

@@ -35,6 +35,15 @@ class ProjectController {
     return this.serverToClient(updatedProject);
   }
 
+  public static async changeProjectRound(project: ProjectClient, newRoundNumber: number) {
+    const projectRepository = getRepository(Project);
+    const updatedProject: ProjectClient = {
+      ...project,
+      roundNumber: newRoundNumber
+    }
+    return await projectRepository.save(updatedProject);
+  }
+
   public static async queueProject(projectID: number, userID: number) {
     const ballotRepository = getRepository(Ballot);
     const projectRepository = getRepository(Project);
@@ -103,6 +112,7 @@ class ProjectController {
           newBallot.criteria = criterion;
           newBallot.user = user;
           newBallot.score = criterion.minScore;
+          newBallot.roundNumber = project.roundNumber;
           newBallots.push(newBallot);
         }
       }
@@ -329,14 +339,14 @@ class ProjectController {
         id,
         name,
         devpostURL,
-        expoNumber,
+        roundNumber,
         tableNumber,
         tags,
         tableGroupID,
         categoryIDs,
       } = project;
       return {
-        id, name, devpostURL, expoNumber, tableNumber, tags,
+        id, name, devpostURL, roundNumber, tableNumber, tags,
         categories: categoryIDs.map((categoryID) => CategoryController.categoryDictionary[categoryID]),
         tableGroup: TableGroupController.tableGroupDictionary[tableGroupID],
       };
@@ -349,14 +359,14 @@ class ProjectController {
         id,
         name,
         devpostURL,
-        expoNumber,
+        roundNumber,
         tableNumber,
         tags,
         tableGroup,
         categories,
       } = project;
       dict[id!] = {
-        id, name, devpostURL, expoNumber, tableNumber, tags,
+        id, name, devpostURL, roundNumber, tableNumber, tags,
         tableGroupID: tableGroup.id!,
         categoryIDs: categories ? categories.map((category) => category.id!) : [],
       };

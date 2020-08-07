@@ -44,6 +44,9 @@ export class Ballot {
   @Column()
   public score: number;
 
+  @Column()
+  public roundNumber: number;
+
   @CreateDateColumn()
   public createdAt?: number;
 
@@ -58,6 +61,7 @@ export interface BallotClient {
   criteriaID: number;
   userID: number;
   score: number;
+  roundNumber: number;
   createdAt: number;
   updatedAt: number;
 }

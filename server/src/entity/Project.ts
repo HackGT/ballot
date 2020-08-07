@@ -15,7 +15,7 @@ export class Project {
   public devpostURL: string;
 
   @Column()
-  public expoNumber: number;
+  public roundNumber: number;
 
   @Column()
   public tableNumber: number;
@@ -44,7 +44,7 @@ export interface ProjectClient {
   id?: number;
   name: string;
   devpostURL: string;
-  expoNumber: number;
+  roundNumber: number;
   tableGroupID: number;
   tableNumber: number;
   categoryIDs: number[];

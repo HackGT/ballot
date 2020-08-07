@@ -1,17 +1,26 @@
 import React, { ReactElement } from 'react';
-import { Overlay, Popover, Badge, Spinner } from 'react-bootstrap';
-import Project, { TableGroup, ProjectWithHealth } from '../../types/Project';
+import { Badge, Button, Overlay, Popover, Spinner } from 'react-bootstrap';
+import Project, { ProjectWithHealth, TableGroup } from '../../types/Project';
 import { AppState } from '../../state/Store';
 import { connect } from 'react-redux';
-import { CategoryState, CategoryCriteriaState } from '../../types/Category';
+import { CategoryCriteriaState } from '../../types/Category';
 import { BallotState } from '../../types/Ballot';
+import { changeProjectRound } from "../../state/Project";
 
 const mapStateToProps = (state: AppState) => {
-	return {
+  return {
     categories: state.categories,
     ballots: state.ballots,
-	};
+  };
 };
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    changeProjectRound: (project: Project, newRoundNumber: number) => {
+      dispatch(changeProjectRound(project, newRoundNumber));
+    }
+  }
+}
 
 interface PageAdminProjectsEpicenterProjectDotProps {
   ballots: BallotState;
@@ -25,6 +34,7 @@ interface PageAdminProjectsEpicenterProjectDotProps {
   onClick?: (event: any) => void;
   onContextMenu?: (event: any) => void;
   handleSelectedProjectChange: (projectID: string) => void;
+  changeProjectRound: (project: Project, newRoundNumber: number) => void;
 }
 
 const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsEpicenterProjectDotProps> = (props) => {
@@ -53,19 +63,23 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
       }
     }
 
+    const _changeRound = (difference: number) => {
+      props.changeProjectRound(props.project, props.project.roundNumber + difference);
+    }
+
     return (
       <Overlay
         show={props.selectedProject === props.project.id! + ' ' + props.userID}
         target={ref.current.current}>
         <Popover id={'popover' + props.project.id}>
           <strong>{props.project.name}</strong>
-          <p><a href={props.project.devpostURL} target='_blank'>{props.project.devpostURL}</a><br />
+          <p><a href={props.project.devpostURL} target='_blank'>{props.project.devpostURL}</a><br/>
             {props.project.categoryIDs.reduce((badges: ReactElement[], categoryID: number) => {
               if (props.categories.categories[categoryID]) {
                 const badgeVariant =
                   props.categories.categories[categoryID].generated
-                  ? 'secondary'
-                  : props.categories.categories[categoryID].isDefault
+                    ? 'secondary'
+                    : props.categories.categories[categoryID].isDefault
                     ? 'success' : 'primary';
                 badges.push(
                   <Badge
@@ -85,11 +99,29 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
               const scoresArray = Object.values(categoryScoreArrays[+categoryID])
               return (
                 <p style={{ margin: 0 }} key={categoryID}>
-                  {props.categories.categories[+categoryID].name} - AVG: {scoresArray.reduce((total, value) => total + value, 0) / scoresArray.length} [{scoresArray.join(', ')}]
+                  {props.categories.categories[+categoryID].name} -
+                  AVG: {scoresArray.reduce((total, value) => total + value, 0) / scoresArray.length} [{scoresArray.join(', ')}]
                 </p>
               )
             })
             : 'No Scores'}
+          <p><br/>Change Round</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => _changeRound(-1)}
+            disabled={props.project.roundNumber == 1}
+          >
+            Move Back 1
+          </Button>
+          {' '}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => _changeRound(1)}
+          >
+            Move Up 1
+          </Button>
         </Popover>
       </Overlay>
     );
@@ -121,7 +153,7 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
           MozUserSelect: 'none',
           cursor: 'pointer',
         }}
-        onClick={() => props.handleSelectedProjectChange('' + props.project.id!)} >
+        onClick={() => props.handleSelectedProjectChange('' + props.project.id!)}>
         <div style={{
           display: 'grid',
           alignItems: 'center',
@@ -129,9 +161,9 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
           width: 40,
           height: 40,
         }}>
-          {props.loading ? <Spinner animation="border" style={{ gridRow: 1, gridColumn: 1 }} /> : null}
+          {props.loading ? <Spinner animation="border" style={{ gridRow: 1, gridColumn: 1 }}/> : null}
           <strong className='dot' style={{ gridRow: 1, gridColumn: 1, lineHeight: 0.9, marginBottom: 8 }}>
-            <span style={{ fontSize: 10 }}>{props.project.expoNumber}</span><br />
+            <span style={{ fontSize: 10 }}>{props.project.roundNumber}</span><br/>
             {props.tableGroup.shortcode}{props.project.tableNumber}
           </strong>
         </div>
@@ -141,7 +173,7 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
   );
 };
 
-const PageAdminProjectsEpicenterProjectDot = connect(mapStateToProps)(PageAdminProjectsEpicenterProjectDotComponent);
+const PageAdminProjectsEpicenterProjectDot = connect(mapStateToProps, mapDispatchToProps)(PageAdminProjectsEpicenterProjectDotComponent);
 
 export default PageAdminProjectsEpicenterProjectDot;
 

@@ -138,7 +138,7 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 							<Card.Title style={{
 								color: tableGroup.color
 							}}>{project.name}</Card.Title>
-							<Card.Subtitle className="mb-2 text-muted">Expo {project.expoNumber}, Table: {tableGroup.name} {project.tableNumber}</Card.Subtitle>
+							<Card.Subtitle className="mb-2 text-muted">Table: {tableGroup.name} {project.tableNumber}</Card.Subtitle>
 							<Card.Text>
 								{categories}
 							</Card.Text>

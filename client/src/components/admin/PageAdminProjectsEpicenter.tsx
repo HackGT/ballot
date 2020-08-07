@@ -15,18 +15,18 @@ import { UserState } from '../../types/User';
 import { Button } from 'react-bootstrap';
 
 const mapStateToProps = (state: AppState) => {
-	return {
+  return {
     account: state.account,
     ballots: state.ballots,
     categories: state.categories,
     tableGroups: state.tableGroups,
     projects: state.projects,
     users: state.users,
-	};
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
-	return {
+  return {
     queueProject: (projectID: number, userID: number) => {
       dispatch(queueProject(projectID, userID));
     },
@@ -63,7 +63,7 @@ const mapDispatchToProps = (dispatch: any) => {
     requestStart: () => {
       dispatch(requestStart());
     },
-	};
+  };
 };
 
 interface PageAdminProjectsEpicenterProps {
@@ -97,7 +97,7 @@ enum SortType {
 type State = {
   selectedProject: string;
   judgeSelectedProject: string;
-  currentExpo: number;
+  currentRound: number;
   powerGoodness: number;
   powerVariance: number;
   powerSkip: number;
@@ -107,19 +107,19 @@ type State = {
 }
 
 type Action =
-  | { type: 'change-current-expo', currentExpo: number }
+  | { type: 'change-current-round', currentRound: number }
   | { type: 'change-selected-project', projectID: string }
   | { type: 'change-judge-selected-project', projectID: string }
   | { type: 'change-parameters', goodness: number, variance: number, skip: number }
   | { type: 'change-sort-by', sortBy: SortType }
   | { type: 'change-filter-by', filterBy: number | undefined }
-  | { type: 'update-projects', projects: { [projectID: number]: ProjectWithHealth }};
+  | { type: 'update-projects', projects: { [projectID: number]: ProjectWithHealth } };
 
 const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterProps> = (props) => {
-	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
-		switch (action.type) {
-      case 'change-current-expo':
-        return { ...state, currentExpo: action.currentExpo > 0 ? action.currentExpo : 1 };
+  const [state, dispatch] = React.useReducer((state: State, action: Action) => {
+    switch (action.type) {
+      case 'change-current-round':
+        return { ...state, currentRound: action.currentRound > 0 ? action.currentRound : 1 };
       case 'change-selected-project':
         return { ...state, selectedProject: action.projectID, judgeSelectedProject: '' };
       case 'change-judge-selected-project':
@@ -137,11 +137,11 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
           powerVariance: action.variance > 0 ? action.variance : 0,
           powerSkip: action.skip > 0 ? action.skip : 0,
         };
-			default:
-				return state;
-		}
-	}, {
-    currentExpo: 1,
+      default:
+        return state;
+    }
+  }, {
+    currentRound: 1,
     selectedProject: '',
     judgeSelectedProject: '',
     powerGoodness: 0.5,
@@ -211,7 +211,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         if (!props.ballots.dJudgeQueues[userID]
           || props.ballots.dJudgeQueues[userID].queuedProject === undefined
           || props.ballots.dJudgeQueues[userID].queuedProject.id === 0) {
-            judgingUsers.push(userID);
+          judgingUsers.push(userID);
         }
       }
       return judgingUsers;
@@ -220,8 +220,10 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
     if (userIDs.length > 0) {
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
       console.log(randomUserID);
+      console.log(state.projects);
+      console.log(props.ballots);
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
-        if (project.expoNumber !== state.currentExpo) {
+        if (project.roundNumber !== state.currentRound) {
           return false;
         }
 
@@ -326,7 +328,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                 return 1;
               }
 
-              const categoryScoreArrays: { [projectID: number]: {[userID: number]: number} } = {
+              const categoryScoreArrays: { [projectID: number]: { [userID: number]: number } } = {
                 [a.id!]: {},
                 [b.id!]: {},
               };
@@ -364,26 +366,26 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
           }
         })
         .reduce((output: ReactElement[], project: ProjectWithHealth) => {
-        const tableGroup = props.tableGroups[project.tableGroupID];
-        if (project.expoNumber === state.currentExpo) {
-          output.push(
-            <PageAdminProjectsEpicenterProjectDot
-              key={project.id!}
-              dimmed={false}
-              loading={false}
-              userID={0}
-              project={project}
-              tableGroup={tableGroup}
-              selectedProject={state.selectedProject + ' 0'}
-              handleSelectedProjectChange={_handleSelectedProjectChange}
-             />
-          );
-        }
-        return output;
-      }, []);
+          const tableGroup = props.tableGroups[project.tableGroupID];
+          if (project.roundNumber === state.currentRound) {
+            output.push(
+              <PageAdminProjectsEpicenterProjectDot
+                key={project.id!}
+                dimmed={false}
+                loading={false}
+                userID={0}
+                project={project}
+                tableGroup={tableGroup}
+                selectedProject={state.selectedProject + ' 0'}
+                handleSelectedProjectChange={_handleSelectedProjectChange}
+              />
+            );
+          }
+          return output;
+        }, []);
 
       if (projectCircles.length === 0) {
-        return <p>No projects in this expo.</p>;
+        return <p>No projects in this round.</p>;
       }
 
       return projectCircles;
@@ -535,7 +537,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
     }, []);
   };
 
-	return (
+  return (
     <>
       <Accordion>
         <Card>
@@ -545,10 +547,10 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
           <Accordion.Collapse eventKey='0'>
             <Card.Body>
               <h2>Sort</h2>
-              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.Location})}>By Location</Button>
-              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.AverageScore})}>By Average Score</Button>
-              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.ProjectHealth})}>By Project Health</Button>
-              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.TimesJudged})}>By Times Judged (Includes Pending/Assigned)</Button>
+              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.Location })}>By Location</Button>
+              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.AverageScore })}>By Average Score</Button>
+              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.ProjectHealth })}>By Project Health</Button>
+              <Button size='sm' onClick={() => dispatch({ type: 'change-sort-by', sortBy: SortType.TimesJudged })}>By Times Judged (Includes Pending/Assigned)</Button>
               <h2>Filter</h2>
               {Object.values(props.categories.categories).reduce((buttons: ReactElement[], category: Category) => {
                 if (!category.generated) {
@@ -569,8 +571,8 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         </Card>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey='1'>
-            Expo {state.currentExpo}
-             {/* | Goodness {state.powerGoodness} | Variance {state.powerVariance} | Skip {state.powerSkip} */}
+            Round {state.currentRound}
+            {/* | Goodness {state.powerGoodness} | Variance {state.powerVariance} | Skip {state.powerSkip} */}
           </Accordion.Toggle>
           <Accordion.Collapse eventKey='1'>
             <Card.Body>
@@ -578,11 +580,11 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                 maxWidth: 150,
                 marginRight: 10,
               }}>
-                <InputGroup.Text>Expo #</InputGroup.Text>
+                <InputGroup.Text>Round #</InputGroup.Text>
                 <FormControl
-                  onChange={(event: any) => dispatch({ type: 'change-current-expo', currentExpo: +event.target.value })}
+                  onChange={(event: any) => dispatch({ type: 'change-current-round', currentRound: +event.target.value })}
                   type='number'
-                  value={"" + state.currentExpo} />
+                  value={"" + state.currentRound} />
               </InputGroup>
               {/* <InputGroup className="mb-3" style={{
                 maxWidth: 350,
@@ -656,7 +658,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         {_getJudges()}
       </div>
     </>
-	);
+  );
 };
 
 const PageAdminProjectsEpicenter = connect(mapStateToProps, mapDispatchToProps)(PageAdminProjectsEpicenterComponent);
