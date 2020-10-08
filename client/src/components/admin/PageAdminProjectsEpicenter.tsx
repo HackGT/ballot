@@ -230,7 +230,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       // get projects that can be assigned to a judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
         // check that project is in current expo
-        if (project.expoNumber !== state.currentExpo) {
+        if (project.roundNumber !== state.currentRound) {
           return false;
         }
 
