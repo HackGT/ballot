@@ -64,23 +64,29 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
   }, [category]);
 
   const handleSaveChanges = async () => {
-    props.requestStart();
-    const result = await Axios.post('/api/categories/update', {
-      categories: [{
-        ...state.category,
-        criteria: Object.values(state.category.criteria).map((criteria: Criteria) => {
-          const { name, rubric, minScore, maxScore } = criteria;
-          return { name, rubric, minScore, maxScore };
-        }),
-      }],
-    });
-    if (result.status) {
-      const data = result.data;
-      props.updateCategory(data);
-      props.closeModal();
-      props.requestFinish();
-    } else {
-      // TODO add error checking.
+    try {
+      props.requestStart();
+      const result = await Axios.post('/api/categories/update', {
+        categories: [{
+          ...state.category,
+          criteria: Object.values(state.category.criteria).map((criteria: Criteria) => {
+            const { name, rubric, minScore, maxScore } = criteria;
+            return { name, rubric, minScore, maxScore };
+          }),
+        }],
+      });
+      if (result.status) {
+        const data = result.data;
+        props.updateCategory(data);
+        props.closeModal();
+        props.requestFinish();
+      } else {
+        // TODO add error checking.
+      }
+    } catch(error) {
+    // TODO improve error handling.
+    alert('Server error. Please try again.');
+    window.location.reload();
     }
   };
 

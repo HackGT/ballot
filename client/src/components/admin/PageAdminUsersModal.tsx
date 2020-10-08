@@ -69,17 +69,23 @@ const PageAdminUsersModalComponent: React.FC<PageAdminUsersModalProps> = (props)
   }, [user]);
 
   const _handleSaveChanges = async () => {
-    props.requestStart();
-    const result = await Axios.post('/api/users/update', {
-      user: clientUserToServerUser(state.user),
-    });
-    if (result.status) {
-      const data = result.data;
-      props.requestFinish();
-      props.closeModal();
-      props.updateUser(serverDataToClientUser(data));
-    } else {
-      // TODO add error checking.
+    try {
+      props.requestStart();
+      const result = await Axios.post('/api/users/update', {
+        user: clientUserToServerUser(state.user),
+      });
+      if (result.status) {
+        const data = result.data;
+        props.requestFinish();
+        props.closeModal();
+        props.updateUser(serverDataToClientUser(data));
+      } else {
+        // TODO add error checking.
+      }
+    } catch(error) {
+      // TODO improve error handling.
+      alert('Server error. Please try again.');
+      window.location.reload();
     }
   };
 
