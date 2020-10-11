@@ -303,7 +303,8 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		if (state.currentProject && state.currentProject.id !== 0) {
 			return (
 				<div style={{ maxWidth: 560, textAlign: 'center', margin: '0 auto' }}>
-					<h1><a href={state.currentProject!.devpostURL} style={{ color: 'black', textDecoration: 'underline' }} target='_blank'>{state.currentProject!.name}</a></h1>
+					<h1>{state.currentProject!.name}</h1>
+          <h3><a href={state.currentProject!.devpostURL} style={{ textDecoration: 'underline' }} target='_blank'>View DevPost Submission</a></h3>
 					<h6><span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}</h6>
 					{_renderBallots()}
 					<Button
@@ -355,8 +356,15 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 		// TODO loading
 	}
 
+	// TODO replace showImHere with round properties
+	let showImHere = false;
+
 	switch (state.judgingState) {
 		case JudgingState.FindProject:
+			if (!showImHere) {
+        props.startBallots(props.account.id!, state.currentProject!.id!);
+        return _renderJudgeProject();
+			}
 			return _renderFindProject();
 		case JudgingState.JudgeProject:
 			return _renderJudgeProject();
