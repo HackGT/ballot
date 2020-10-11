@@ -61,12 +61,14 @@ type State = {
   requesting: boolean;
   totalProjectsToAccountFor: number;
   totalProjectsAccountedFor: number;
+  inputNumberExpos: number;
   inputTableGroups: { [tableGroupID: number]: number };
   useSelfAssign: boolean;
 }
 
 type Action =
   | { type: 'use-self-assign', enabled: boolean }
+  | { type: 'adjust-totals', numberExpos: number }
   | { type: 'adjust-counts', tableGroups: { [tableGroupID: number]: number } }
   | { type: 'update-csv', csv: string[][], csvHeaderIndicies: { [header: string]: number } }
   | { type: 'request-start' }
@@ -78,6 +80,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     csvHeaderIndicies: {},
     totalProjectsToAccountFor: -1,
     totalProjectsAccountedFor: 0,
+    inputNumberExpos: 1,
     inputTableGroups: {},
     requesting: false,
     useSelfAssign: false,
@@ -89,6 +92,12 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         return {
           ...state,
           useSelfAssign: action.enabled,
+        };
+      case 'adjust-totals':
+        return {
+          ...state,
+          inputNumberExpos: action.numberExpos > 0 ? action.numberExpos : 1,
+          totalProjectsToAccountFor: Math.ceil(state.csv.length / action.numberExpos)
         };
       case 'adjust-counts':
         const inputTableGroups = {
@@ -259,23 +268,25 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     let csvRowNumber = 0;
 
     // Pass 2 allocate rest.
-    for (const tableGroup of tableGroups) {
-      for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
-        const finalTableGroupName = `1 ${tableGroup.name} ${tableNumber}`;
-        if (allocatedTables[finalTableGroupName] === undefined) {
-          while (allocatedRows.includes(csvRowNumber)) {
-            csvRowNumber++;
-          }
+    for (let expoNumber = 1; expoNumber <= state.inputNumberExpos; expoNumber++) {
+      for (const tableGroup of tableGroups) {
+        for (let tableNumber = 1; tableNumber <= state.inputTableGroups[tableGroup.id!]; tableNumber++) {
+          const finalTableGroupName = `${expoNumber} ${tableGroup.name} ${tableNumber}`;
+          if (allocatedTables[finalTableGroupName] === undefined) {
+            while (allocatedRows.includes(csvRowNumber)) {
+              csvRowNumber++;
+            }
 
-          let csvRow = state.csv[csvRowNumber];
-          // console.log(csvRow);
-          if (csvRow) {
-            allocatedTables[finalTableGroupName] = csvRowNumber;
-            allocatedRows.push(csvRowNumber);
-            csvRowNumber++;
+            let csvRow = state.csv[csvRowNumber];
+            // console.log(csvRow);
+            if (csvRow) {
+              allocatedTables[finalTableGroupName] = csvRowNumber;
+              allocatedRows.push(csvRowNumber);
+              csvRowNumber++;
+            }
+          } else {
+            console.log('thegame', finalTableGroupName);
           }
-        } else {
-          console.log('thegame', finalTableGroupName);
         }
       }
     }
@@ -299,6 +310,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
       projectsToSend.push({
         name: csvRow[state.csvHeaderIndicies['Submission Title']],
         devpostURL: csvRow[state.csvHeaderIndicies['Submission Url']],
+        expoNumber: parseInt(parts[0]),
         roundNumber: 1,
         tableGroupID: tableGroupNameToObject[parts[1]].id!,
         tableNumber: parseInt(parts[2]),
@@ -386,6 +398,20 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
     if (state.csv.length > 0) {
       return (
         <div>
+          <Form.Group>
+            <Form.Label>Number of Expos</Form.Label>
+            <Form.Control
+              disabled={state.requesting}
+              name='numberExpos'
+              onChange={(event: any) => {
+                dispatch({ type: 'adjust-totals', numberExpos: event.target.value})
+              }}
+              type='number'
+              value={"" + state.inputNumberExpos} />
+            <Form.Text className="text-muted">
+              How many expos will there be at this event?
+            </Form.Text>
+          </Form.Group>
           {Object.values(props.tableGroups).map((tableGroup: TableGroup) => {
             return (
               <Form.Group key={tableGroup.id}>
@@ -402,7 +428,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
                   type='number'
                   value={"" + state.inputTableGroups[tableGroup.id!]} />
                 <Form.Text className="text-muted">
-                  How many tables are available in the {tableGroup.name} group?
+                  How many tables are available in the {tableGroup.name} group in each expo?
                   </Form.Text>
               </Form.Group>
             )

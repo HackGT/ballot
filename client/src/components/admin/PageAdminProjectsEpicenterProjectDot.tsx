@@ -163,6 +163,7 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
         }}>
           {props.loading ? <Spinner animation="border" style={{ gridRow: 1, gridColumn: 1 }}/> : null}
           <strong className='dot' style={{ gridRow: 1, gridColumn: 1, lineHeight: 0.9, marginBottom: 8 }}>
+            <span style={{ fontSize: 10 }}>{props.project.expoNumber}</span><br />
             <span style={{ fontSize: 10 }}>{props.project.roundNumber}</span><br/>
             {props.tableGroup.shortcode}{props.project.tableNumber}
           </strong>

@@ -97,6 +97,7 @@ enum SortType {
 type State = {
   selectedProject: string;
   judgeSelectedProject: string;
+  currentExpo: number;
   currentRound: number;
   powerGoodness: number;
   powerVariance: number;
@@ -107,6 +108,7 @@ type State = {
 }
 
 type Action =
+  | { type: 'change-current-expo', currentExpo: number }
   | { type: 'change-current-round', currentRound: number }
   | { type: 'change-selected-project', projectID: string }
   | { type: 'change-judge-selected-project', projectID: string }
@@ -118,6 +120,8 @@ type Action =
 const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterProps> = (props) => {
   const [state, dispatch] = React.useReducer((state: State, action: Action) => {
     switch (action.type) {
+      case 'change-current-expo':
+        return { ...state, currentExpo: action.currentExpo > 0 ? action.currentExpo : 1 };
       case 'change-current-round':
         return { ...state, currentRound: action.currentRound > 0 ? action.currentRound : 1 };
       case 'change-selected-project':
@@ -141,6 +145,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         return state;
     }
   }, {
+    currentExpo: 1,
     currentRound: 1,
     selectedProject: '',
     judgeSelectedProject: '',
@@ -227,10 +232,10 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       // pick a random judge
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
       console.log(randomUserID);
-      // get projects that can be assigned to a judge
+      // get projects that can be assigned to ax judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
-        // check that project is in current expo
-        if (project.roundNumber !== state.currentRound) {
+        // check that project is in current expo & round
+        if (project.expoNumber != state.currentExpo || project.roundNumber !== state.currentRound) {
           return false;
         }
 
@@ -382,7 +387,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         })
         .reduce((output: ReactElement[], project: ProjectWithHealth) => {
           const tableGroup = props.tableGroups[project.tableGroupID];
-          if (project.roundNumber === state.currentRound) {
+          if (project.expoNumber === state.currentExpo && project.roundNumber === state.currentRound) {
             output.push(
               <PageAdminProjectsEpicenterProjectDot
                 key={project.id!}
@@ -400,7 +405,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         }, []);
 
       if (projectCircles.length === 0) {
-        return <p>No projects in this round.</p>;
+        return <p>No projects in this expo/round.</p>;
       }
 
       return projectCircles;
@@ -595,11 +600,21 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         </Card>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey='1'>
-            Round {state.currentRound}
+            Expo {state.currentExpo} | Round {state.currentRound}
             {/* | Goodness {state.powerGoodness} | Variance {state.powerVariance} | Skip {state.powerSkip} */}
           </Accordion.Toggle>
           <Accordion.Collapse eventKey='1'>
             <Card.Body>
+              <InputGroup className="mb-3" style={{
+                maxWidth: 150,
+                marginRight: 10,
+              }}>
+                <InputGroup.Text>Expo #</InputGroup.Text>
+                <FormControl
+                  onChange={(event: any) => dispatch({ type: 'change-current-expo', currentExpo: +event.target.value })}
+                  type='number'
+                  value={"" + state.currentExpo} />
+              </InputGroup>
               <InputGroup className="mb-3" style={{
                 maxWidth: 150,
                 marginRight: 10,

@@ -339,6 +339,7 @@ class ProjectController {
         id,
         name,
         devpostURL,
+        expoNumber,
         roundNumber,
         tableNumber,
         tags,
@@ -346,7 +347,7 @@ class ProjectController {
         categoryIDs,
       } = project;
       return {
-        id, name, devpostURL, roundNumber, tableNumber, tags,
+        id, name, devpostURL, expoNumber, roundNumber, tableNumber, tags,
         categories: categoryIDs.map((categoryID) => CategoryController.categoryDictionary[categoryID]),
         tableGroup: TableGroupController.tableGroupDictionary[tableGroupID],
       };
@@ -359,6 +360,7 @@ class ProjectController {
         id,
         name,
         devpostURL,
+        expoNumber,
         roundNumber,
         tableNumber,
         tags,
@@ -366,7 +368,7 @@ class ProjectController {
         categories,
       } = project;
       dict[id!] = {
-        id, name, devpostURL, roundNumber, tableNumber, tags,
+        id, name, devpostURL, expoNumber, roundNumber, tableNumber, tags,
         tableGroupID: tableGroup.id!,
         categoryIDs: categories ? categories.map((category) => category.id!) : [],
       };
