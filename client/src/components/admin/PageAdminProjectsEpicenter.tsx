@@ -232,7 +232,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       // pick a random judge
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
       console.log(randomUserID);
-      // get projects that can be assigned to ax judge
+      // get projects that can be assigned to a judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
         // check that project is in current expo & round
         if (project.expoNumber != state.currentExpo || project.roundNumber !== state.currentRound) {
