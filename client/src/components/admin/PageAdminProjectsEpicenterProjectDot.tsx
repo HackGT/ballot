@@ -73,14 +73,14 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
         target={ref.current.current}>
         <Popover id={'popover' + props.project.id}>
           <strong>{props.project.name}</strong>
-          <p><a href={props.project.devpostURL} target='_blank'>{props.project.devpostURL}</a><br/>
+          <p><a href={props.project.devpostURL} target='_blank'>{props.project.devpostURL}</a><br />
             {props.project.categoryIDs.reduce((badges: ReactElement[], categoryID: number) => {
               if (props.categories.categories[categoryID]) {
                 const badgeVariant =
                   props.categories.categories[categoryID].generated
                     ? 'secondary'
                     : props.categories.categories[categoryID].isDefault
-                    ? 'success' : 'primary';
+                      ? 'success' : 'primary';
                 badges.push(
                   <Badge
                     key={categoryID}
@@ -105,7 +105,7 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
               )
             })
             : 'No Scores'}
-          <p><br/>Change Round</p>
+          <p><br />Change Round</p>
           <Button
             variant="secondary"
             size="sm"
@@ -140,11 +140,10 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
         className='dot'
         style={{
           margin: 2,
-          width: 40,
-          height: 40,
+          width: 60,
+          height: 60,
           background: props.tableGroup.color,
           opacity: props.dimmed ? 0.5 : 1,
-          borderRadius: '50%',
           color: 'white',
           textAlign: 'center',
           lineHeight: '40px',
@@ -155,18 +154,19 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
         }}
         onClick={() => props.handleSelectedProjectChange('' + props.project.id!)}>
         <div style={{
-          display: 'grid',
+          display: 'flex',
+          flexDirection: "column",
           alignItems: 'center',
-          justifyContent: 'center',
-          width: 40,
-          height: 40,
-        }}>
-          {props.loading ? <Spinner animation="border" style={{ gridRow: 1, gridColumn: 1 }}/> : null}
-          <strong className='dot' style={{ gridRow: 1, gridColumn: 1, lineHeight: 0.9, marginBottom: 8 }}>
-            <span style={{ fontSize: 10 }}>{props.project.expoNumber}</span><br />
-            <span style={{ fontSize: 10 }}>{props.project.roundNumber}</span><br/>
-            {props.tableGroup.shortcode}{props.project.tableNumber}
-          </strong>
+          justifyContent: 'space-evenly',
+          width: 60,
+          height: 60,
+          fontWeight: "bold",
+          lineHeight: "initial"
+        }} className='dot'>
+          {props.loading ? <Spinner animation="border" style={{ gridRow: 1, gridColumn: 1 }} /> : null}
+          <span style={{ fontSize: 10 }}>E: {props.project.expoNumber}</span>
+          <span style={{ fontSize: 10 }}>R: {props.project.roundNumber}</span>
+          <span>{props.tableGroup.shortcode}{props.project.tableNumber}</span>
         </div>
       </div>
       {_getOverlay()}

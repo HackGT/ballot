@@ -11,10 +11,9 @@ const PageAdminProjectsEpicenterEmptyDot: React.FC<PageAdminProjectsEpicenterEmp
       style={{
         display: 'inline-block',
         margin: 2,
-        minWidth: 40,
-        width: 40,
-        height: 40,
-        borderRadius: '50%',
+        minWidth: 60,
+        width: 60,
+        height: 60,
         borderWidth: 2,
         lineHeight: '40px',
         userSelect: 'none',
