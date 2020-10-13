@@ -64,8 +64,8 @@ type State = {
 }
 
 type Action =
-	| { type: 'modal-close'}
-	| { type: 'modal-open', modal: ModalType};
+	| { type: 'modal-close' }
+	| { type: 'modal-open', modal: ModalType };
 
 const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => {
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
@@ -113,6 +113,8 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 
 		return (
 			<>
+				<iframe src="https://hackgt.whereby.com/test-1?embed&iframeSource=hackgt" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>
+				<iframe src="https://www.example.com/"></iframe>
 				<div style={{
 					display: 'flex',
 					justifyContent: 'center',
@@ -156,9 +158,9 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 				}}>
 					{Object.values(props.projects).length !== 0
 						&& Object.values(props.tableGroups).length !== 0
-						&& Object.values(props.categories.criteria).length !==0
-							? <PageAdminProjectsEpicenter />
-							: null}
+						&& Object.values(props.categories.criteria).length !== 0
+						? <PageAdminProjectsEpicenter />
+						: null}
 				</div>
 			</>
 		)
