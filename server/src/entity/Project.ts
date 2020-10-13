@@ -23,6 +23,9 @@ export class Project {
   @Column()
   public tableNumber: number;
 
+  @Column({ default: '' })
+  public roomUrl: string;
+
   @Column('character varying', { array: true })
   public tags: string[];
 
@@ -51,6 +54,7 @@ export interface ProjectClient {
   roundNumber: number;
   tableGroupID: number;
   tableNumber: number;
+  roomUrl: string;
   categoryIDs: number[];
   tags: string[];
 }

@@ -105,7 +105,8 @@ const PageAdminProjectsEpicenterProjectDotComponent: React.FC<PageAdminProjectsE
               )
             })
             : 'No Scores'}
-          <p><br />Change Round</p>
+          <p><br /><a href={props.project.roomUrl} target="_blank">Join Meeting Room</a></p>
+          <p>Change Round</p>
           <Button
             variant="secondary"
             size="sm"

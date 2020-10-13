@@ -6,6 +6,7 @@ export default interface Project {
   roundNumber: number;
   tableGroupID: number;
   tableNumber: number;
+  roomUrl: string;
   categoryIDs: number[];
   tags: string[];
 }
@@ -22,11 +23,11 @@ export interface TableGroup {
 }
 
 export interface ProjectState {
-  [ id: number ]: Project;
+  [id: number]: Project;
 }
 
 export interface TableGroupState {
-  [ id: number ]: TableGroup;
+  [id: number]: TableGroup;
 }
 
 export const EMPTY_PROJECT = {
@@ -37,6 +38,7 @@ export const EMPTY_PROJECT = {
   roundNumber: 0,
   tableGroupID: 0,
   tableNumber: 0,
+  roomUrl: '',
   categoryIDs: [],
   tags: [],
 }
