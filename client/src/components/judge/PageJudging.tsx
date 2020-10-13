@@ -268,7 +268,8 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 					<Card
 						key={ballot.id}
 						style={{
-							margin: '12px 0',
+							margin: '12px auto',
+							maxWidth: "560px"
 						}}>
 						<Card.Body>
 							<Card.Title>{criteria.name}</Card.Title>
@@ -302,18 +303,25 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 
 		if (state.currentProject && state.currentProject.id !== 0) {
 			return (
-				<div style={{ maxWidth: 560, textAlign: 'center', margin: '0 auto' }}>
+				<div style={{ textAlign: 'center', margin: '0 auto' }}>
 					<h1>{state.currentProject!.name}</h1>
-          <h3><a href={state.currentProject!.devpostURL} style={{ textDecoration: 'underline' }} target='_blank'>View DevPost Submission</a></h3>
+					<h3><a href={state.currentProject!.devpostURL} style={{ textDecoration: 'underline' }} target='_blank'>View DevPost Submission</a></h3>
 					<h6><span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}</h6>
+					<iframe
+						src={state.currentProject!.roomUrl + "?embed&iframeSource=hackgt&chat=on&leaveButton=on&displayName=[Judge] " + props.account.name}
+						allow="camera; microphone; fullscreen; speaker"
+						width="90%"
+						style={{ height: "75vh" }}>
+					</iframe>
+					<h6>Note: If the above video call does not work, please open it in a different tab <a href={state.currentProject!.roomUrl} target="_blank">here</a></h6>
 					{_renderBallots()}
 					<Button
 						size='lg'
 						variant='success'
 						onClick={() => _handleScoreBallots()}
-						>Submit Scores</Button>
-					{_getSkipButtons()}
-				</div>
+					>Submit Scores</Button>
+					{ _getSkipButtons()}
+				</div >
 			);
 		}
 
@@ -362,8 +370,8 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 	switch (state.judgingState) {
 		case JudgingState.FindProject:
 			if (!showImHere) {
-        props.startBallots(props.account.id!, state.currentProject!.id!);
-        return _renderJudgeProject();
+				props.startBallots(props.account.id!, state.currentProject!.id!);
+				return _renderJudgeProject();
 			}
 			return _renderFindProject();
 		case JudgingState.JudgeProject:

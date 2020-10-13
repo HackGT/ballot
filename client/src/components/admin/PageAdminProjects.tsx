@@ -113,8 +113,6 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 
 		return (
 			<>
-				<iframe src="https://hackgt.whereby.com/test-1?embed&iframeSource=hackgt" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>
-				<iframe src="https://www.example.com/"></iframe>
 				<div style={{
 					display: 'flex',
 					justifyContent: 'center',
