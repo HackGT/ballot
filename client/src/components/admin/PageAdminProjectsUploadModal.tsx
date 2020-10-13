@@ -314,6 +314,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         roundNumber: 1,
         tableGroupID: tableGroupNameToObject[parts[1]].id!,
         tableNumber: parseInt(parts[2]),
+        roomUrl: '',
         categoryIDs: devpostDesiredCategories.concat(defaultCategoryIDs),
         tags: [],
       });
@@ -404,7 +405,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
               disabled={state.requesting}
               name='numberExpos'
               onChange={(event: any) => {
-                dispatch({ type: 'adjust-totals', numberExpos: event.target.value})
+                dispatch({ type: 'adjust-totals', numberExpos: event.target.value })
               }}
               type='number'
               value={"" + state.inputNumberExpos} />
