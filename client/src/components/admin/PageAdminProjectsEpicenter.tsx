@@ -258,16 +258,18 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       });
       console.log(canAssignProjects);
 
-      // get lowest health value
-      const lowestHealth = canAssignProjects[0].health;
-      // get projects with health = lowest health value
-      const sameLowestHealthProjects = canAssignProjects.filter((project: ProjectWithHealth) => {
-        return project.health === lowestHealth;
-      });
+      if (canAssignProjects.length > 0) {
+        // get lowest health value
+        const lowestHealth = canAssignProjects[0].health;
+        // get projects with health = lowest health value
+        const sameLowestHealthProjects = canAssignProjects.filter((project: ProjectWithHealth) => {
+          return project.health === lowestHealth;
+        });
 
-      // randomly pick project to assign from among projects with health = lowest health value
-      // assign project to judge
-      queueProject(sameLowestHealthProjects[Math.floor(Math.random() * sameLowestHealthProjects.length)].id!, randomUserID);
+        // randomly pick project to assign from among projects with health = lowest health value
+        // assign project to judge
+        queueProject(sameLowestHealthProjects[Math.floor(Math.random() * sameLowestHealthProjects.length)].id!, randomUserID);
+      }
     }
   };
 

@@ -103,7 +103,8 @@ class ProjectController {
     const newBallots: Ballot[] = [];
     for (const category of project.categories) {
       // console.log(category);
-      if (!category.generated && category.company === user.company) {
+      // if (!category.generated && category.company === user.company) {
+      if (category.company === user.company) {
         const criteria = category.criteria;
         for (const criterion of criteria) {
           const newBallot = new Ballot();

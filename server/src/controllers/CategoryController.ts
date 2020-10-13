@@ -28,7 +28,7 @@ class CategoryController {
       }),
     ]);
     const result = await categoryRepository.find({
-      where: newCategories,
+      where: await newCategories.map(newCategory => ({id: newCategory.id})),
       relations: ['criteria'],
     });
     if (result) {
