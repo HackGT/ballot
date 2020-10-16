@@ -77,6 +77,14 @@ class Environment {
 
         return true;
     }
+
+    public static getSubmitURL(): string {
+        return process.env.SUBMIT_URL || 'submit.hack.gt';
+    }
+
+    public static getSubmitSecret(): string {
+        return process.env.SUBMIT_SECRET || '';
+    }
 }
 
 export default Environment;

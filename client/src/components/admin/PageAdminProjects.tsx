@@ -16,6 +16,7 @@ import { requestFinish, requestStart } from '../../state/Request';
 import { UserState } from '../../types/User';
 import { fetchBallots } from '../../state/Ballot';
 import { CategoryCriteriaState } from '../../types/Category';
+import Axios from "axios";
 
 const mapStateToProps = (state: AppState) => {
 	return {
@@ -119,6 +120,56 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
 					flexWrap: 'wrap',
 				}}>
 					<ButtonGroup>
+            <Button
+              onClick={async () => {
+                if (window.confirm('This operation will replace all existing projects and generated categories. Continue?')) {
+                  const projects = await Axios.get('/api/submit/import/true');
+                  if (projects.status) {
+                    const data = projects.data;
+                    console.log(data);
+                    alert('Projects and categories imported!');
+                    window.location.reload();
+                  } else {
+                    alert('Import error!');
+                  }
+								}
+              }}
+              size='sm'>
+              Import Projects and Categories
+            </Button>
+            <Button
+              onClick={async () => {
+                if (window.confirm('This operation will replace all existing projects. Continue?')) {
+                  const projects = await Axios.get('/api/submit/import/false');
+                  if (projects.status) {
+                    const data = projects.data;
+                    console.log(data);
+                    alert('Projects imported!');
+                    window.location.reload();
+                  } else {
+                    alert('Import error!');
+                  }
+                }
+              }}
+              size='sm'>
+              Import Projects
+            </Button>
+            <Button
+              onClick={async () => {
+                if (window.confirm('This operation will accept projects in Submit. Continue?')) {
+                  const projects = await Axios.get('/api/submit/accept');
+                  if (projects.status) {
+                    const data = projects.data;
+                    console.log(data);
+                    alert('Projects accepted!');
+                  } else {
+                    alert('Acceptance error!');
+                  }
+                }
+              }}
+              size='sm'>
+              Accept Projects to Submit
+            </Button>
 						<Button
 							onClick={() => dispatch({
 								type: 'modal-open',

@@ -11,6 +11,17 @@ class CategoryController {
     return this.convertToClientCategories(allCategories, false);
   }
 
+  public static async getDefaultCategories() {
+    const categoryRepository = getRepository(Category);
+    const allCategories = await categoryRepository.find({
+        where: {
+          isDefault: true
+        },
+      }
+    );
+    return this.convertToClientCategories(allCategories, false);
+  }
+
   public static async getAllCategoriesWithCriteria() {
     const categoryRepository = getRepository(Category);
     const allCategories = await categoryRepository.find({

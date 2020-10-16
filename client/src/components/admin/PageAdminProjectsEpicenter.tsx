@@ -13,6 +13,7 @@ import { queueProjectEmit, subscribeQueuedProject, subscribeQueueProject, queueP
 import { requestStart, requestFinish } from '../../state/Request';
 import { UserState } from '../../types/User';
 import { Button } from 'react-bootstrap';
+import Axios from "axios";
 
 const mapStateToProps = (state: AppState) => {
   return {
@@ -272,6 +273,62 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       }
     }
   };
+
+  const calculateProjectScore = (projectId: number): number => {
+    if (!props.ballots.dProjectScores[projectId!]) {
+      return 0;
+    }
+
+    const categoryScoreArrays: { [projectID: number]: { [userID: number]: number } } = {
+      [projectId!]: {}
+    };
+    const defaultCategoryID = Object.values(props.categories.categories).filter((category: Category) => {
+      return state.filterBy ? category.id! === state.filterBy : category.isDefault;
+    })[0].id;
+    const allUserBallots = Object.values(props.ballots.dProjectScores[projectId!]);
+    for (const userBallots of allUserBallots) {
+      for (const ballot of userBallots) {
+        if (ballot.status === BallotStatus.Submitted) {
+          if (props.categories.criteria[ballot.criteriaID].categoryID === defaultCategoryID) {
+            if (!categoryScoreArrays[ballot.projectID][ballot.userID]) {
+              categoryScoreArrays[ballot.projectID][ballot.userID] = 0;
+            }
+
+            categoryScoreArrays[ballot.projectID][ballot.userID] += ballot.score;
+          }
+        }
+      }
+    }
+
+    const catScoreArrays = Object.values(categoryScoreArrays[projectId!]);
+    const score = catScoreArrays.reduce((total, score) => total + score, 0) / (catScoreArrays.length > 0 ? catScoreArrays.length : 1);
+    console.log(score);
+    return score;
+  }
+
+  const moveProjectsToRound2 = async () => {
+    const projects = [];
+    for (const projectId of Object.keys(props.projects)) {
+      if (calculateProjectScore(parseInt(projectId)) >= 1) {
+        projects.push(props.projects[parseInt(projectId)]);
+      }
+    }
+    const newRoundNumber = 2;
+    try {
+      const result = await Axios.post('/api/projects/changeProjectRounds', {
+        projects,
+        newRoundNumber
+      });
+      if (result.status) {
+        alert('Projects moved to round 2!');
+        window.location.reload();
+      }
+    } catch (error) {
+      alert('Error moving projects!');
+      console.log(error);
+      return Promise.resolve();
+    }
+  }
 
   document.onkeypress = (event: any) => {
     if (event.key === ' ') {
@@ -678,6 +735,20 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
                   value={"" + state.powerSkip} />
               </InputGroup>
               <p>Twice-skipped projects have lower health. Multiplier is (# skipped) to the skipPower. 0 to disable.</p> */}
+            </Card.Body>
+          </Accordion.Collapse>
+        </Card>
+        <Card>
+          <Accordion.Toggle as={Card.Header} eventKey='2'>
+            Bulk Move Projects
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey='2'>
+            <Card.Body>
+              <Button size='sm' onClick={() => {
+                if (window.confirm('This operation will move all projects with score >=1 to round 2. Continue?')) {
+                  moveProjectsToRound2()
+                }
+              }}>Move Projects to Round 2</Button>
             </Card.Body>
           </Accordion.Collapse>
         </Card>

@@ -40,7 +40,6 @@ export default function socketMiddleware() {
 
     if (emit) {
       socket.emit(event, payload);
-      console.log(event, payload);
       return;
     }
 

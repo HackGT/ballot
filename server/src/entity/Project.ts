@@ -8,6 +8,9 @@ export class Project {
   @PrimaryGeneratedColumn()
   public id?: number;
 
+  @Column({nullable: true})
+  public submitId?: number;
+
   @Column()
   public name: string;
 

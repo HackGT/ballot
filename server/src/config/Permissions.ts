@@ -25,6 +25,8 @@ export enum Action {
 
   BatchUploadProjects = 'BatchUploadProjects',
   AddProject = 'AddProject',
+  ImportProjects = 'ImportProjects',
+  AcceptProjects = 'AcceptProjects',
   DeleteProject = 'DeleteProject',
   UpdateProject = 'UpdateProject',
   ViewProjects = 'ViewProjects',
@@ -56,6 +58,8 @@ export function can(user: User, action: Action): boolean {
       case Action.DequeueProject:
       case Action.BatchUploadProjects:
       case Action.AddProject:
+      case Action.ImportProjects:
+      case Action.AcceptProjects:
       case Action.DeleteProject:
       case Action.UpdateProject:
         return user.role === UserRole.Owner

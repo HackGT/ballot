@@ -44,6 +44,14 @@ class ProjectController {
     return await projectRepository.save(updatedProject);
   }
 
+  public static async changeProjectRounds(projects: ProjectClient[], newRoundNumber: number) {
+    const projectRepository = getRepository(Project);
+    await projects.map((project: ProjectClient) => {
+      project.roundNumber = newRoundNumber;
+    });
+    return await projectRepository.save(projects);
+  }
+
   public static async queueProject(projectID: number, userID: number) {
     const ballotRepository = getRepository(Ballot);
     const projectRepository = getRepository(Project);

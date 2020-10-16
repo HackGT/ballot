@@ -104,4 +104,16 @@ router.post('/changeProjectRound', async (req, res) => {
   return res.status(401).send('Not enough permissions to update project round');
 })
 
+router.post('/changeProjectRounds', async (req, res) => {
+  if (true) {
+    return res.status(200).json(await ProjectController.changeProjectRounds(req.body.projects, req.body.newRoundNumber).catch(error => {
+      console.log((error as Error).message);
+      res.status(500).send((error as Error).message);
+    }));
+
+  }
+
+  return res.status(401).send('Not enough permissions to update project round');
+})
+
 export default router;
