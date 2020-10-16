@@ -58,6 +58,13 @@ const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
           Users
         </Nav.Link>
       </Nav.Item>
+      <Nav.Item>
+        <Nav.Link
+          eventKey={`/dashboard`}
+          onClick={() => navTo(`${adminRoute}/dashboard`)}>
+          Dashboard
+        </Nav.Link>
+      </Nav.Item>
     </Nav>
     // <Menu pointing secondary>
     //   <Menu.Item
