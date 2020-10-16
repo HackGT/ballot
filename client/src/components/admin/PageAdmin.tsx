@@ -10,6 +10,7 @@ import AdminNavigation from './AdminNavigation';
 import PageAdminUsers from './PageAdminUsers';
 import PageAdminProjects from './PageAdminProjects';
 import PageAdminCategories from './PageAdminCategories';
+import PageAdminDashboard from "./PageAdminDashboard";
 
 export const adminRoute = '/admin';
 
@@ -60,6 +61,7 @@ const PageAdminComponent: React.FC<PageAdminProps> = (props) => {
       <Switch>
         <Route path={`${adminRoute}/users`} component={PageAdminUsers} />
         <Route path={`${adminRoute}/categories`} component={PageAdminCategories} />
+        <Route path={`${adminRoute}/dashboard`} component={PageAdminDashboard} />
         <Route exact path={`${adminRoute}`} component={PageAdminProjects} />
         <Redirect to={`${adminRoute}`} />
       </Switch>

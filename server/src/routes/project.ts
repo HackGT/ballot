@@ -116,4 +116,16 @@ router.post('/changeProjectRounds', async (req, res) => {
   return res.status(401).send('Not enough permissions to update project round');
 })
 
+router.get('/export-sponsor/:sponsor', async (req, res) => {
+  if (can(req.user, Action.BatchUploadProjects)) {
+    res.attachment("data.csv");
+    return res.status(200).send(await ProjectController.exportSponsorData(req.params.sponsor).catch(error => {
+      console.log((error as Error).message);
+      res.status(500).send((error as Error).message);
+    }));
+  }
+
+  return res.status(401).send('Not enough permissions to export csv');
+});
+
 export default router;
