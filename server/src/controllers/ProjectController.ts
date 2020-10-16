@@ -91,7 +91,12 @@ class ProjectController {
         criteriaJudgeNum[criteriaID] = 0;
       }
 
+
       for (let ballot of project.ballots) {
+        if (!ballot.criteria) {
+          continue;
+        }
+        
         if (criteriaIDs.includes(ballot.criteria.id!)) {
           criteriaScores[ballot.criteria.id!] += ballot.score;
           criteriaJudgeNum[ballot.criteria.id!] += 1;
@@ -154,7 +159,8 @@ class ProjectController {
         value: "score",
         label: "Average Score"
       }
-    ]
+    ];
+
 
     fields = fields.concat(criteriaFields).concat(scoreField);
 
