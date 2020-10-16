@@ -97,6 +97,10 @@ const PageAdminDashboardComponent: React.FC<PageAdminDashboardProps> = (props) =
 								return <h5>Category ID: {categoryID}</h5>
 							}
 
+							if (!props.ballots.dProjectScores[project.id!]) {
+								return <h5>{props.categories.categories[categoryID].name}</h5>;
+							}
+
 							const criteriaIDs: number[] = Object.values(props.categories.categories[categoryID].criteria).map((criteria) => criteria.id);
 							const criteriaNames: string[] = Object.values(props.categories.categories[categoryID].criteria).map((criteria) => criteria.name);
 
