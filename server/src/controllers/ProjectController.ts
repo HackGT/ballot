@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-
+import { Parser } from "json2csv";
 import CategoryController from './CategoryController';
 import { Project, ProjectClient, ProjectClientState } from '../entity/Project';
 import TableGroupController from './TableGroupController';
@@ -7,6 +7,7 @@ import { User } from '../entity/User';
 import { Ballot, BallotStatus, convertToClient } from '../entity/Ballot';
 import { io } from '../app';
 import { SocketStrings } from '../routes/socket';
+import { Category } from "../entity/Category";
 
 class ProjectController {
   public static async getAllProjects() {
@@ -42,6 +43,124 @@ class ProjectController {
       roundNumber: newRoundNumber
     }
     return await projectRepository.save(updatedProject);
+  }
+
+  public static async exportSponsorData(sponsor: string) {
+    const projectRepository = getRepository(Project);
+    const categoryRepository = getRepository(Category);
+
+    const sponsorCategory = await categoryRepository.findOne({
+      relations: ["criteria"],
+      where: {
+        company: sponsor
+      }
+    });
+
+    if (!sponsorCategory) {
+      return "Invalid sponsor";
+    }
+
+    const criteriaIDs = sponsorCategory.criteria.map(criteria => criteria.id!);
+
+    if (criteriaIDs.length < 1) {
+      return "No criteria";
+    }
+
+    let projects = await projectRepository.find({
+      relations: ["categories", "ballots", "ballots.criteria"]
+    });
+
+    projects = projects.filter(project => {
+      return project.categories.filter(category => category.id == sponsorCategory.id).length > 0;
+    });
+
+    let outputArray: any = [];
+
+    for (let project of projects) {
+      let output: any = {
+        id: project.id,
+        name: project.name,
+        devpost: project.devpostURL
+      }
+
+      let criteriaScores: any = {};
+      let criteriaJudgeNum: any = {};
+
+      for (let criteriaID of criteriaIDs) {
+        criteriaScores[criteriaID] = 0;
+        criteriaJudgeNum[criteriaID] = 0;
+      }
+
+      for (let ballot of project.ballots) {
+        if (criteriaIDs.includes(ballot.criteria.id!)) {
+          criteriaScores[ballot.criteria.id!] += ballot.score;
+          criteriaJudgeNum[ballot.criteria.id!] += 1;
+        }
+      }
+
+      let numJudged = criteriaJudgeNum[criteriaIDs[0]];
+
+      for (let criteriaID of criteriaIDs) {
+        if (criteriaJudgeNum[criteriaID] != numJudged) {
+          return "Invalid ballots: num judge mismatch";
+        }
+      }
+
+      let total = 0;
+
+      for (let criteriaID in criteriaScores) {
+        criteriaScores[criteriaID] /= numJudged;
+        total += criteriaScores[criteriaID];
+      }
+
+      output = {
+        ...output,
+        ...criteriaScores,
+        numJudged,
+        score: total / criteriaIDs.length
+      }
+
+      outputArray.push(output);
+    }
+
+    let fields = [
+      {
+        value: "id",
+        label: "Id"
+      },
+      {
+        value: "name",
+        label: "Name"
+      },
+      {
+        value: "devpost",
+        label: "Devpost URL"
+      },
+      {
+        value: "numJudged",
+        label: "Number of Times Judged"
+      }
+    ]
+
+    const criteriaFields = sponsorCategory.criteria.map(criteria => {
+      return {
+        value: criteria.id!.toString(),
+        label: criteria.name!
+      };
+    })
+
+    const scoreField = [
+      {
+        value: "score",
+        label: "Average Score"
+      }
+    ]
+
+    fields = fields.concat(criteriaFields).concat(scoreField);
+
+    const csvParser = new Parser({ fields });
+
+    return csvParser.parse(outputArray);
   }
 
   public static async queueProject(projectID: number, userID: number) {
