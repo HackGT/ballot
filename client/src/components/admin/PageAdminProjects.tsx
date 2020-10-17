@@ -123,7 +123,7 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
             <Button
               onClick={async () => {
                 if (window.confirm('This operation will replace all existing projects and generated categories. Continue?')) {
-                  const projects = await Axios.get('/api/submit/import/true');
+                  const projects = await Axios.get('/api/submit/import/true/false');
                   if (projects.status) {
                     const data = projects.data;
                     console.log(data);
@@ -140,7 +140,7 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
             <Button
               onClick={async () => {
                 if (window.confirm('This operation will replace all existing projects. Continue?')) {
-                  const projects = await Axios.get('/api/submit/import/false');
+                  const projects = await Axios.get('/api/submit/import/false/false');
                   if (projects.status) {
                     const data = projects.data;
                     console.log(data);
@@ -153,6 +153,23 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
               }}
               size='sm'>
               Import Projects
+            </Button>
+            <Button
+              onClick={async () => {
+                if (window.confirm('This operation will replace all existing projects and generated categories. Continue?')) {
+                  const projects = await Axios.get('/api/submit/import/true/true');
+                  if (projects.status) {
+                    const data = projects.data;
+                    console.log(data);
+                    alert('Projects and categories imported!');
+                    window.location.reload();
+                  } else {
+                    alert('Import error!');
+                  }
+                }
+              }}
+              size='sm'>
+              Import Accepted Projects and Categories
             </Button>
             <Button
               onClick={async () => {

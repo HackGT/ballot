@@ -24,8 +24,12 @@ interface ProjectFromSubmit {
 
 class SubmitController {
 
-  public static async importProjects(withCategories: String) {
-    const result = await fetch(Environment.getSubmitURL() + '/ballot/export',
+  public static async importProjects(withCategories: String, accepted: String) {
+    let exportEndpoint = '/ballot/export';
+    if (accepted === 'true') {
+      exportEndpoint = '/ballot/exportAccepted';
+    }
+    const result = await fetch(Environment.getSubmitURL() + exportEndpoint,
       {
         headers: {
           'Authorization': 'Bearer ' + Environment.getSubmitSecret()
@@ -36,7 +40,7 @@ class SubmitController {
     if (result.error) {
       throw new Error(result.error);
     }
-    
+
     const prizes = await result.categories;
     const projects = await result.projects;
 
