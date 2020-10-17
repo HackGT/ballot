@@ -14,4 +14,4 @@ env:
   TYPEORM_LOGGING: true
   TYPEORM_ENTITIES: "entity/.*ts,modules/**/entity/.*ts"
   PORT: 3000
-  SUBMIT_URL: https://submit.dev.hack.gt
+  SUBMIT_URL: https://submit.hack.gt
