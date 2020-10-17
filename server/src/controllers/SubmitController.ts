@@ -31,9 +31,12 @@ class SubmitController {
           'Authorization': 'Bearer ' + Environment.getSubmitSecret()
         }
       // @ts-ignore
-      }).then(res => res.json())
-      .catch((error: Error) => {throw new Error(error.message)});
+      }).then(res => res.json());
 
+    if (result.error) {
+      throw new Error(result.error);
+    }
+    
     const prizes = await result.categories;
     const projects = await result.projects;
 
