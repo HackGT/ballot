@@ -174,11 +174,11 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
             <Button
               onClick={async () => {
                 if (window.confirm('This operation will replace all existing projects. Continue?')) {
-                  const projects = await Axios.get('/api/submit/import/true/false');
+                  const projects = await Axios.get('/api/submit/import/false/true');
                   if (projects.status) {
                     const data = projects.data;
                     console.log(data);
-                    alert('Projects and categories imported!');
+                    alert('Projects imported!');
                     window.location.reload();
                   } else {
                     alert('Import error!');
