@@ -104,7 +104,7 @@ class ProjectController {
         if (!ballot.criteria) {
           continue;
         }
-        
+
         if (criteriaIDs.includes(ballot.criteria.id!)) {
           criteriaScores[ballot.criteria.id!] += ballot.score;
           criteriaJudgeNum[ballot.criteria.id!] += 1;
@@ -130,7 +130,7 @@ class ProjectController {
         ...output,
         ...criteriaScores,
         numJudged,
-        score: total / criteriaIDs.length
+        score: total
       }
 
       outputArray.push(output);
