@@ -81,7 +81,7 @@ class SubmitController {
           devpostURL: project.devpost,
           roundNumber: 1,
           expoNumber: (accepted === 'true') ? project.expo + 1 : 1,
-          tableNumber: 1,
+          tableNumber: project.projectId,
           tags: {},
           roomUrl: project.wherebyRoom.roomUrl,
           tableGroup: TableGroupController.tableGroupDictionary[value.id],

@@ -309,7 +309,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
   const moveProjectsToRound2 = async () => {
     const projects = [];
     for (const projectId of Object.keys(props.projects)) {
-      if (calculateProjectScore(parseInt(projectId)) >= 1) {
+      if (calculateProjectScore(parseInt(projectId)) >= 0.5) {
         projects.push(props.projects[parseInt(projectId)]);
       }
     }
@@ -745,7 +745,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
           <Accordion.Collapse eventKey='2'>
             <Card.Body>
               <Button size='sm' onClick={() => {
-                if (window.confirm('This operation will move all projects with score >=1 to round 2. Continue?')) {
+                if (window.confirm('This operation will move all projects with score >=0.5 to round 2. Continue?')) {
                   moveProjectsToRound2()
                 }
               }}>Move Projects to Round 2</Button>
