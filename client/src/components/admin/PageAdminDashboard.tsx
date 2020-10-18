@@ -132,7 +132,7 @@ const PageAdminDashboardComponent: React.FC<PageAdminDashboardProps> = (props) =
 														<tr>
 															<td>{props.users[ballots[0].userID].name}</td>
 															{scores.map(score => <td>{score}</td>)}
-															<td>{scores.reduce((a, b) => a + b)}</td>
+															<td>{scores.reduce((a, b) => a + b, 0)}</td>
 														</tr>
 													);
 												} else {
