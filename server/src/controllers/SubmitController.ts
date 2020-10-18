@@ -11,6 +11,7 @@ interface ProjectFromSubmit {
   projectId: number;
   name: string;
   devpost: string;
+  expo: number;
   prizes: String[];
   wherebyRoom: {
     startDate: string;
@@ -79,8 +80,8 @@ class SubmitController {
           name: project.name,
           devpostURL: project.devpost,
           roundNumber: 1,
-          expoNumber: (accepted === 'true') ? i % 2 + 1 : 1,
-          tableNumber: 1,
+          expoNumber: (accepted === 'true') ? project.expo + 1 : 1,
+          tableNumber: project.projectId,
           tags: {},
           roomUrl: project.wherebyRoom.roomUrl,
           tableGroup: TableGroupController.tableGroupDictionary[value.id],
@@ -100,11 +101,13 @@ class SubmitController {
       }
     });
 
-    const projectIds = await allProjects.map(project => project.submitId);
+    const projects = await allProjects.map(project => {
+      return { projectId: project.submitId, expoNumber: project.expoNumber }
+    });
     const result = await fetch(Environment.getSubmitURL() + '/ballot/accept-projects',
       {
         method: 'post',
-        body: JSON.stringify({projectIds: projectIds}),
+        body: JSON.stringify({projects: projects}),
         headers: {
           'Authorization': 'Bearer ' + Environment.getSubmitSecret(),
           'Content-Type': 'application/json'
