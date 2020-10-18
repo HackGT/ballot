@@ -173,6 +173,23 @@ const PageAdminProjectsComponent: React.FC<PageAdminProjectsProps> = (props) => 
             </Button>
             <Button
               onClick={async () => {
+                if (window.confirm('This operation will replace all existing projects. Continue?')) {
+                  const projects = await Axios.get('/api/submit/import/false/true');
+                  if (projects.status) {
+                    const data = projects.data;
+                    console.log(data);
+                    alert('Projects imported!');
+                    window.location.reload();
+                  } else {
+                    alert('Import error!');
+                  }
+                }
+              }}
+              size='sm'>
+              Import Accepted Projects
+            </Button>
+            <Button
+              onClick={async () => {
                 if (window.confirm('This operation will accept projects in Submit. Continue?')) {
                   const projects = await Axios.get('/api/submit/accept');
                   if (projects.status) {

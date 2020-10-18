@@ -80,7 +80,7 @@ class SubmitController {
           name: project.name,
           devpostURL: project.devpost,
           roundNumber: 1,
-          expoNumber: (accepted === 'true') ? project.expo + 1 : 1,
+          expoNumber: (accepted === 'true') ? project.expo : 1,
           tableNumber: project.projectId,
           tags: {},
           roomUrl: project.wherebyRoom.roomUrl,
@@ -101,8 +101,8 @@ class SubmitController {
       }
     });
 
-    const projects = await allProjects.map(project => {
-      return { projectId: project.submitId, expoNumber: project.expoNumber }
+    const projects = await allProjects.map((project, i) => {
+      return { projectId: project.submitId, expoNumber: i % 2 + 1 }
     });
     const result = await fetch(Environment.getSubmitURL() + '/ballot/accept-projects',
       {
