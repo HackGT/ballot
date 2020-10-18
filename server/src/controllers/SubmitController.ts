@@ -11,6 +11,7 @@ interface ProjectFromSubmit {
   projectId: number;
   name: string;
   devpost: string;
+  expo: number;
   prizes: String[];
   wherebyRoom: {
     startDate: string;
@@ -79,7 +80,7 @@ class SubmitController {
           name: project.name,
           devpostURL: project.devpost,
           roundNumber: 1,
-          expoNumber: (accepted === 'true') ? i % 2 + 1 : 1,
+          expoNumber: (accepted === 'true') ? project.expo + 1 : 1,
           tableNumber: 1,
           tags: {},
           roomUrl: project.wherebyRoom.roomUrl,
