@@ -100,11 +100,13 @@ class SubmitController {
       }
     });
 
-    const projectIds = await allProjects.map(project => project.submitId);
+    const projects = await allProjects.map(project => {
+      return { projectId: project.submitId, expoNumber: project.expoNumber }
+    });
     const result = await fetch(Environment.getSubmitURL() + '/ballot/accept-projects',
       {
         method: 'post',
-        body: JSON.stringify({projectIds: projectIds}),
+        body: JSON.stringify({projects: projects}),
         headers: {
           'Authorization': 'Bearer ' + Environment.getSubmitSecret(),
           'Content-Type': 'application/json'
