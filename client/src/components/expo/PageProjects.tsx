@@ -113,6 +113,9 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 				.filter((project: Project) => project.name.toLowerCase().includes(state.searchText.toLowerCase()))
 				.map((project: Project) => {
 				const categories = project.categoryIDs.filter((categoryID: number) => {
+					if (props.categories.categories[categoryID] == null) {
+						return false
+					}
 					if (props.categories.categories[categoryID].isHidden) {
 						return false
 					}
