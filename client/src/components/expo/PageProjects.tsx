@@ -112,7 +112,12 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 				.filter((project: Project) => !state.filterBy || project.categoryIDs.includes(state.filterBy))
 				.filter((project: Project) => project.name.toLowerCase().includes(state.searchText.toLowerCase()))
 				.map((project: Project) => {
-				const categories = project.categoryIDs.map((categoryID: number) => {
+				const categories = project.categoryIDs.filter((categoryID: number) => {
+					if (props.categories.categories[categoryID].isHidden) {
+						return false
+					}
+					return true
+				}).map((categoryID: number) => {
 					return (
 						<Badge
 							key={categoryID}
@@ -151,7 +156,12 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 	};
 
 	const getCategoriesRadios = () => {
-		return Object.values(props.categories.categories).map((category: Category) => {
+		return Object.values(props.categories.categories).filter((category: Category) => {
+			if (category.isHidden) {
+				return false
+			}
+			return true
+		}).map((category: Category) => {
 			return (
 				<Form.Check
 				checked={state.filterBy === category.id!}

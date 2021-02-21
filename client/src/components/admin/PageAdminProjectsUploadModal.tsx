@@ -195,6 +195,7 @@ const PageAdminProjectsUploadModalComponent: React.FC<PageAdminProjectsUploadMod
         name: categoryName,
         isDefault: false,
         generated: true,
+        isHidden: false,
         description: `Sponsor prize generated when projects were uploaded. Do not remove. - ${categoryName}`,
         company: '',
         criteria: [],
