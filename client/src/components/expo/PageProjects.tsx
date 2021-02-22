@@ -114,12 +114,12 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 				.map((project: Project) => {
 				const categories = project.categoryIDs.filter((categoryID: number) => {
 					if (props.categories.categories[categoryID] == null) {
-						return false
+						return false;
 					}
 					if (props.categories.categories[categoryID].isHidden) {
-						return false
+						return false;
 					}
-					return true
+					return true;
 				}).map((categoryID: number) => {
 					return (
 						<Badge
@@ -161,9 +161,9 @@ const PageProjectsComponent: React.FC<PageProjectsProps> = (props) => {
 	const getCategoriesRadios = () => {
 		return Object.values(props.categories.categories).filter((category: Category) => {
 			if (category.isHidden) {
-				return false
+				return false;
 			}
-			return true
+			return true;
 		}).map((category: Category) => {
 			return (
 				<Form.Check
