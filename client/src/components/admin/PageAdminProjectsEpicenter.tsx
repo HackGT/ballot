@@ -171,40 +171,55 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
 
   const calculateProjectHealth = (project: Project) => {
     let totalHealth = 0;
+
+    /* 
+    // This block checks the number of times a project has been judged for the default category
+
+    // If project has already been judged
     if (props.ballots.dProjectScores[project.id!] && Object.values(props.ballots.dProjectScores[project.id!]).length > 0) {
       const categoryScoreArrays: { [userID: number]: number } = {};
       const allUserBallots = Object.values(props.ballots.dProjectScores[project.id!]);
+      // The default prize category
       let defaultCategoryID = Object.values(props.categories.categories).filter((category: Category) => {
         return category.isDefault
       })[0].id;
       console.log('default', defaultCategoryID);
+      // Iterate over all ballots for project
       for (const userBallots of allUserBallots) {
+        // Get the ballot associated with that judgement
         for (const ballot of userBallots) {
+          // If the judge was for the default category (i.e. overall hackgt or how all judging is in healthtech)
           if (props.categories.criteria[ballot.criteriaID].categoryID === defaultCategoryID) {
+            // If the judge hasn't been put into the map
             if (!categoryScoreArrays[ballot.userID]) {
               categoryScoreArrays[ballot.userID] = 0;
             }
-
+            // Add the judge's id -> score into the map
             categoryScoreArrays[ballot.userID] += ballot.score;
           }
         }
       }
 
       console.log('calcProjectHe', categoryScoreArrays);
+      // Add the number of times the project has been judged
       totalHealth += Object.values(categoryScoreArrays).length;
     }
+    */
 
     for (const judgeQueue of Object.values(props.ballots.dJudgeQueues)) {
+      // If project is in the queue increase the health by 1
       if (judgeQueue.queuedProject && judgeQueue.queuedProject.id === project.id!) {
         totalHealth++;
       }
 
+      // If project is currently being judged increase health by 2
       if (judgeQueue.activeProjectID === project.id!) {
-        totalHealth++;
+        totalHealth += 2;
       }
 
+      // If judge already judged this project
       if (judgeQueue.otherProjectIDs.includes(project.id!)) {
-        totalHealth++;
+        totalHealth += 2;
       }
     }
 
@@ -227,12 +242,12 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       }
       return judgingUsers;
     }, []);
-    console.log(userIDs);
+    console.log("User IDS", userIDs);
     // check that there is at least one judge that we can assign the project to
     if (userIDs.length > 0) {
       // pick a random judge
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
-      console.log(randomUserID);
+      console.log("Random judge", randomUserID);
       // get projects that can be assigned to a judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
         // check that project is in current expo & round
@@ -257,7 +272,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       }).sort((a: ProjectWithHealth, b: ProjectWithHealth) => {
         return a.health - b.health;
       });
-      console.log(canAssignProjects);
+      console.log("Projects to be assigned", canAssignProjects);
 
       if (canAssignProjects.length > 0) {
         // get lowest health value
