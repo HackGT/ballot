@@ -176,6 +176,22 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
           </Form.Text>
         </Form.Group>
         <Form.Group>
+          <Form.Check
+            disabled={state.requesting}
+            onChange={(event: any) => dispatch({
+              type: 'update-category',
+              category: {
+                ...state.category,
+                isHidden: event.target.value === 'on',
+              }
+            })}
+            type="checkbox"
+            label="Hidden Category" />
+          <Form.Text className="text-muted">
+            Check this box if this is a hidden category.
+          </Form.Text>
+        </Form.Group>
+        <Form.Group>
           <Form.Label>Company</Form.Label>
           <Form.Control
             disabled={state.requesting}

@@ -75,6 +75,7 @@ const PageAdminCategoriesComponent: React.FC<PageAdminCategoriesProps> = (props)
 				<Card.Title>
 					{props.category.name}
 					<span style={{ margin: '0 5px'}}>{props.category.isDefault ? <Badge variant="primary">Default</Badge>: <></>}{props.category.generated ? <Badge variant="secondary">Generated</Badge> : <></>}</span>
+					<span>{props.category.isHidden ? <Badge variant="primary">Hidden</Badge>: <></>}</span>
 					<br /><h6>{props.category.company}</h6>
 				</Card.Title>
 				<Card.Text style={{

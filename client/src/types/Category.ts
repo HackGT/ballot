@@ -3,6 +3,7 @@ export default interface Category {
   name: string;
   isDefault: boolean;
   generated: boolean;
+  isHidden: boolean;
   description: string;
   company: string;
   criteria: CriteriaState;
@@ -44,6 +45,7 @@ export const EMPTY_CATEGORY = {
   name: '',
   isDefault: false,
   generated: false,
+  isHidden: false,
   description: '',
   company: '',
   criteria: createPlaceholderCriteria(),

@@ -54,6 +54,7 @@ class SubmitController {
             name: categoryName,
             isDefault: false,
             generated: true,
+            isHidden: false,
             description: `Sponsor prize generated when projects were imported. Do not remove. - ${categoryName}`,
             company: '',
             criteria: [],
