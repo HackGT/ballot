@@ -270,10 +270,12 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         return projectCompanyList.includes(props.users[randomUserID].company!);
         // sort projects by health
       }).sort((a: ProjectWithHealth, b: ProjectWithHealth) => {
-        return a.health - b.health;
+        // return a.health - b.health;
+        let company = props.users[randomUserID].company!
+        return calculateProjectCompanyHealth(a, company) - calculateProjectCompanyHealth(b, company)
       });
       console.log("Projects to be assigned", canAssignProjects);
-
+      
       if (canAssignProjects.length > 0) {
         // get lowest health value
         const lowestHealth = canAssignProjects[0].health;
@@ -288,6 +290,35 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       }
     }
   };
+
+  // Calculates the health of a project for a certain company
+  const calculateProjectCompanyHealth = (project: Project, company: string): number => {
+    let categoryHealth = 0;
+
+    // Iterate over all judges
+    for (const judgeID of Object.keys(props.ballots.dJudgeQueues).map(Number)) {
+      // If the judge is not of the same company
+      if (props.users[judgeID].company! !== company) {
+        continue
+      }
+      let judgeQueue = props.ballots.dJudgeQueues[judgeID];
+      // If project is in the queue increase the health by 1
+      if (judgeQueue.queuedProject && judgeQueue.queuedProject.id === project.id!) {
+        categoryHealth++;
+      }
+
+      // If project is currently being judged increase health by 2
+      if (judgeQueue.activeProjectID === project.id!) {
+        categoryHealth += 2;
+      }
+
+      // If judge already judged this project
+      if (judgeQueue.otherProjectIDs.includes(project.id!)) {
+        categoryHealth += 2;
+      }
+    }
+    return categoryHealth;
+  }
 
   const calculateProjectScore = (projectId: number): number => {
     if (!props.ballots.dProjectScores[projectId!]) {
