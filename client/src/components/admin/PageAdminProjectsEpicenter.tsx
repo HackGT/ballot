@@ -248,6 +248,7 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
       // pick a random judge
       const randomUserID = userIDs[Math.floor(Math.random() * userIDs.length)];
       console.log("Random judge", randomUserID);
+      let judgeCompany = props.users[randomUserID].company!
       // get projects that can be assigned to a judge
       const canAssignProjects = Object.values(state.projects).filter((project: Project) => {
         // check that project is in current expo & round
@@ -271,17 +272,18 @@ const PageAdminProjectsEpicenterComponent: React.FC<PageAdminProjectsEpicenterPr
         // sort projects by health
       }).sort((a: ProjectWithHealth, b: ProjectWithHealth) => {
         // return a.health - b.health;
-        let company = props.users[randomUserID].company!
-        return calculateProjectCompanyHealth(a, company) - calculateProjectCompanyHealth(b, company)
+        return calculateProjectCompanyHealth(a, judgeCompany) - calculateProjectCompanyHealth(b, judgeCompany)
       });
       console.log("Projects to be assigned", canAssignProjects);
-      
+
       if (canAssignProjects.length > 0) {
         // get lowest health value
-        const lowestHealth = canAssignProjects[0].health;
+        // const lowestHealth = canAssignProjects[0].health;
+        const lowestHealth = calculateProjectCompanyHealth(canAssignProjects[0], judgeCompany);
         // get projects with health = lowest health value
         const sameLowestHealthProjects = canAssignProjects.filter((project: ProjectWithHealth) => {
-          return project.health === lowestHealth;
+          // return project.health === lowestHealth;
+          return calculateProjectCompanyHealth(project, judgeCompany) === lowestHealth;
         });
 
         // randomly pick project to assign from among projects with health = lowest health value
