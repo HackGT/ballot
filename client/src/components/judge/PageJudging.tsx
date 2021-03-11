@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Button, Card, ButtonGroup, Form } from 'react-bootstrap';
 
@@ -96,6 +96,8 @@ type Action =
 	| { type: 'update-criteria', criteria: CriteriaState };
 
 const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
+	const [vidActive, setVidActive] = useState(false);
+
 	const [state, dispatch] = React.useReducer((state: State, action: Action) => {
 		switch (action.type) {
 			case 'update-criteria':
@@ -307,13 +309,21 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 					<h1>{state.currentProject!.name}</h1>
 					<h3><a href={state.currentProject!.devpostURL} style={{ textDecoration: 'underline' }} target='_blank'>View DevPost Submission</a></h3>
 					<h6><span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}</h6>
-					<iframe
-						src={state.currentProject!.roomUrl}
-						allow="camera; microphone; fullscreen; speaker"
-						width="90%"
-						style={{ height: "75vh" }}>
-					</iframe>
-					<h6>Note: If the above video call does not work, please open it in a different tab <a href={state.currentProject!.roomUrl} target="_blank">here</a></h6>
+					<div style={{ margin: "50px" }}>
+						{!vidActive ?
+							<Button onClick={() => setVidActive(true)}>Join Judging Call</Button> :
+							<>
+								<Button onClick={() => setVidActive(false)} style={{ marginBottom: "15px "}}>Leave Judging Call</Button>
+								<iframe
+									src={`${state.currentProject!.roomUrl}?name=[Judge]+${props.account.name!.split(" ").join("+")}`}
+									allow="camera; microphone; fullscreen; speaker"
+									width="90%"
+									style={{ height: "75vh" }}>
+								</iframe>
+								<h6>Note: If the above video call does not work, please open it in a different tab <a href={`${state.currentProject!.roomUrl}?name=[Judge]+${props.account.name!.split(" ").join("+")}`} target="_blank">here</a></h6>
+							</>
+						}
+					</div>
 					{_renderBallots()}
 					<Button
 						size='lg'
