@@ -32,6 +32,7 @@ export enum Action {
   ViewProjects = 'ViewProjects',
   QueueProject = 'QueueProject',
   DequeueProject = 'DequeueProject',
+  ChangeProjectRound = 'ChangeProjectRound',
 
   ViewBallot = 'ViewBallot',
   ScoreBallot = 'ScoreBallot',
@@ -56,6 +57,7 @@ export function can(user: User, action: Action): boolean {
       case Action.ManageTableGroups:
       case Action.QueueProject:
       case Action.DequeueProject:
+      case Action.ChangeProjectRound:
       case Action.BatchUploadProjects:
       case Action.AddProject:
       case Action.ImportProjects:

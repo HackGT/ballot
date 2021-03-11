@@ -93,7 +93,7 @@ router.post('/missing', async (req, res) => {
 });
 
 router.post('/changeProjectRound', async (req, res) => {
-  if (true) {
+  if (can(req.user, Action.ChangeProjectRound)) {
     return res.status(200).json(await ProjectController.changeProjectRound(req.body.project, req.body.newRoundNumber).catch(error => {
       console.log((error as Error).message);
       res.status(500).send((error as Error).message);
@@ -105,7 +105,7 @@ router.post('/changeProjectRound', async (req, res) => {
 })
 
 router.post('/changeProjectRounds', async (req, res) => {
-  if (true) {
+  if (can(req.user, Action.ChangeProjectRound)) {
     return res.status(200).json(await ProjectController.changeProjectRounds(req.body.projects, req.body.newRoundNumber).catch(error => {
       console.log((error as Error).message);
       res.status(500).send((error as Error).message);
