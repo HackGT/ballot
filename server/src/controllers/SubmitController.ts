@@ -13,13 +13,7 @@ interface ProjectFromSubmit {
   devpost: string;
   expo: number;
   prizes: String[];
-  wherebyRoom: {
-    startDate: string;
-    endDate: string;
-    roomUrl: string;
-    meetingId: string;
-    hostRoomUrl: string;
-  };
+  meetingUrl: string;
   _id: string;
 }
 
@@ -84,7 +78,7 @@ class SubmitController {
           expoNumber: (accepted === 'true') ? project.expo : 1,
           tableNumber: project.projectId,
           tags: {},
-          roomUrl: project.wherebyRoom.roomUrl,
+          roomUrl: project.meetingUrl,
           tableGroup: TableGroupController.tableGroupDictionary[value.id],
           categories: project.prizes.map((category: String) => this.findCategory(categories, defaultCategories, category))
 
