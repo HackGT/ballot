@@ -12,6 +12,9 @@ export class Category {
   @Column()
   public isDefault: boolean;
 
+  @Column({ default: false })
+  public isHidden: boolean;
+
   @Column()
   public isHidden: boolean;
 
