@@ -162,11 +162,12 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
         <Form.Group>
           <Form.Check
             disabled={state.requesting}
+            checked={state.category.isDefault}
             onChange={(event: any) => dispatch({
               type: 'update-category',
               category: {
                 ...state.category,
-                isDefault: event.target.value === 'on',
+                isDefault: event.target.checked,
               }
             })}
             type="checkbox"
@@ -178,11 +179,12 @@ const PageAdminCategoriesModalComponent: React.FC<PageAdminCategoriesModalProps>
         <Form.Group>
           <Form.Check
             disabled={state.requesting}
+            checked={state.category.isHidden}
             onChange={(event: any) => dispatch({
               type: 'update-category',
               category: {
                 ...state.category,
-                isHidden: event.target.value === 'on',
+                isHidden: event.target.checked,
               }
             })}
             type="checkbox"
