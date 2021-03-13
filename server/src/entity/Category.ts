@@ -16,9 +16,6 @@ export class Category {
   public isHidden: boolean;
 
   @Column()
-  public isHidden: boolean;
-
-  @Column()
   public generated: boolean;
 
   @Column('text')
