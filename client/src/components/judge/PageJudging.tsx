@@ -308,7 +308,7 @@ const PageJudgingComponent: React.FC<PageJudgingProps> = (props) => {
 					<h3><a href={state.currentProject!.devpostURL} style={{ textDecoration: 'underline' }} target='_blank'>View DevPost Submission</a></h3>
 					<h6><span style={{ color: props.tableGroups[state.currentProject!.tableGroupID].color }}>{props.tableGroups[state.currentProject!.tableGroupID].name}</span> {state.currentProject!.tableNumber}</h6>
 					<iframe
-						src={state.currentProject!.roomUrl}
+						src={state.currentProject!.roomUrl + "?name=[Judge] " + props.account.name}
 						allow="camera; microphone; fullscreen; speaker"
 						width="90%"
 						style={{ height: "75vh" }}>
